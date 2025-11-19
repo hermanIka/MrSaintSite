@@ -66,13 +66,15 @@ export function Navigation() {
               ))}
               <ThemeToggle />
               <Link href="/contact">
-                <Button
-                  data-testid="button-reserve-service"
-                  className="ml-4"
-                  size="default"
-                >
-                  Réserver un service
-                </Button>
+                <a>
+                  <Button
+                    data-testid="button-reserve-service"
+                    className="ml-4"
+                    size="default"
+                  >
+                    Réserver un service
+                  </Button>
+                </a>
               </Link>
             </div>
 
@@ -109,13 +111,15 @@ export function Navigation() {
               </Link>
             ))}
             <Link href="/contact">
-              <Button
-                data-testid="button-mobile-reserve"
-                className="w-full mt-4"
-                size="lg"
-              >
-                Réserver un service
-              </Button>
+              <a>
+                <Button
+                  data-testid="button-mobile-reserve"
+                  className="w-full mt-4"
+                  size="lg"
+                >
+                  Réserver un service
+                </Button>
+              </a>
             </Link>
           </div>
         </div>
