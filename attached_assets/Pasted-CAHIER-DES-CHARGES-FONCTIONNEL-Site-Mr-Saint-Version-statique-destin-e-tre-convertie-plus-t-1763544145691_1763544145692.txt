@@ -1,0 +1,339 @@
+CAHIER DES CHARGES FONCTIONNEL — Site “Mr Saint”
+
+(Version statique destinée à être convertie plus tard en version dynamique)
+
+1. Objectif du site
+
+Créer un site web professionnel et luxueux permettant de :
+
+Présenter clairement les services de Mr Saint
+
+Afficher son expertise et sa crédibilité
+
+Proposer des pages prêtes pour la vente : facilitation visa, formation, voyages organisés
+
+Afficher un portfolio visuel simulé
+
+Présenter un module de paiement simulé (design visible, boutons visibles, mais non actifs)
+
+Permettre plus tard de transformer cette base en site dynamique (portfolio + paiement)
+
+La version Replit doit générer :
+
+✔️ Un site statique complet
+✔️ Un design propre, moderne, premium
+✔️ Des pages prêtes à recevoir des fonctionnalités dynamiques plus tard
+
+2. Plan du site (Arborescence)
+Pages principales :
+
+Page d’accueil
+
+Page Facilitation Visa
+
+Page Accompagnement création d’agence
+
+Page Voyages organisés
+
+Page Portfolio (statique)
+
+Page Détail voyage (1 template)
+
+Page Contact
+
+Page À propos
+
+3. Fonctionnalités — version statique (design visible uniquement)
+A. En-tête (Header / Navigation)
+
+Comportement :
+
+Logo à gauche
+
+Menu à droite : Accueil, Services, Voyages, Portfolio, Contact
+
+Bouton CTA : “Réserver un service”
+
+Version mobile :
+
+Menu hamburger
+
+Menu déroulant en overlay
+
+Objectif statique :
+
+Navigation fonctionnelle entre les pages statiques
+
+B. Page d’accueil
+1. Hero Section
+
+Grand visuel premium (image sombre + filtre or/noir)
+
+Titre : “Voyager n’a jamais été aussi simple.”
+
+Sous-texte : mise en avant de l’expertise de Mr Saint
+
+Deux boutons visibles :
+
+“Facilitation Visa”
+
+“Créer mon agence”
+
+2. Section Services (aperçu)
+
+3 cartes services :
+
+Facilitation Visa
+
+Création d’agence
+
+Voyages organisés
+
+Chaque carte doit avoir :
+
+Une icône ou image
+
+Un titre
+
+Un court texte
+
+Un bouton “En savoir plus”
+
+3. Section Témoignages (statique)
+
+3 témoignages avec photo/nom (fictifs)
+
+Slider visuel (animation simple)
+
+4. Section “Pourquoi Mr Saint ?”
+
+3 à 4 arguments clés
+
+Icônes premium
+
+Mise en page en grille
+
+C. Page Facilitation Visa
+Objectif visuel :
+
+Afficher clairement :
+
+Description du service
+
+Avantages
+
+Processus en 3 à 5 étapes
+
+Liste des types de visas :
+
+Tourisme
+
+Business
+
+Études
+
+Un bouton “Commencer la demande”
+
+Un bloc “Prix” (statique)
+
+Faux bouton de paiement :
+
+“Payer maintenant (prototype)”
+
+⚠️ Ce bouton ne doit rien faire, juste afficher un design professionnel.
+
+D. Page Accompagnement création d’agence
+Contenu attendu :
+
+Titre
+
+Description motivante
+
+Modules compris dans la formation
+
+Ce que le client va apprendre
+
+Résultats obtenus par d’autres entrepreneurs
+
+Bouton visible :
+
+“Acheter la formation (prototype)”
+
+Bloc “Prix” (statique)
+
+Témoignages d’entrepreneurs (fictifs dans la version Replit)
+
+E. Page Voyages organisés
+Présentation d’une liste de voyages :
+
+3 à 6 cartes de programmes annuels, par exemple :
+
+“Business Chine – Mars 2025”
+
+“Dubaï Business Retreat”
+
+“Istanbul Import Trip”
+
+Chaque carte doit afficher :
+
+Image
+
+Titre du voyage
+
+Date
+
+Court descriptif
+
+Prix visible
+
+Bouton : “Voir le programme” → mène à une page modèle “détail voyage”.
+
+F. Page Détail d’un voyage (modèle)
+Contenu visuel :
+
+Image principale
+
+Titre + date
+
+Prix affiché
+
+Itinéraire détaillé par jour
+
+Ce qui est inclus / non inclus
+
+Bouton : “Réserver ma place (prototype)”
+
+⚠️ Bouton non fonctionnel (juste visuel).
+
+G. Portfolio (statique — design seulement)
+Objectif :
+
+Simuler un portfolio dynamique mais seulement en visuel.
+
+Contenu :
+
+Titre : “Réalisations et Entrepreneurs accompagnés”
+
+Grille de 6 projets fictifs :
+
+Image
+
+Nom du business
+
+Catégorie (agence de voyage, import-export, etc.)
+
+Comportement statique :
+
+Hover animation (zoom, ombre)
+
+Aucun clic nécessaire
+
+Pour ton développeur plus tard :
+
+Remplacer la grille statique par une liste dynamique provenant d’une base de données
+
+Ajouter une page “Ajouter un projet” (interface admin)
+
+H. Page Contact
+Contenu statique :
+
+Formulaire (ne doit pas envoyer) :
+
+Nom
+
+Email
+
+Message
+
+Boutons directs :
+
+WhatsApp
+
+Appel
+
+Adresse email visible
+
+Horaires ou disponibilité
+
+I. Pied de page (Footer)
+
+Doit contenir :
+
+Logo
+
+Liens rapides
+
+Réseaux sociaux
+
+Légal : Politique de confidentialité, Termes
+
+Copyright
+
+4. Directive Design (obligatoire pour Replit)
+
+👉 Palette premium jaune-or + noir :
+
+Jaune or : #F2C94C
+
+Noir profond : #000000
+
+Gris anthracite : #1A1A1A
+
+Blanc : #FFFFFF
+
+Or métallique (option) : #CFAF59
+
+👉 Style général :
+
+Look premium
+
+Sections avec alternance noir/blanc
+
+Boutons jaunes sur fond noir
+
+Icônes fines
+
+Spacing large (effet luxe)
+
+👉 Typographies :
+
+Titres : Poppins ou Montserrat
+
+Paragraphes : Inter
+
+5. Fonctionnalités prévues mais non actives dans Replit
+Paiement :
+
+Boutons présents
+
+Pages visibles
+
+Aucun script de transaction
+
+Portfolio dynamique :
+
+Design visible
+
+Grille statique
+
+Pas de back-office
+
+Réservation :
+
+Boutons visibles
+
+Page modèle
+
+Aucun envoi de données
+
+6. Ce que ton développeur ajoutera plus tard
+
+Connexion des paiements (Stripe, PayPal ou Flutterwave)
+
+Portfolio dynamique avec mise à jour autonome
+
+Formulaire qui envoie réellement les messages
+
+Réservation avec base de données
+
+Back-office d’ajout de voyages
