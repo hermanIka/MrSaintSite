@@ -114,7 +114,7 @@ export default function TripsPage() {
                           data-testid={`button-view-program-${trip.id}`}
                           variant="outline"
                         >
-                          Voir le programme
+                          Voyager Maintenant
                         </Button>
                       </Link>
                     </div>
