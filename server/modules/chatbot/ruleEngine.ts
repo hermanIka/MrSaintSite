@@ -251,7 +251,7 @@ Notre mission : Vous accompagner dans tous vos projets de voyage et création d'
   {
     keywords: ["merci", "super", "genial", "parfait", "excellent"],
     category: "thanks",
-    response: `Avec plaisir ! 😊
+    response: `Avec plaisir !
 
 N'hésitez pas si vous avez d'autres questions. Je suis là pour vous aider !
 
@@ -260,6 +260,37 @@ Vous pouvez aussi :
 • Réserver directement
 • Nous contacter pour une question spécifique`,
     links: ["/services", "/reservation", "/contact"]
+  },
+  {
+    keywords: ["portfolio", "realisation", "client", "accompagne", "projet", "success", "reussite", "exemple", "cas"],
+    category: "portfolio",
+    response: `Découvrez nos réalisations et clients accompagnés !
+
+Quelques succès récents :
+• Afrique Travel Express - Agence de voyage créée avec 50+ réservations le premier mois
+• Elite Visa Consulting - 100% de réussite sur 25 dossiers visa traités
+• Business Travel Pro - 8 partenariats commerciaux signés lors d'un voyage Dubaï
+
+Nos chiffres :
+• 50+ projets accompagnés
+• 95% de taux de réussite
+• 8+ années d'expérience
+
+Visitez notre portfolio pour voir tous les détails !`,
+    links: ["/portfolio"]
+  },
+  {
+    keywords: ["temoignage", "avis", "recommandation", "experience", "satisfait"],
+    category: "testimonials",
+    response: `Nos clients témoignent de leur expérience :
+
+Nos clients ont réussi :
+• Sophie Martin (Go Africa Travel) - CA de 150k€/an après formation
+• Karim Bensalem - 3 partenariats majeurs après voyage Dubaï
+• Marie Dupont - Taux de réussite visa impressionnant
+
+Consultez notre portfolio pour plus de success stories !`,
+    links: ["/portfolio", "/a-propos"]
   },
   {
     keywords: ["aide", "aider", "question", "info", "information", "renseigner"],

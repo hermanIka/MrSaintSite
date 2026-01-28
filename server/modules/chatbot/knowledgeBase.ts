@@ -158,9 +158,37 @@ export const knowledgeBase = {
     visaFacilitation: { path: "/facilitation-visa", title: "Facilitation Visa" },
     agencyCreation: { path: "/creation-agence", title: "Création d'Agence" },
     trips: { path: "/voyages", title: "Voyages" },
+    portfolio: { path: "/portfolio", title: "Portfolio" },
     faq: { path: "/faq", title: "FAQ" },
     contact: { path: "/contact", title: "Contact" },
     reservation: { path: "/reservation", title: "Réservation" }
+  },
+
+  portfolio: {
+    description: "Nos réalisations et clients accompagnés - preuve sociale concrète de nos résultats",
+    stats: {
+      projectsAccompanied: "50+",
+      successRate: "95%",
+      yearsExperience: "8+"
+    },
+    highlights: [
+      {
+        name: "Afrique Travel Express",
+        type: "Création d'Agence",
+        result: "50+ réservations le premier mois, CA de 45k€"
+      },
+      {
+        name: "Elite Visa Consulting",
+        type: "Facilitation Visa",
+        result: "100% de réussite sur 25 dossiers"
+      },
+      {
+        name: "Business Travel Pro",
+        type: "Voyage d'Affaires",
+        result: "8 partenariats commerciaux signés"
+      }
+    ],
+    link: "/portfolio"
   }
 };
 
@@ -205,10 +233,17 @@ Annulation: remboursement total jusqu'à J-30, 50% entre J-30 et J-15.
 6. Ne fournis JAMAIS d'informations financières personnelles ou sensibles
 7. Pour les questions complexes, suggère de contacter l'équipe directement
 
+## PORTFOLIO - PREUVES SOCIALES
+Notre portfolio présente ${kb.portfolio.stats.projectsAccompanied} projets accompagnés avec ${kb.portfolio.stats.successRate} de réussite.
+Exemples de succès:
+${kb.portfolio.highlights.map(h => `- ${h.name} (${h.type}): ${h.result}`).join("\n")}
+Quand un prospect doute, cite ces exemples concrets et renvoie vers /portfolio
+
 ## LIENS UTILES À MENTIONNER
 - Réservation: /reservation
 - Contact: /contact
 - Nos services: /services
+- Portfolio (réalisations): /portfolio
 - FAQ: /faq
 - Facilitation visa: /facilitation-visa
 - Création d'agence: /creation-agence
