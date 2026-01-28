@@ -25,7 +25,7 @@ export function Navigation() {
   const navLinks = [
     { href: "/", label: "Accueil" },
     { href: "/facilitation-visa", label: "Visa" },
-    { href: "/creation-agence", label: "Agence" },
+    { href: "/creation-agence", label: "Créer Agences" },
     { href: "/voyages", label: "Voyages" },
     { href: "/portfolio", label: "Portfolio" },
     { href: "/contact", label: "Contact" },
