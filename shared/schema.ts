@@ -40,12 +40,19 @@ export const insertTestimonialSchema = createInsertSchema(testimonials).omit({
 export type InsertTestimonial = z.infer<typeof insertTestimonialSchema>;
 export type Testimonial = typeof testimonials.$inferSelect;
 
-// Portfolio schema
+// Portfolio schema - enriched for dynamic content
 export const portfolio = pgTable("portfolio", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   businessName: text("business_name").notNull(),
-  category: text("category").notNull(),
+  description: text("description").notNull(),
+  serviceType: text("service_type").notNull(), // visa, agence, voyage
+  category: text("category").notNull(), // Type de client/projet
+  result: text("result").notNull(), // Résultat obtenu
+  year: text("year").notNull(), // Année/période
   imageUrl: text("image_url").notNull(),
+  clientLogo: text("client_logo"), // Logo optionnel
+  status: text("status").notNull().default("published"), // draft, published
+  createdAt: text("created_at").notNull(),
 });
 
 export const insertPortfolioSchema = createInsertSchema(portfolio).omit({
@@ -54,6 +61,13 @@ export const insertPortfolioSchema = createInsertSchema(portfolio).omit({
 
 export type InsertPortfolio = z.infer<typeof insertPortfolioSchema>;
 export type Portfolio = typeof portfolio.$inferSelect;
+
+// Service types for portfolio filtering
+export const SERVICE_TYPES = [
+  { value: "visa", label: "Facilitation Visa" },
+  { value: "agence", label: "Création d'Agence" },
+  { value: "voyage", label: "Voyage d'Affaires" },
+] as const;
 
 // Admin schema
 export const admins = pgTable("admins", {
