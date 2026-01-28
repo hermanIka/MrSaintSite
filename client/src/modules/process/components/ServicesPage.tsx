@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { FileText, Briefcase, Plane, CheckCircle, ArrowRight } from "lucide-react";
+import servicesHeroBanner from "@/assets/images/services-hero-banner.png";
 
 export default function ServicesPage() {
   const services = [
@@ -65,7 +66,14 @@ export default function ServicesPage() {
   return (
     <Layout>
       <section className="relative py-32 bg-black text-white overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent" />
+        <div className="absolute inset-0">
+          <img 
+            src={servicesHeroBanner} 
+            alt="" 
+            className="w-full h-full object-cover opacity-60"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-black/80" />
+        </div>
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1
             data-testid="text-services-title"
