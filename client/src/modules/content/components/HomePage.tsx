@@ -112,6 +112,7 @@ export default function HomePage() {
                 data-testid="button-hero-agency"
                 size="lg"
                 variant="outline"
+                className="text-white border-white hover:bg-white/10"
               >
                 Créer mon agence
               </Button>
