@@ -26,7 +26,7 @@ export function Navigation() {
     { href: "/", label: "Accueil" },
     { href: "/facilitation-visa", label: "Visa" },
     { href: "/creation-agence", label: "Créer Agences" },
-    { href: "/voyages", label: "Voyages" },
+    { href: "/voyages", label: "Nos Voyages" },
     { href: "/portfolio", label: "Portfolio" },
     { href: "/contact", label: "Contact" },
   ];
