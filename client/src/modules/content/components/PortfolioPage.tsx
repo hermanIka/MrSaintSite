@@ -13,16 +13,12 @@ import { CheckCircle, Calendar, ArrowRight } from "lucide-react";
 export default function PortfolioPage() {
   const [activeFilter, setActiveFilter] = useState<string>("all");
 
+  const queryKey = activeFilter !== "all" 
+    ? `/api/portfolio?serviceType=${activeFilter}` 
+    : "/api/portfolio";
+
   const { data: portfolioItems = [], isLoading } = useQuery<Portfolio[]>({
-    queryKey: ["/api/portfolio", activeFilter !== "all" ? activeFilter : undefined],
-    queryFn: async () => {
-      const url = activeFilter !== "all" 
-        ? `/api/portfolio?serviceType=${activeFilter}` 
-        : "/api/portfolio";
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("Erreur de chargement");
-      return res.json();
-    },
+    queryKey: [queryKey],
   });
 
   const filters = [
