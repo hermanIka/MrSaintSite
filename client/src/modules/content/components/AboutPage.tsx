@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Award, Globe, Users, Target, CheckCircle, Plane } from "lucide-react";
 import mrSaintPhoto from "@assets/Mr_saint_photo_profil_1769639553577.jfif";
+import aboutHeroBanner from "@/assets/images/about-hero-banner.png";
 
 export default function AboutPage() {
   const milestones = [
@@ -46,7 +47,14 @@ export default function AboutPage() {
   return (
     <Layout>
       <section className="relative py-32 bg-black text-white overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent" />
+        <div className="absolute inset-0">
+          <img 
+            src={aboutHeroBanner} 
+            alt="" 
+            className="w-full h-full object-cover opacity-60"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-black/80" />
+        </div>
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div data-testid="badge-since-2018" className="inline-flex items-center gap-2 bg-primary/20 text-primary px-4 py-2 rounded-full mb-6">
             <Plane className="w-4 h-4" />
