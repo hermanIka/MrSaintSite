@@ -69,7 +69,7 @@ Comment puis-je vous aider aujourd'hui ?`,
 • Canada/USA : 2-4 semaines
 • Europe Schengen : 1-2 semaines
 
-💰 Tarif : À partir de 50 000 FCFA
+💰 Tarif : À partir de 75€
 📈 Taux de réussite : 95%
 
 Souhaitez-vous réserver une consultation ?`,
@@ -118,8 +118,8 @@ Souhaitez-vous qu'on analyse votre situation ?`,
 • 6 mois de coaching après formation
 • Accès à notre réseau de partenaires
 
-💰 Tarif : À partir de 150 000 FCFA
-💼 Budget initial recommandé : 500 000 - 2 000 000 FCFA
+💰 Tarif : À partir de 230€
+💼 Budget initial recommandé : 750€ - 3 000€
 ✅ Aucun diplôme requis !
 
 Intéressé(e) par cette opportunité ?`,
@@ -132,7 +132,7 @@ Intéressé(e) par cette opportunité ?`,
 
 Ce qu'il faut :
 • Motivation et engagement
-• Budget initial (500 000 - 2 000 000 FCFA)
+• Budget initial (750€ - 3 000€)
 • Suivre notre formation (fortement recommandée)
 
 Notre formation vous donne toutes les compétences nécessaires pour réussir dans ce métier.
@@ -145,11 +145,11 @@ Voulez-vous en savoir plus sur la formation ?`,
     category: "pricing",
     response: `Voici nos tarifs :
 
-🛂 Facilitation Visa : À partir de 50 000 FCFA
-📚 Création d'Agence : À partir de 150 000 FCFA
-✈️ Voyages Organisés : À partir de 500 000 FCFA
+🛂 Facilitation Visa : À partir de 75€
+📚 Création d'Agence : À partir de 230€
+✈️ Voyages Organisés : À partir de 750€
 
-Pour la création d'agence, prévoyez un budget initial de 500 000 à 2 000 000 FCFA (formation + équipement + fonds de roulement).
+Pour la création d'agence, prévoyez un budget initial de 750€ à 3 000€ (formation + équipement + fonds de roulement).
 
 Quel service vous intéresse ?`,
     links: ["/services", "/reservation"]
@@ -168,7 +168,7 @@ Quel service vous intéresse ?`,
 • Excursions sélectionnées
 • Networking avec entrepreneurs locaux
 
-💰 Tarif : À partir de 500 000 FCFA
+💰 Tarif : À partir de 750€
 
 Nous proposons aussi des voyages sur mesure pour les groupes !`,
     links: ["/voyages", "/reservation"]

@@ -22,7 +22,7 @@ export default function ServicesPage() {
       ],
       destinations: ["Dubaï", "Canada", "États-Unis", "Europe", "Chine"],
       link: "/facilitation-visa",
-      price: "À partir de 50 000 FCFA",
+      price: "À partir de 75€",
     },
     {
       id: "agence",
@@ -40,7 +40,7 @@ export default function ServicesPage() {
       ],
       benefits: ["Indépendance financière", "Flexibilité horaire", "Marché en croissance"],
       link: "/creation-agence",
-      price: "Programme complet : 500 000 FCFA",
+      price: "Programme complet : 750€",
     },
     {
       id: "voyages",
@@ -58,7 +58,7 @@ export default function ServicesPage() {
       ],
       destinations: ["Dubaï", "Istanbul", "Canton", "Bangkok", "Marrakech"],
       link: "/voyages",
-      price: "À partir de 800 000 FCFA",
+      price: "À partir de 1 200€",
     },
   ];
 

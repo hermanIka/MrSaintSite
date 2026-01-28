@@ -53,7 +53,7 @@ export default function FAQPage() {
       category: "agence",
       question: "Quel budget faut-il pour lancer son agence ?",
       answer:
-        "Le budget initial varie entre 500 000 et 2 000 000 FCFA selon l'envergure de votre projet. Cela inclut la formation, les frais administratifs, l'équipement de base et un fonds de roulement. Notre programme inclut un accompagnement pour optimiser vos investissements.",
+        "Le budget initial varie entre 750€ et 3 000€ selon l'envergure de votre projet. Cela inclut la formation, les frais administratifs, l'équipement de base et un fonds de roulement. Notre programme inclut un accompagnement pour optimiser vos investissements.",
     },
     {
       category: "agence",

@@ -25,7 +25,7 @@ export const knowledgeBase = {
       title: "Facilitation Visa",
       subtitle: "Votre visa sans stress",
       description: "Accompagnement complet pour toutes vos démarches de visa. Nous analysons votre dossier, préparons vos documents et suivons votre demande jusqu'à l'obtention.",
-      price: "À partir de 50 000 FCFA",
+      price: "À partir de 75€",
       features: [
         "Analyse personnalisée du dossier",
         "Préparation complète des documents",
@@ -47,7 +47,7 @@ export const knowledgeBase = {
       title: "Création d'Agence",
       subtitle: "Devenez entrepreneur du voyage",
       description: "Formation complète et coaching personnalisé pour lancer votre propre agence de voyage. Du business plan à vos premiers clients.",
-      price: "À partir de 150 000 FCFA",
+      price: "À partir de 230€",
       features: [
         "Formation complète de 4 semaines",
         "Business plan personnalisé",
@@ -57,7 +57,7 @@ export const knowledgeBase = {
       ],
       benefits: ["Indépendance", "Revenus illimités", "Flexibilité", "Passion"],
       requirements: "Aucun diplôme requis, motivation et engagement nécessaires",
-      budget: "Entre 500 000 et 2 000 000 FCFA pour démarrer",
+      budget: "Entre 750€ et 3 000€ pour démarrer",
       link: "/creation-agence"
     },
     voyage: {
@@ -65,7 +65,7 @@ export const knowledgeBase = {
       title: "Voyages Organisés",
       subtitle: "Voyages d'affaires premium",
       description: "Voyages d'affaires haut de gamme pour entrepreneurs et professionnels. Networking, découverte et opportunités business.",
-      price: "À partir de 500 000 FCFA",
+      price: "À partir de 750€",
       features: [
         "Vols aller-retour inclus",
         "Hôtels 4-5 étoiles",
@@ -114,7 +114,7 @@ export const knowledgeBase = {
     {
       category: "agence",
       question: "Quel budget faut-il pour lancer son agence ?",
-      answer: "Le budget initial varie entre 500 000 et 2 000 000 FCFA selon l'envergure du projet. Cela inclut formation, frais administratifs, équipement et fonds de roulement."
+      answer: "Le budget initial varie entre 750€ et 3 000€ selon l'envergure du projet. Cela inclut formation, frais administratifs, équipement et fonds de roulement."
     },
     {
       category: "agence",

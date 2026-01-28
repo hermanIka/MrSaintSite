@@ -19,7 +19,7 @@ export default function ReservationPage() {
       icon: FileText,
       title: "Facilitation Visa",
       description: "Demande de visa pour votre destination",
-      price: "À partir de 50 000 FCFA",
+      price: "À partir de 75€",
       features: ["Analyse du dossier", "Constitution des documents", "Suivi de la demande"],
     },
     {
@@ -27,7 +27,7 @@ export default function ReservationPage() {
       icon: Briefcase,
       title: "Création d'Agence",
       description: "Formation et accompagnement complet",
-      price: "500 000 FCFA",
+      price: "750€",
       features: ["Formation 4 semaines", "Coaching 6 mois", "Accès au réseau"],
     },
     {
@@ -35,7 +35,7 @@ export default function ReservationPage() {
       icon: Plane,
       title: "Voyage Organisé",
       description: "Voyage business clé en main",
-      price: "À partir de 800 000 FCFA",
+      price: "À partir de 1 200€",
       features: ["Vol + Hébergement", "Transferts inclus", "Guide francophone"],
     },
   ];
