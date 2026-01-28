@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { MessageCircle, X, Send, Bot, User, Loader2 } from "lucide-react";
@@ -123,7 +124,7 @@ export default function ChatWidget() {
       setMessages([
         {
           role: "assistant",
-          content: "Bonjour ! Je suis l'assistant virtuel de Mr Saint. Comment puis-je vous aider aujourd'hui ? 🌍\n\nJe peux vous renseigner sur :\n• La facilitation de visa\n• La création d'agence de voyage\n• Nos voyages organisés",
+          content: "Bonjour ! Je suis l'assistant virtuel de Mr Saint. Comment puis-je vous aider aujourd'hui ?\n\nJe peux vous renseigner sur :\n• La facilitation de visa\n• La création d'agence de voyage\n• Nos voyages organisés",
           timestamp: new Date()
         }
       ]);
@@ -155,8 +156,8 @@ export default function ChatWidget() {
           data-testid="card-chat-widget"
           className="fixed bottom-20 right-4 sm:right-6 w-[calc(100vw-2rem)] sm:w-96 max-h-[70vh] z-50 shadow-2xl border-primary/20 flex flex-col"
         >
-          <CardHeader className="bg-primary text-primary-foreground rounded-t-lg p-4 flex flex-row items-center justify-between space-y-0">
-            <div className="flex items-center gap-3">
+          <CardHeader className="bg-primary text-primary-foreground rounded-t-lg p-4 flex flex-row flex-wrap items-center justify-between gap-3 space-y-0">
+            <div className="flex flex-wrap items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
                 <Bot className="w-5 h-5" />
               </div>
@@ -172,7 +173,7 @@ export default function ChatWidget() {
               variant="ghost"
               size="icon"
               onClick={() => setIsOpen(false)}
-              className="text-white hover:bg-white/20"
+              className="text-white"
             >
               <X className="w-5 h-5" />
             </Button>
@@ -183,7 +184,7 @@ export default function ChatWidget() {
               <div
                 key={index}
                 data-testid={`message-${msg.role}-${index}`}
-                className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                className={`flex flex-wrap gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 {msg.role === "assistant" && (
                   <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
@@ -207,7 +208,7 @@ export default function ChatWidget() {
               </div>
             ))}
             {isLoading && (
-              <div className="flex gap-3 justify-start">
+              <div className="flex flex-wrap gap-3 justify-start">
                 <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                   <Bot className="w-4 h-4 text-primary" />
                 </div>
@@ -220,7 +221,7 @@ export default function ChatWidget() {
           </CardContent>
 
           <div className="p-4 border-t bg-background">
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Input
                 ref={inputRef}
                 data-testid="input-chat-message"
@@ -245,18 +246,28 @@ export default function ChatWidget() {
         </Card>
       )}
 
-      <Button
-        data-testid="button-toggle-chat"
-        onClick={toggleChat}
-        size="icon"
-        className="fixed bottom-4 right-4 sm:right-6 w-14 h-14 rounded-full shadow-lg z-50"
-      >
-        {isOpen ? (
-          <X className="w-6 h-6" />
-        ) : (
-          <MessageCircle className="w-6 h-6" />
+      <div className="fixed bottom-4 right-4 sm:right-6 z-50 flex flex-wrap items-center gap-3">
+        {!isOpen && (
+          <Badge 
+            data-testid="label-chat-prompt"
+            className="shadow-lg"
+          >
+            Posez-moi vos questions
+          </Badge>
         )}
-      </Button>
+        <Button
+          data-testid="button-toggle-chat"
+          onClick={toggleChat}
+          size="icon"
+          className="rounded-full shadow-lg"
+        >
+          {isOpen ? (
+            <X className="w-6 h-6" />
+          ) : (
+            <MessageCircle className="w-6 h-6" />
+          )}
+        </Button>
+      </div>
     </>
   );
 }
