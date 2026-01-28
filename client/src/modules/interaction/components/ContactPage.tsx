@@ -7,8 +7,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Phone, Mail, MapPin, Clock } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, Calendar } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
+import { Link } from "wouter";
 
 const contactFormSchema = z.object({
   name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
@@ -168,41 +169,45 @@ export default function ContactPage() {
                     Contact direct
                   </h3>
                   <div className="space-y-6">
-                    <a
-                      href="https://wa.me/33666013866"
-                      data-testid="link-whatsapp"
-                      className="flex items-center gap-4 hover-elevate active-elevate-2 p-4 rounded-lg transition-all"
-                    >
-                      <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-                        <SiWhatsapp className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <div className="font-medium text-foreground">
-                          WhatsApp
+                    <Link href="/reservation">
+                      <div
+                        data-testid="link-whatsapp"
+                        className="flex items-center gap-4 hover-elevate active-elevate-2 p-4 rounded-lg transition-all cursor-pointer"
+                      >
+                        <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                          <SiWhatsapp className="w-6 h-6 text-white" />
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                          Message instantané
+                        <div>
+                          <div className="font-medium text-foreground">
+                            WhatsApp
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            Réserver d'abord
+                          </div>
                         </div>
+                        <Calendar className="w-5 h-5 text-primary ml-auto" />
                       </div>
-                    </a>
+                    </Link>
 
-                    <a
-                      href="tel:+33666013866"
-                      data-testid="link-phone"
-                      className="flex items-center gap-4 hover-elevate active-elevate-2 p-4 rounded-lg transition-all"
-                    >
-                      <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-                        <Phone className="w-6 h-6 text-primary-foreground" />
-                      </div>
-                      <div>
-                        <div className="font-medium text-foreground">
-                          Téléphone
+                    <Link href="/reservation">
+                      <div
+                        data-testid="link-phone"
+                        className="flex items-center gap-4 hover-elevate active-elevate-2 p-4 rounded-lg transition-all cursor-pointer"
+                      >
+                        <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                          <Phone className="w-6 h-6 text-primary-foreground" />
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                          +33 6 66 01 38 66
+                        <div>
+                          <div className="font-medium text-foreground">
+                            Téléphone
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            Réserver d'abord
+                          </div>
                         </div>
+                        <Calendar className="w-5 h-5 text-primary ml-auto" />
                       </div>
-                    </a>
+                    </Link>
 
                     <a
                       href="mailto:matandusaint@gmail.com"
