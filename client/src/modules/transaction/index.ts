@@ -16,6 +16,7 @@
  */
 
 export { default as ReservationPage } from "./components/ReservationPage";
+export { default as CalendarBooking } from "./components/CalendarBooking";
 
 export const TRANSACTION_STATUS = {
   ready: false,

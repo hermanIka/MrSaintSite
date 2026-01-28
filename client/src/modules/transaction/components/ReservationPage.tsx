@@ -3,12 +3,15 @@ import { Layout } from "@/modules/foundation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { FileText, Briefcase, Plane, CheckCircle, Calendar, CreditCard, Lock } from "lucide-react";
+import { FileText, Briefcase, Plane, CheckCircle, Calendar, CreditCard, Lock, ArrowLeft } from "lucide-react";
+import CalendarBooking from "./CalendarBooking";
 
 type ServiceType = "visa" | "agence" | "voyage" | null;
+type Step = "select" | "calendar";
 
 export default function ReservationPage() {
   const [selectedService, setSelectedService] = useState<ServiceType>(null);
+  const [currentStep, setCurrentStep] = useState<Step>("select");
 
   const services = [
     {
@@ -164,12 +167,12 @@ export default function ReservationPage() {
             })}
           </div>
 
-          {selectedService && (
+          {selectedService && currentStep === "select" && (
             <Card className="border-primary/20 bg-white">
               <CardContent className="p-8">
                 <div className="text-center mb-8">
                   <h3 data-testid="text-payment-title" className="text-2xl font-heading font-bold text-foreground mb-2">
-                    Prochaine étape : Paiement
+                    Prochaine étape : Réserver un créneau
                   </h3>
                   <p className="text-muted-foreground">
                     Vous avez sélectionné :{" "}
@@ -181,22 +184,22 @@ export default function ReservationPage() {
 
                 <div className="bg-muted/50 rounded-lg p-6 mb-8">
                   <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                    <Lock className="w-5 h-5 text-primary" />
-                    <span data-testid="text-security-notice">
-                      Paiement sécurisé via Stripe. Vos informations bancaires sont protégées.
+                    <Calendar className="w-5 h-5 text-primary" />
+                    <span data-testid="text-calendar-notice">
+                      Choisissez un créneau disponible pour votre consultation avec Mr Saint.
                     </span>
                   </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center flex-wrap">
                   <Button
-                    data-testid="button-proceed-payment"
+                    data-testid="button-choose-slot"
                     size="lg"
                     className="gap-2"
-                    disabled
+                    onClick={() => setCurrentStep("calendar")}
                   >
-                    <CreditCard className="w-5 h-5" />
-                    Procéder au paiement
+                    <Calendar className="w-5 h-5" />
+                    Choisir un créneau
                   </Button>
                   <Link href="/contact">
                     <Button
@@ -208,13 +211,30 @@ export default function ReservationPage() {
                     </Button>
                   </Link>
                 </div>
-
-                <p data-testid="text-payment-notice" className="text-center text-sm text-muted-foreground mt-6">
-                  Le système de paiement sera bientôt disponible. 
-                  En attendant, contactez-nous pour finaliser votre réservation.
-                </p>
               </CardContent>
             </Card>
+          )}
+
+          {selectedService && currentStep === "calendar" && (
+            <div className="space-y-6">
+              <Button
+                variant="ghost"
+                onClick={() => setCurrentStep("select")}
+                className="gap-2"
+                data-testid="button-back-to-services"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Retour aux services
+              </Button>
+              
+              <CalendarBooking
+                serviceType={selectedService}
+                serviceName={services.find((s) => s.id === selectedService)?.title || ""}
+                onSlotSelected={(date, time) => {
+                  console.log("Slot selected:", date, time);
+                }}
+              />
+            </div>
           )}
         </div>
       </section>
