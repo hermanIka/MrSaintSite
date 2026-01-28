@@ -164,7 +164,7 @@ export default function Home() {
                         variant="outline"
                         className="w-full"
                       >
-                        En savoir plus
+                        Commencer Maintenant
                       </Button>
                     </Link>
                   </CardContent>
