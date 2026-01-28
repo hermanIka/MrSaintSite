@@ -159,15 +159,19 @@ npm run db:push  # Synchronisation schema DB
 
 ## Notes de Développement
 
-### Dernière Mise à Jour (Module 3 - Chatbot Hybride)
-- Ajout du ChatWidget flottant intégré au Layout
-- Système de chatbot hybride :
-  - **Mode Règles** (par défaut) : Fonctionne sans API externe, utilise le matching de mots-clés avec la FAQ
-  - **Mode IA** : Activé automatiquement quand OPENAI_API_KEY est configurée
-- Moteur de règles avec 15+ catégories de réponses prédéfinies
-- Base de connaissances complète sur les services Mr Saint
+### Dernière Mise à Jour (Module 4 - Calendrier de Réservation)
+- Composant CalendarBooking avec sélection de date et créneau horaire
+- Gestion des créneaux disponibles/réservés
+- Fuseau horaire affiché (Paris GMT+1)
+- Flow complet : sélection service → calendrier → créneau → confirmation
+- Préparé pour intégration Calendly API (créneaux actuellement mockés)
+- Intégration paiement Stripe prévue (20€ avant accès calendrier)
+
+### Module 3 (Chatbot Hybride - Complété)
+- ChatWidget flottant intégré au Layout
+- Système de chatbot hybride (Mode Règles par défaut, Mode IA avec clé API)
+- 15+ catégories de réponses prédéfinies
 - Fallback automatique vers le mode règles en cas d'erreur IA
-- Indicateur de mode visible dans l'en-tête du chat (FAQ / IA)
 
 ### Module 1 (Complété)
 - Ajout de AboutPage (À propos)
