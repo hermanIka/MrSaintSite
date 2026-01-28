@@ -199,7 +199,16 @@ npm run db:push  # Synchronisation schema DB
 
 ## Notes de Développement
 
-### Dernière Mise à Jour (Module 6 - Admin & Supervision)
+### Dernière Mise à Jour (Module Portfolio Dynamique - Janvier 2026)
+- Portfolio enrichi avec champs : description, serviceType, result, year, status, clientLogo
+- Filtrage dynamique par type de service (visa, agence, voyage)
+- Système de statut draft/published - seuls les projets publiés sont visibles au public
+- Page admin avec CRUD complet et toggle de publication
+- Intégration chatbot avec exemples concrets de succès
+- 6 projets seed réalistes avec résultats mesurables
+- Statistiques affichées : 50+ projets, 95% réussite, 8+ ans d'expérience
+
+### Module 6 (Admin & Supervision)
 - Système d'authentification par token avec session active
 - Dashboard administrateur avec statistiques (voyages, témoignages, portfolio, FAQ)
 - Gestion CRUD complète pour voyages, témoignages, portfolio et FAQ
@@ -207,6 +216,7 @@ npm run db:push  # Synchronisation schema DB
 - Toutes les routes admin protégées par middleware d'authentification
 - Identifiants par défaut : admin / admin123
 - Navigation responsive avec sidebar et menu mobile
+- Convention admin : local state pour formulaires, custom queryFn avec auth headers
 
 ### Module 4 (Calendrier de Réservation)
 - Composant CalendarBooking avec sélection de date et créneau horaire
