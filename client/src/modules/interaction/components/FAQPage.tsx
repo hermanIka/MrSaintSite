@@ -120,7 +120,7 @@ export default function FAQPage() {
         </div>
       </section>
 
-      <section className="py-12 bg-white border-b">
+      <section className="py-12 bg-background border-b">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="relative mb-8">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />

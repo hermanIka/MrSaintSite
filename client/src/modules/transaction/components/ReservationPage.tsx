@@ -85,7 +85,7 @@ export default function ReservationPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white border-b">
+      <section className="py-16 bg-background border-b">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {steps.map((step) => {
@@ -168,7 +168,7 @@ export default function ReservationPage() {
           </div>
 
           {selectedService && currentStep === "select" && (
-            <Card className="border-primary/20 bg-white">
+            <Card className="border-primary/20 bg-card">
               <CardContent className="p-8">
                 <div className="text-center mb-8">
                   <h3 data-testid="text-payment-title" className="text-2xl font-heading font-bold text-foreground mb-2">
@@ -239,7 +239,7 @@ export default function ReservationPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div data-testid="feature-secure-payment">

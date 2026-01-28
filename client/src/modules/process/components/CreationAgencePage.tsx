@@ -76,7 +76,7 @@ export default function CreationAgencePage() {
         </div>
       </section>
 
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="prose max-w-none">
             <h2 className="text-3xl font-heading font-bold text-foreground mb-6">
@@ -135,7 +135,7 @@ export default function CreationAgencePage() {
         </div>
       </section>
 
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-4">
@@ -189,7 +189,7 @@ export default function CreationAgencePage() {
         </div>
       </section>
 
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-background">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <Card className="border-primary/20">
             <CardContent className="p-12">
