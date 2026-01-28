@@ -42,9 +42,17 @@ export function registerContentRoutes(app: Express): void {
     }
   });
 
-  app.get("/api/portfolio", async (_req, res) => {
+  app.get("/api/portfolio", async (req, res) => {
     try {
-      const portfolio = await contentStorage.getAllPortfolio();
+      const { serviceType } = req.query;
+      let portfolio;
+      
+      if (serviceType && typeof serviceType === "string") {
+        portfolio = await contentStorage.getPortfolioByServiceType(serviceType);
+      } else {
+        portfolio = await contentStorage.getPublishedPortfolio();
+      }
+      
       res.json(portfolio);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch portfolio" });

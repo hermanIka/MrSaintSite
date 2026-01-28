@@ -31,6 +31,8 @@ export interface IContentStorage {
   deleteTestimonial(id: string): Promise<boolean>;
 
   getAllPortfolio(): Promise<Portfolio[]>;
+  getPublishedPortfolio(): Promise<Portfolio[]>;
+  getPortfolioByServiceType(serviceType: string): Promise<Portfolio[]>;
   getPortfolioById(id: string): Promise<Portfolio | undefined>;
   createPortfolio(portfolio: InsertPortfolio): Promise<Portfolio>;
   updatePortfolio(id: string, portfolio: Partial<InsertPortfolio>): Promise<Portfolio | undefined>;
@@ -194,39 +196,87 @@ export class ContentMemStorage implements IContentStorage {
     const portfolioData: InsertPortfolio[] = [
       {
         businessName: "Afrique Travel Express",
+        description: "Accompagnement complet pour la création d'une agence de voyage spécialisée dans les destinations africaines. Formation sur les réservations, partenariats hôteliers et marketing digital.",
+        serviceType: "agence",
         category: "Agence de voyage",
+        result: "Lancement réussi avec 50+ réservations le premier mois et CA de 45k€",
+        year: "2024",
         imageUrl: "https://api.dicebear.com/7.x/shapes/svg?seed=business1",
+        clientLogo: null,
+        status: "published",
+        createdAt: new Date().toISOString(),
       },
       {
         businessName: "Elite Visa Consulting",
+        description: "Facilitation de visa business pour 25 entrepreneurs souhaitant se rendre en Chine. Dossiers complexes avec justificatifs d'affaires et invitations professionnelles.",
+        serviceType: "visa",
         category: "Facilitation visa",
+        result: "100% de taux de réussite sur les 25 dossiers traités",
+        year: "2024",
         imageUrl: "https://api.dicebear.com/7.x/shapes/svg?seed=business2",
+        clientLogo: null,
+        status: "published",
+        createdAt: new Date().toISOString(),
       },
       {
         businessName: "Golden Tours International",
+        description: "Création d'une agence de voyages organisés haut de gamme. Coaching personnalisé sur le positionnement luxe et les partenariats avec des hôtels 5 étoiles.",
+        serviceType: "agence",
         category: "Voyages organisés",
+        result: "Agence opérationnelle en 2 mois avec 3 groupes réservés",
+        year: "2023",
         imageUrl: "https://api.dicebear.com/7.x/shapes/svg?seed=business3",
+        clientLogo: null,
+        status: "published",
+        createdAt: new Date().toISOString(),
       },
       {
         businessName: "Business Travel Pro",
+        description: "Organisation d'un voyage d'affaires groupé à Dubaï pour 15 entrepreneurs français. Networking, visites d'entreprises et rencontres avec investisseurs locaux.",
+        serviceType: "voyage",
         category: "Voyages d'affaires",
+        result: "8 partenariats commerciaux signés pendant le voyage",
+        year: "2024",
         imageUrl: "https://api.dicebear.com/7.x/shapes/svg?seed=business4",
+        clientLogo: null,
+        status: "published",
+        createdAt: new Date().toISOString(),
       },
       {
         businessName: "Sahara Adventures",
+        description: "Accompagnement dans la création d'une agence spécialisée tourisme aventure et désert. Formation sur les circuits, la logistique et les partenaires locaux.",
+        serviceType: "agence",
         category: "Tourisme aventure",
+        result: "Premier circuit vendu à 12 personnes sous 3 semaines",
+        year: "2023",
         imageUrl: "https://api.dicebear.com/7.x/shapes/svg?seed=business5",
+        clientLogo: null,
+        status: "published",
+        createdAt: new Date().toISOString(),
       },
       {
         businessName: "Luxury Destinations",
-        category: "Voyages de luxe",
+        description: "Facilitation de visas Schengen pour une délégation d'entrepreneurs africains venant à Paris pour un salon professionnel.",
+        serviceType: "visa",
+        category: "Visa Schengen",
+        result: "18 visas obtenus sur 20 demandes en délai express",
+        year: "2024",
         imageUrl: "https://api.dicebear.com/7.x/shapes/svg?seed=business6",
+        clientLogo: null,
+        status: "published",
+        createdAt: new Date().toISOString(),
       },
     ];
 
     portfolioData.forEach((item) => {
       const id = randomUUID();
-      this.portfolio.set(id, { ...item, id });
+      const portfolioItem: Portfolio = {
+        ...item,
+        id,
+        clientLogo: item.clientLogo ?? null,
+        status: item.status ?? "published",
+      };
+      this.portfolio.set(id, portfolioItem);
     });
   }
 
@@ -290,13 +340,30 @@ export class ContentMemStorage implements IContentStorage {
     return Array.from(this.portfolio.values());
   }
 
+  async getPublishedPortfolio(): Promise<Portfolio[]> {
+    return Array.from(this.portfolio.values()).filter(
+      (item) => item.status === "published"
+    );
+  }
+
+  async getPortfolioByServiceType(serviceType: string): Promise<Portfolio[]> {
+    return Array.from(this.portfolio.values()).filter(
+      (item) => item.status === "published" && item.serviceType === serviceType
+    );
+  }
+
   async getPortfolioById(id: string): Promise<Portfolio | undefined> {
     return this.portfolio.get(id);
   }
 
   async createPortfolio(insertPortfolio: InsertPortfolio): Promise<Portfolio> {
     const id = randomUUID();
-    const portfolio: Portfolio = { ...insertPortfolio, id };
+    const portfolio: Portfolio = { 
+      ...insertPortfolio, 
+      id,
+      clientLogo: insertPortfolio.clientLogo ?? null,
+      status: insertPortfolio.status ?? "published",
+    };
     this.portfolio.set(id, portfolio);
     return portfolio;
   }
