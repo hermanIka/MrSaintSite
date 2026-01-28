@@ -5,14 +5,19 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 import { ThemeProvider } from "@/modules/foundation";
-import { HomePage, TripsPage, TripDetailPage, PortfolioPage, NotFoundPage } from "@/modules/content";
-import { ContactPage } from "@/modules/interaction";
-import { FacilitationVisaPage, CreationAgencePage } from "@/modules/process";
+import { HomePage, AboutPage, TripsPage, TripDetailPage, PortfolioPage, NotFoundPage } from "@/modules/content";
+import { ContactPage, FAQPage } from "@/modules/interaction";
+import { FacilitationVisaPage, CreationAgencePage, ServicesPage } from "@/modules/process";
+import { ReservationPage } from "@/modules/transaction";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={HomePage} />
+      <Route path="/a-propos" component={AboutPage} />
+      <Route path="/services" component={ServicesPage} />
+      <Route path="/faq" component={FAQPage} />
+      <Route path="/reservation" component={ReservationPage} />
       <Route path="/facilitation-visa" component={FacilitationVisaPage} />
       <Route path="/creation-agence" component={CreationAgencePage} />
       <Route path="/voyages" component={TripsPage} />

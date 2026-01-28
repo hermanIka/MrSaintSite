@@ -1,7 +1,7 @@
 /**
  * TRANSACTION MODULE - Exports
  * 
- * Ce module est en préparation pour les intégrations paiement/réservation.
+ * Ce module gère les paiements et réservations.
  * 
  * INTÉGRATIONS PRÉVUES:
  * - Calendly (réservation)
@@ -12,8 +12,10 @@
  * 2. Confirmation backend
  * 3. Accès à la réservation Calendly
  * 
- * STATUT: En attente d'implémentation
+ * STATUT: Page de réservation créée, paiement en attente d'intégration
  */
+
+export { default as ReservationPage } from "./components/ReservationPage";
 
 export const TRANSACTION_STATUS = {
   ready: false,

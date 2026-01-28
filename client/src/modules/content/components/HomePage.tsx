@@ -98,12 +98,11 @@ export default function HomePage() {
             Expert voyagiste depuis 7 ans, je vous accompagne dans tous vos
             projets : facilitation visa, création d'agence, voyages organisés.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center flex-wrap">
             <Link href="/facilitation-visa">
               <Button
                 data-testid="button-hero-visa"
                 size="lg"
-                className="text-lg px-8 py-6 rounded-full"
               >
                 Facilitation Visa
               </Button>
@@ -113,7 +112,6 @@ export default function HomePage() {
                 data-testid="button-hero-agency"
                 size="lg"
                 variant="outline"
-                className="text-lg px-8 py-6 rounded-full bg-white/10 backdrop-blur-sm text-white border-white/30 hover:bg-white/20"
               >
                 Créer mon agence
               </Button>
@@ -131,7 +129,7 @@ export default function HomePage() {
             >
               Nos Services Premium
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p data-testid="text-services-subtitle" className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Des solutions sur mesure pour tous vos besoins en voyage et entrepreneuriat
             </p>
           </div>
@@ -143,16 +141,16 @@ export default function HomePage() {
                 <Card
                   key={service.testId}
                   data-testid={service.testId}
-                  className="hover-elevate active-elevate-2 transition-all duration-300 hover:-translate-y-1 border-primary/20"
+                  className="border-primary/20"
                 >
                   <CardContent className="p-8">
                     <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center mb-6">
                       <Icon className="w-7 h-7 text-primary" />
                     </div>
-                    <h3 className="text-xl font-heading font-semibold mb-3 text-foreground">
+                    <h3 data-testid={`text-${service.testId}-title`} className="text-xl font-heading font-semibold mb-3 text-foreground">
                       {service.title}
                     </h3>
-                    <p className="text-muted-foreground mb-6 leading-relaxed">
+                    <p data-testid={`text-${service.testId}-desc`} className="text-muted-foreground mb-6 leading-relaxed">
                       {service.description}
                     </p>
                     <Link href={service.link}>
@@ -175,10 +173,10 @@ export default function HomePage() {
       <section className="py-24 bg-black text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-4">
+            <h2 data-testid="text-why-title" className="text-3xl sm:text-4xl font-heading font-bold mb-4">
               Pourquoi choisir Mr Saint ?
             </h2>
-            <p className="text-lg text-white/70 max-w-2xl mx-auto">
+            <p data-testid="text-why-subtitle" className="text-lg text-white/70 max-w-2xl mx-auto">
               Une expertise reconnue au service de vos ambitions
             </p>
           </div>
@@ -195,10 +193,10 @@ export default function HomePage() {
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
                     <Icon className="w-8 h-8 text-primary" />
                   </div>
-                  <h3 className="text-lg font-heading font-semibold mb-3">
+                  <h3 data-testid={`text-benefit-title-${index}`} className="text-lg font-heading font-semibold mb-3">
                     {benefit.title}
                   </h3>
-                  <p className="text-white/70 leading-relaxed">
+                  <p data-testid={`text-benefit-desc-${index}`} className="text-white/70 leading-relaxed">
                     {benefit.description}
                   </p>
                 </div>
@@ -308,8 +306,7 @@ export default function HomePage() {
             <Button
               data-testid="button-cta-contact"
               size="lg"
-              variant="outline"
-              className="text-lg px-8 py-6 rounded-full bg-white text-primary border-white hover:bg-white/90"
+              variant="secondary"
             >
               Me contacter
             </Button>

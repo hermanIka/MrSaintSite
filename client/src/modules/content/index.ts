@@ -5,6 +5,7 @@
  */
 
 export { default as HomePage } from "./components/HomePage";
+export { default as AboutPage } from "./components/AboutPage";
 export { default as TripsPage } from "./components/TripsPage";
 export { default as TripDetailPage } from "./components/TripDetailPage";
 export { default as PortfolioPage } from "./components/PortfolioPage";

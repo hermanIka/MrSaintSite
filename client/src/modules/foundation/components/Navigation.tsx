@@ -24,10 +24,10 @@ export function Navigation() {
 
   const navLinks = [
     { href: "/", label: "Accueil" },
-    { href: "/facilitation-visa", label: "Visa" },
-    { href: "/creation-agence", label: "Créer Agences" },
-    { href: "/voyages", label: "Nos Voyages" },
-    { href: "/portfolio", label: "Portfolio" },
+    { href: "/a-propos", label: "À propos" },
+    { href: "/services", label: "Services" },
+    { href: "/voyages", label: "Voyages" },
+    { href: "/faq", label: "FAQ" },
     { href: "/contact", label: "Contact" },
   ];
 
@@ -65,13 +65,13 @@ export function Navigation() {
                 </Link>
               ))}
               <ThemeToggle />
-              <Link href="/contact">
+              <Link href="/reservation">
                 <Button
                   data-testid="button-reserve-service"
                   className="ml-4"
                   size="default"
                 >
-                  Réserver un service
+                  Réserver
                 </Button>
               </Link>
             </div>
@@ -108,13 +108,13 @@ export function Navigation() {
                 </span>
               </Link>
             ))}
-            <Link href="/contact">
+            <Link href="/reservation">
               <Button
                 data-testid="button-mobile-reserve"
                 className="w-full mt-4"
                 size="lg"
               >
-                Réserver un service
+                Réserver
               </Button>
             </Link>
           </div>

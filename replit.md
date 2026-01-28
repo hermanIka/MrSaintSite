@@ -22,23 +22,23 @@ modules/
 │   └── index.ts         # Exports du module
 │
 ├── content/             # Contenu dynamique
-│   ├── components/      # HomePage, TripsPage, PortfolioPage
+│   ├── components/      # HomePage, AboutPage, TripsPage, PortfolioPage, NotFoundPage
 │   ├── context/         # Contexte du module
 │   ├── api/             # Logique d'appels API (si nécessaire)
 │   └── index.ts         # Exports du module
 │
 ├── interaction/         # Points de contact utilisateur
-│   ├── components/      # ContactPage, Formulaires
+│   ├── components/      # ContactPage, FAQPage
 │   ├── context/         # Contexte du module
 │   └── index.ts         # Exports du module
 │
 ├── process/             # Processus métier
-│   ├── components/      # FacilitationVisaPage, CreationAgencePage
+│   ├── components/      # ServicesPage, FacilitationVisaPage, CreationAgencePage
 │   ├── context/         # Contexte du module
 │   └── index.ts         # Exports du module
 │
-└── transaction/         # Paiements et réservations (EN PRÉPARATION)
-    ├── components/      # Composants de paiement (futur)
+└── transaction/         # Paiements et réservations
+    ├── components/      # ReservationPage (paiement en attente d'intégration)
     ├── context/         # Contexte du module
     └── index.ts         # Exports du module
 ```
@@ -141,13 +141,31 @@ npm run check    # Vérification TypeScript
 npm run db:push  # Synchronisation schema DB
 ```
 
+## Pages et Routes
+
+| Route | Page | Module |
+|-------|------|--------|
+| `/` | HomePage | content |
+| `/a-propos` | AboutPage | content |
+| `/services` | ServicesPage | process |
+| `/faq` | FAQPage | interaction |
+| `/reservation` | ReservationPage | transaction |
+| `/facilitation-visa` | FacilitationVisaPage | process |
+| `/creation-agence` | CreationAgencePage | process |
+| `/voyages` | TripsPage | content |
+| `/voyages/:id` | TripDetailPage | content |
+| `/portfolio` | PortfolioPage | content |
+| `/contact` | ContactPage | interaction |
+
 ## Notes de Développement
 
-### Dernière Mise à Jour
-- Restructuration complète en architecture modulaire
-- Création des modules: foundation, content, interaction, process, transaction
-- Séparation claire frontend/backend
-- Préparation du module transaction pour Calendly/Stripe
+### Dernière Mise à Jour (Module 1 - Structure & Base)
+- Ajout de AboutPage (À propos)
+- Ajout de ServicesPage (Offres de services)
+- Ajout de FAQPage (Foire aux questions)
+- Ajout de ReservationPage (Réservation avec sélection de service)
+- Navigation mise à jour avec nouvelles pages
+- Fichiers de contexte mis à jour pour chaque module
 
 ### Prochaines Étapes
 1. Intégration Calendly pour les réservations

@@ -1,11 +1,12 @@
 /**
  * PROCESS MODULE CONTEXT
  * 
- * Domaine: Processus métier
+ * Domaine: Processus métier et offres de services
  * 
  * Responsabilités:
- * - Processus de facilitation visa
- * - Processus de création d'agence
+ * - Page Services/Offres (ServicesPage)
+ * - Processus de facilitation visa (FacilitationVisaPage)
+ * - Processus de création d'agence (CreationAgencePage)
  * - Parcours client pour les services
  * 
  * Ce module décrit les étapes des services proposés.
@@ -14,10 +15,12 @@
 
 export const PROCESS_MODULE = {
   name: 'process',
-  description: 'Processus métier - visa, création agence',
+  description: 'Processus métier - services, visa, création agence',
+  pages: ['ServicesPage', 'FacilitationVisaPage', 'CreationAgencePage'],
   processes: [
     'FacilitationVisa',
-    'CreationAgence'
+    'CreationAgence',
+    'VoyagesOrganisés'
   ],
   futureProcesses: ['FormationEnLigne']
 } as const;

@@ -4,6 +4,7 @@
  * Domaine: Paiements et réservations
  * 
  * Responsabilités:
+ * - Page de réservation (ReservationPage)
  * - Intégration Calendly pour les réservations
  * - Intégration Stripe/Lemon Squeezy pour les paiements
  * - Gestion du flux de paiement AVANT réservation
@@ -15,23 +16,24 @@
  * - Aucune clé API exposée côté frontend
  * - Architecture extensible pour Mobile Money (futur)
  * 
- * STATUT: En préparation - pas encore implémenté
+ * STATUT: Page de réservation créée, intégrations paiement en attente
  */
 
 export const TRANSACTION_MODULE = {
   name: 'transaction',
   description: 'Paiements et réservations',
-  status: 'preparation',
+  status: 'partial',
+  pages: ['ReservationPage'],
   integrations: {
     current: [],
     planned: ['calendly', 'stripe', 'lemon_squeezy'],
     future: ['mobile_money']
   },
   flow: [
-    '1. Sélection du service',
-    '2. Paiement (Stripe/Lemon Squeezy)',
+    '1. Sélection du service (ReservationPage)',
+    '2. Paiement (Stripe/Lemon Squeezy - à venir)',
     '3. Confirmation paiement (backend)',
-    '4. Réservation créneau (Calendly)',
+    '4. Réservation créneau (Calendly - à venir)',
     '5. Confirmation finale'
   ]
 } as const;

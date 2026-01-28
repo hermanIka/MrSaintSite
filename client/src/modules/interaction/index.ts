@@ -5,3 +5,4 @@
  */
 
 export { default as ContactPage } from "./components/ContactPage";
+export { default as FAQPage } from "./components/FAQPage";
