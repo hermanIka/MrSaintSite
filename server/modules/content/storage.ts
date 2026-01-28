@@ -21,12 +21,20 @@ export interface IContentStorage {
   getAllTrips(): Promise<Trip[]>;
   getTripById(id: string): Promise<Trip | undefined>;
   createTrip(trip: InsertTrip): Promise<Trip>;
+  updateTrip(id: string, trip: Partial<InsertTrip>): Promise<Trip | undefined>;
+  deleteTrip(id: string): Promise<boolean>;
 
   getAllTestimonials(): Promise<Testimonial[]>;
+  getTestimonialById(id: string): Promise<Testimonial | undefined>;
   createTestimonial(testimonial: InsertTestimonial): Promise<Testimonial>;
+  updateTestimonial(id: string, testimonial: Partial<InsertTestimonial>): Promise<Testimonial | undefined>;
+  deleteTestimonial(id: string): Promise<boolean>;
 
   getAllPortfolio(): Promise<Portfolio[]>;
+  getPortfolioById(id: string): Promise<Portfolio | undefined>;
   createPortfolio(portfolio: InsertPortfolio): Promise<Portfolio>;
+  updatePortfolio(id: string, portfolio: Partial<InsertPortfolio>): Promise<Portfolio | undefined>;
+  deletePortfolio(id: string): Promise<boolean>;
 }
 
 export class ContentMemStorage implements IContentStorage {
@@ -237,8 +245,24 @@ export class ContentMemStorage implements IContentStorage {
     return trip;
   }
 
+  async updateTrip(id: string, tripData: Partial<InsertTrip>): Promise<Trip | undefined> {
+    const existing = this.trips.get(id);
+    if (!existing) return undefined;
+    const updated: Trip = { ...existing, ...tripData };
+    this.trips.set(id, updated);
+    return updated;
+  }
+
+  async deleteTrip(id: string): Promise<boolean> {
+    return this.trips.delete(id);
+  }
+
   async getAllTestimonials(): Promise<Testimonial[]> {
     return Array.from(this.testimonials.values());
+  }
+
+  async getTestimonialById(id: string): Promise<Testimonial | undefined> {
+    return this.testimonials.get(id);
   }
 
   async createTestimonial(
@@ -250,8 +274,24 @@ export class ContentMemStorage implements IContentStorage {
     return testimonial;
   }
 
+  async updateTestimonial(id: string, data: Partial<InsertTestimonial>): Promise<Testimonial | undefined> {
+    const existing = this.testimonials.get(id);
+    if (!existing) return undefined;
+    const updated: Testimonial = { ...existing, ...data };
+    this.testimonials.set(id, updated);
+    return updated;
+  }
+
+  async deleteTestimonial(id: string): Promise<boolean> {
+    return this.testimonials.delete(id);
+  }
+
   async getAllPortfolio(): Promise<Portfolio[]> {
     return Array.from(this.portfolio.values());
+  }
+
+  async getPortfolioById(id: string): Promise<Portfolio | undefined> {
+    return this.portfolio.get(id);
   }
 
   async createPortfolio(insertPortfolio: InsertPortfolio): Promise<Portfolio> {
@@ -259,6 +299,18 @@ export class ContentMemStorage implements IContentStorage {
     const portfolio: Portfolio = { ...insertPortfolio, id };
     this.portfolio.set(id, portfolio);
     return portfolio;
+  }
+
+  async updatePortfolio(id: string, data: Partial<InsertPortfolio>): Promise<Portfolio | undefined> {
+    const existing = this.portfolio.get(id);
+    if (!existing) return undefined;
+    const updated: Portfolio = { ...existing, ...data };
+    this.portfolio.set(id, updated);
+    return updated;
+  }
+
+  async deletePortfolio(id: string): Promise<boolean> {
+    return this.portfolio.delete(id);
   }
 }
 

@@ -37,9 +37,15 @@ modules/
 │   ├── context/         # Contexte du module
 │   └── index.ts         # Exports du module
 │
-└── transaction/         # Paiements et réservations
-    ├── components/      # ReservationPage (paiement en attente d'intégration)
-    ├── context/         # Contexte du module
+├── transaction/         # Paiements et réservations
+│   ├── components/      # ReservationPage, CalendarBooking
+│   ├── context/         # Contexte du module
+│   └── index.ts         # Exports du module
+│
+└── admin/               # Administration et supervision
+    ├── components/      # AdminLoginPage, AdminDashboard, CRUD pages
+    ├── hooks/           # useAdminAuth (authentification)
+    ├── context.ts       # Documentation du module
     └── index.ts         # Exports du module
 ```
 
@@ -53,8 +59,21 @@ modules/
 │   ├── context.ts       # Documentation du module
 │   └── index.ts         # Exports du module
 │
-└── transaction/         # API pour les paiements (EN PRÉPARATION)
-    ├── routes.ts        # Routes API (futur)
+├── transaction/         # API pour les paiements (EN PRÉPARATION)
+│   ├── routes.ts        # Routes API (futur)
+│   ├── context.ts       # Documentation du module
+│   └── index.ts         # Exports du module
+│
+├── chatbot/             # Chatbot hybride (règles + IA)
+│   ├── routes.ts        # API chatbot
+│   ├── ruleEngine.ts    # Moteur de règles
+│   ├── knowledgeBase.ts # Base de connaissances
+│   └── index.ts         # Exports du module
+│
+└── admin/               # Administration et supervision
+    ├── routes.ts        # Routes API protégées (CRUD admin)
+    ├── storage.ts       # Stockage admins, logs, FAQ
+    ├── auth.ts          # Authentification par token
     ├── context.ts       # Documentation du module
     └── index.ts         # Exports du module
 ```
@@ -93,6 +112,20 @@ modules/
 - `POST /api/payments/create-session` (prévu)
 - `POST /api/webhooks/stripe` (prévu)
 - `POST /api/bookings/create` (prévu)
+
+### Module Admin (Protégé)
+- `POST /api/admin/login` - Connexion admin
+- `POST /api/admin/logout` - Déconnexion (auth requise)
+- `GET /api/admin/me` - Info admin connecté (auth requise)
+- `GET /api/admin/stats` - Statistiques dashboard (auth requise)
+- `GET/POST/PUT/DELETE /api/admin/trips` - Gestion voyages (auth requise)
+- `GET/POST/PUT/DELETE /api/admin/testimonials` - Gestion témoignages (auth requise)
+- `GET/POST/PUT/DELETE /api/admin/portfolio` - Gestion portfolio (auth requise)
+- `GET/POST/PUT/DELETE /api/admin/faqs` - Gestion FAQ (auth requise)
+- `GET /api/admin/logs` - Historique activités (auth requise)
+
+### Module FAQ (Public)
+- `GET /api/faqs` - Liste toutes les FAQ
 
 ## Intégrations Prévues
 
@@ -156,10 +189,26 @@ npm run db:push  # Synchronisation schema DB
 | `/voyages/:id` | TripDetailPage | content |
 | `/portfolio` | PortfolioPage | content |
 | `/contact` | ContactPage | interaction |
+| `/admin` | AdminLoginPage | admin |
+| `/admin/dashboard` | AdminDashboard | admin |
+| `/admin/trips` | AdminTripsPage | admin |
+| `/admin/testimonials` | AdminTestimonialsPage | admin |
+| `/admin/portfolio` | AdminPortfolioPage | admin |
+| `/admin/faq` | AdminFaqPage | admin |
+| `/admin/logs` | AdminLogsPage | admin |
 
 ## Notes de Développement
 
-### Dernière Mise à Jour (Module 4 - Calendrier de Réservation)
+### Dernière Mise à Jour (Module 6 - Admin & Supervision)
+- Système d'authentification par token avec session active
+- Dashboard administrateur avec statistiques (voyages, témoignages, portfolio, FAQ)
+- Gestion CRUD complète pour voyages, témoignages, portfolio et FAQ
+- Historique des activités avec traçabilité des actions
+- Toutes les routes admin protégées par middleware d'authentification
+- Identifiants par défaut : admin / admin123
+- Navigation responsive avec sidebar et menu mobile
+
+### Module 4 (Calendrier de Réservation)
 - Composant CalendarBooking avec sélection de date et créneau horaire
 - Gestion des créneaux disponibles/réservés
 - Fuseau horaire affiché (Paris GMT+1)

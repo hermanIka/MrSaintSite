@@ -9,6 +9,15 @@ import { HomePage, AboutPage, TripsPage, TripDetailPage, PortfolioPage, NotFound
 import { ContactPage, FAQPage } from "@/modules/interaction";
 import { FacilitationVisaPage, CreationAgencePage, ServicesPage } from "@/modules/process";
 import { ReservationPage } from "@/modules/transaction";
+import {
+  AdminLoginPage,
+  AdminDashboard,
+  AdminTripsPage,
+  AdminTestimonialsPage,
+  AdminPortfolioPage,
+  AdminFaqPage,
+  AdminLogsPage,
+} from "@/modules/admin";
 
 function Router() {
   return (
@@ -24,6 +33,13 @@ function Router() {
       <Route path="/voyages/:id" component={TripDetailPage} />
       <Route path="/portfolio" component={PortfolioPage} />
       <Route path="/contact" component={ContactPage} />
+      <Route path="/admin" component={AdminLoginPage} />
+      <Route path="/admin/dashboard" component={AdminDashboard} />
+      <Route path="/admin/trips" component={AdminTripsPage} />
+      <Route path="/admin/testimonials" component={AdminTestimonialsPage} />
+      <Route path="/admin/portfolio" component={AdminPortfolioPage} />
+      <Route path="/admin/faq" component={AdminFaqPage} />
+      <Route path="/admin/logs" component={AdminLogsPage} />
       <Route component={NotFoundPage} />
     </Switch>
   );
