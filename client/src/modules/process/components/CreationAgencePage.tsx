@@ -1,12 +1,11 @@
-import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
+import { Layout } from "@/modules/foundation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, TrendingUp, Users, Rocket, DollarSign } from "lucide-react";
 import { Link } from "wouter";
 import agencyImage from "@assets/generated_images/Agency_coaching_service_image_40575f0c.png";
 
-export default function CreationAgence() {
+export default function CreationAgencePage() {
   const modules = [
     {
       title: "Formation complète",
@@ -53,9 +52,7 @@ export default function CreationAgence() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-
+    <Layout>
       <section
         className="relative h-[50vh] flex items-center justify-center overflow-hidden"
         style={{ marginTop: "80px" }}
@@ -226,8 +223,6 @@ export default function CreationAgence() {
           </Card>
         </div>
       </section>
-
-      <Footer />
-    </div>
+    </Layout>
   );
 }

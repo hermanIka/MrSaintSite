@@ -1,23 +1,20 @@
-import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
+import { Layout } from "@/modules/foundation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import type { Trip } from "@shared/schema";
-import { Calendar, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { Link } from "wouter";
 
-export default function Voyages() {
+export default function TripsPage() {
   const { data: trips = [], isLoading } = useQuery<Trip[]>({
     queryKey: ["/api/trips"],
   });
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-
+    <Layout>
       <section
         className="py-24 bg-black text-white"
         style={{ marginTop: "80px" }}
@@ -141,8 +138,6 @@ export default function Voyages() {
           </Link>
         </div>
       </section>
-
-      <Footer />
-    </div>
+    </Layout>
   );
 }

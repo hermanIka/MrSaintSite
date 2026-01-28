@@ -1,15 +1,14 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
+import { Layout } from "@/modules/foundation";
 import { useQuery } from "@tanstack/react-query";
 import type { Testimonial } from "@shared/schema";
 import { Plane, FileText, Briefcase, Shield, Users, Globe, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import heroImage from "@assets/generated_images/Luxury_travel_hero_image_4477beea.png";
 
-export default function Home() {
+export default function HomePage() {
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   
   const { data: testimonials = [], isLoading: testimonialsLoading, isError: testimonialsError } = useQuery<Testimonial[]>({
@@ -77,9 +76,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-
+    <Layout>
       <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
@@ -319,8 +316,6 @@ export default function Home() {
           </Link>
         </div>
       </section>
-
-      <Footer />
-    </div>
+    </Layout>
   );
 }

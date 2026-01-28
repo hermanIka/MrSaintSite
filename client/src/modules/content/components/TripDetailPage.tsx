@@ -1,5 +1,4 @@
-import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
+import { Layout } from "@/modules/foundation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +14,7 @@ import type { Trip } from "@shared/schema";
 import { useRoute, Link } from "wouter";
 import { Calendar, MapPin, CheckCircle2, XCircle } from "lucide-react";
 
-export default function TripDetail() {
+export default function TripDetailPage() {
   const [, params] = useRoute("/voyages/:id");
   const tripId = params?.id;
 
@@ -26,8 +25,7 @@ export default function TripDetail() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navigation />
+      <Layout>
         <div className="pt-32 pb-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Skeleton className="h-96 w-full rounded-lg mb-8" />
@@ -36,15 +34,13 @@ export default function TripDetail() {
             <Skeleton className="h-6 w-2/3" />
           </div>
         </div>
-        <Footer />
-      </div>
+      </Layout>
     );
   }
 
   if (!trip) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navigation />
+      <Layout>
         <div className="pt-32 pb-20 text-center">
           <h1 className="text-3xl font-heading font-bold text-foreground mb-4">
             Voyage non trouvé
@@ -53,15 +49,12 @@ export default function TripDetail() {
             <Button>Retour aux voyages</Button>
           </Link>
         </div>
-        <Footer />
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-
+    <Layout>
       <div className="pt-24">
         <div
           className="relative h-96 bg-cover bg-center"
@@ -225,8 +218,6 @@ export default function TripDetail() {
           </div>
         </div>
       </div>
-
-      <Footer />
-    </div>
+    </Layout>
   );
 }

@@ -1,12 +1,11 @@
-import { Navigation } from "@/components/Navigation";
-import { Footer } from "@/components/Footer";
+import { Layout } from "@/modules/foundation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, FileText, Clock, Shield, Plane } from "lucide-react";
+import { CheckCircle2, FileText, Plane } from "lucide-react";
 import { Link } from "wouter";
 import visaImage from "@assets/generated_images/Visa_facilitation_service_image_24df3a0c.png";
 
-export default function FacilitationVisa() {
+export default function FacilitationVisaPage() {
   const visaTypes = [
     { type: "Tourisme", description: "Pour vos vacances et découvertes" },
     { type: "Business", description: "Pour vos déplacements professionnels" },
@@ -47,9 +46,7 @@ export default function FacilitationVisa() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-
+    <Layout>
       <section
         className="relative h-[50vh] flex items-center justify-center overflow-hidden"
         style={{ marginTop: "80px" }}
@@ -213,8 +210,6 @@ export default function FacilitationVisa() {
           </Card>
         </div>
       </section>
-
-      <Footer />
-    </div>
+    </Layout>
   );
 }

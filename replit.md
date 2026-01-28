@@ -2,185 +2,155 @@
 
 ## Overview
 
-Mr Saint is a premium travel agency website offering three core services: visa facilitation, travel agency creation consulting/coaching, and organized business trips. The site is built as a modern, full-stack web application with a luxury design aesthetic featuring gold and black color schemes. It currently uses in-memory storage with plans to transition to a PostgreSQL database for dynamic content management.
+Mr Saint is a premium travel agency website offering three core services: visa facilitation, travel agency creation consulting/coaching, and organized business trips. The site is built as a modern, full-stack web application with a luxury design aesthetic featuring gold and black color schemes.
 
-The application serves as both a marketing platform and a foundation for future e-commerce functionality, with UI elements for payment processing designed but not yet active.
+The application follows a **modular domain-driven architecture** with clear separation between frontend and backend, organized by business domains.
 
 ## User Preferences
 
-Preferred communication style: Simple, everyday language.
+Preferred communication style: Simple, everyday language (French preferred).
 
-## System Architecture
+## Architecture Modulaire par Domaines
 
-### Frontend Architecture
+### Structure des Modules Frontend (`client/src/modules/`)
 
-**Framework & Build Tools**
-- React 18 with TypeScript for type-safe component development
-- Vite as the build tool and development server
-- Wouter for lightweight client-side routing
-- TanStack Query (React Query) for server state management and data fetching
+```
+modules/
+├── foundation/          # Infrastructure de base
+│   ├── components/      # Layout, Navigation, Footer, Theme
+│   ├── context/         # Contexte du module
+│   └── index.ts         # Exports du module
+│
+├── content/             # Contenu dynamique
+│   ├── components/      # HomePage, TripsPage, PortfolioPage
+│   ├── context/         # Contexte du module
+│   ├── api/             # Logique d'appels API (si nécessaire)
+│   └── index.ts         # Exports du module
+│
+├── interaction/         # Points de contact utilisateur
+│   ├── components/      # ContactPage, Formulaires
+│   ├── context/         # Contexte du module
+│   └── index.ts         # Exports du module
+│
+├── process/             # Processus métier
+│   ├── components/      # FacilitationVisaPage, CreationAgencePage
+│   ├── context/         # Contexte du module
+│   └── index.ts         # Exports du module
+│
+└── transaction/         # Paiements et réservations (EN PRÉPARATION)
+    ├── components/      # Composants de paiement (futur)
+    ├── context/         # Contexte du module
+    └── index.ts         # Exports du module
+```
 
-**UI Component System**
-- Shadcn UI component library (New York style variant) providing pre-built, accessible components
-- Radix UI primitives for complex interactive components (dialogs, dropdowns, accordions, etc.)
-- Tailwind CSS for utility-first styling with custom design tokens
-- CSS variables for theming support (light/dark modes)
+### Structure des Modules Backend (`server/modules/`)
 
-**Design System Implementation**
-- Strict color palette: Primary Gold (#F2C94C), Deep Black (#000000), Anthracite Gray (#1A1A1A), Metallic Gold (#CFAF59), Pure White (#FFFFFF)
-- Typography: Poppins/Montserrat for headings, Inter for body text
-- Consistent spacing system using Tailwind units (4, 6, 8, 12, 16, 20, 24)
-- Responsive breakpoints handled via Tailwind's mobile-first approach
+```
+modules/
+├── content/             # API pour le contenu
+│   ├── routes.ts        # Routes API (trips, testimonials, portfolio)
+│   ├── storage.ts       # Stockage des données
+│   ├── context.ts       # Documentation du module
+│   └── index.ts         # Exports du module
+│
+└── transaction/         # API pour les paiements (EN PRÉPARATION)
+    ├── routes.ts        # Routes API (futur)
+    ├── context.ts       # Documentation du module
+    └── index.ts         # Exports du module
+```
 
-**State Management Strategy**
-- React Query for server state with aggressive caching (staleTime: Infinity)
-- React Context for theme management (light/dark mode toggle)
-- Local component state using hooks for UI interactions
-- Form state managed via React Hook Form with Zod validation
+## Règles d'Architecture
 
-**Page Structure**
-- Home: Hero section, services grid, benefits, testimonials carousel, CTA
-- Service pages: FacilitationVisa, CreationAgence with dedicated layouts
-- Voyages: Trip listing page with filtering capability
-- TripDetail: Dynamic route for individual trip details
-- Portfolio: Showcase of client success stories
-- Contact: Form with validation (non-functional submission)
+### Règles Strictes
 
-### Backend Architecture
+1. **Séparation Frontend/Backend**
+   - Aucune logique métier dans le frontend
+   - Les API keys ne sont JAMAIS exposées côté client
+   - Validation côté serveur obligatoire
 
-**Server Framework**
-- Express.js with TypeScript for type-safe API development
-- ESM (ES Modules) for modern JavaScript module system
-- Custom middleware for request logging and JSON body parsing
+2. **Un fichier = Un module**
+   - Chaque composant appartient à un seul domaine
+   - Pas de mélange entre modules
 
-**Data Layer**
-- Current: In-memory storage using Map data structures (MemStorage class)
-- Future: Drizzle ORM configured for PostgreSQL with Neon serverless adapter
-- Database schema defined with three main entities: trips, testimonials, portfolio
-- UUID-based primary keys using PostgreSQL's gen_random_uuid()
+3. **Fichiers de contexte obligatoires**
+   - Chaque module contient un fichier de contexte documentant sa responsabilité
+   - Les contextes sont mis à jour à chaque modification majeure
 
-**API Design**
-- RESTful endpoints following resource-based routing conventions
-- GET /api/trips - Retrieve all trips
-- GET /api/trips/:id - Retrieve single trip by ID
-- GET /api/testimonials - Retrieve all testimonials
-- GET /api/portfolio - Retrieve all portfolio items
-- Error handling with appropriate HTTP status codes (404, 500)
+4. **Extensions futures**
+   - L'architecture permet l'ajout de Mobile Money sans refactoring massif
+   - Le module transaction est préparé pour Calendly + Stripe/Lemon Squeezy
 
-**Development Setup**
-- Vite middleware integration for HMR in development
-- SSR-ready architecture with template rendering capability
-- Production build uses esbuild for server bundling
-- Separate client and server build outputs
+## API Endpoints
 
-**Storage Abstraction**
-- IStorage interface defines contract for data operations
-- MemStorage provides in-memory implementation with seed data
-- Design allows easy swapping to database-backed storage without API changes
-- Seed data includes sample trips, testimonials, and portfolio items
+### Module Content
+- `GET /api/trips` - Liste tous les voyages
+- `GET /api/trips/:id` - Détails d'un voyage
+- `GET /api/testimonials` - Liste les témoignages
+- `GET /api/portfolio` - Liste le portfolio
 
-### Asset Management
+### Module Transaction (Futur)
+- `GET /api/transaction/status` - Statut du module
+- `POST /api/payments/create-session` (prévu)
+- `POST /api/webhooks/stripe` (prévu)
+- `POST /api/bookings/create` (prévu)
 
-**Static Assets**
-- Images stored in /attached_assets/generated_images/
-- Asset path aliasing configured in Vite (@assets resolver)
-- Design guidelines document stored as attached asset
-- Favicon and fonts loaded from static paths
+## Intégrations Prévues
 
-**Font Loading**
-- Google Fonts (Poppins, Montserrat, Inter) loaded via CDN
-- Preconnect hints for performance optimization
-- Font-display: swap for better perceived performance
+### Actuelles (Non implémentées)
+- **Calendly** - Réservation de créneaux
+- **Stripe / Lemon Squeezy** - Paiement en ligne
 
-### Routing Strategy
+### Futures
+- **Mobile Money** - Extension pour paiements africains
 
-**Client-Side Routing**
-- Wouter for minimal bundle size (1KB vs React Router's ~40KB)
-- Route definitions centralized in App.tsx
-- Dynamic route parameters for trip details (/voyages/:id)
-- 404 handling with NotFound component
+### Flux de Paiement Prévu
+1. Sélection du service par l'utilisateur
+2. Paiement obligatoire (Stripe/Lemon Squeezy)
+3. Confirmation du paiement (backend uniquement)
+4. Accès à la réservation (Calendly)
+5. Confirmation finale
 
-**SSR Preparation**
-- Server configured to handle all routes (*) for SPA fallback
-- HTML template injection ready for future SSR implementation
-- Development server proxies API requests to Express
+## Stack Technique
 
-### Form Handling
+### Frontend
+- **React 18** avec TypeScript
+- **Vite** comme bundler
+- **Wouter** pour le routing
+- **TanStack Query** pour la gestion d'état serveur
+- **Shadcn UI** + **Radix UI** pour les composants
+- **Tailwind CSS** pour le styling
 
-**Validation & Submission**
-- React Hook Form for performant form state management
-- Zod schemas for runtime validation (contactFormSchema)
-- @hookform/resolvers for seamless Zod integration
-- Non-functional submission (console.log for now, ready for backend integration)
+### Backend
+- **Express.js** avec TypeScript
+- **Architecture modulaire** par domaines
+- **In-Memory Storage** (MemStorage) actuellement
+- **Drizzle ORM** préparé pour PostgreSQL
 
-**Form Components**
-- Reusable form primitives from Shadcn (Input, Textarea, Form, FormField)
-- Accessible form controls with proper ARIA labels
-- Error message display integrated with validation
+### Design System
+- Palette: Gold (#F2C94C), Black (#000000), Gray (#1A1A1A)
+- Typographie: Poppins/Montserrat (titres), Inter (corps)
+- Thème: Light/Dark mode supporté
 
-### Build & Deployment
+## Commandes
 
-**Development Workflow**
-- tsx for running TypeScript directly in development
-- Concurrent client and server development with HMR
-- Type checking via tsc (noEmit mode)
+```bash
+npm run dev      # Développement avec HMR
+npm run build    # Build production
+npm run start    # Démarrer en production
+npm run check    # Vérification TypeScript
+npm run db:push  # Synchronisation schema DB
+```
 
-**Production Build**
-- Client: Vite build outputs to dist/public
-- Server: esbuild bundles to dist/index.js with external packages
-- Single node process serves static files and API
+## Notes de Développement
 
-**Database Migration**
-- Drizzle Kit configured for schema migrations
-- Migration files output to /migrations directory
-- npm run db:push for schema synchronization
+### Dernière Mise à Jour
+- Restructuration complète en architecture modulaire
+- Création des modules: foundation, content, interaction, process, transaction
+- Séparation claire frontend/backend
+- Préparation du module transaction pour Calendly/Stripe
 
-## External Dependencies
-
-### UI & Styling
-- **Shadcn UI**: Pre-built accessible component library
-- **Radix UI**: Headless UI primitives (accordion, dialog, dropdown, tooltip, etc.)
-- **Tailwind CSS**: Utility-first CSS framework with PostCSS
-- **class-variance-authority**: Type-safe variant-based styling
-- **Lucide React**: Icon library for consistent iconography
-- **React Icons**: Additional icon sets (WhatsApp icon)
-
-### Data Fetching & State
-- **TanStack Query**: Server state management and caching
-- **React Hook Form**: Form state and validation
-- **Zod**: Schema validation for forms and API
-- **@hookform/resolvers**: Zod resolver for React Hook Form
-
-### Database & ORM
-- **Drizzle ORM**: Type-safe SQL query builder
-- **@neondatabase/serverless**: PostgreSQL driver for Neon (serverless-compatible)
-- **drizzle-zod**: Generate Zod schemas from Drizzle tables
-- **drizzle-kit**: CLI for migrations and schema management
-
-### Routing & Navigation
-- **Wouter**: Lightweight React router (1KB)
-
-### Development Tools
-- **Vite**: Fast build tool with HMR
-- **@vitejs/plugin-react**: React support for Vite
-- **TypeScript**: Type safety across codebase
-- **esbuild**: Fast JavaScript bundler for production
-- **tsx**: TypeScript execution for development
-
-### Carousel & Media
-- **embla-carousel-react**: Touch-friendly carousel for testimonials
-
-### Utilities
-- **date-fns**: Date manipulation and formatting
-- **clsx**: Conditional className utility
-- **tailwind-merge**: Merge Tailwind classes without conflicts
-- **nanoid**: Unique ID generation
-
-### Replit-Specific
-- **@replit/vite-plugin-runtime-error-modal**: Error overlay in development
-- **@replit/vite-plugin-cartographer**: Code navigation tools
-- **@replit/vite-plugin-dev-banner**: Development environment banner
-
-### Session Management (Configured but Unused)
-- **connect-pg-simple**: PostgreSQL session store for Express (prepared for future authentication)
-- 
+### Prochaines Étapes
+1. Intégration Calendly pour les réservations
+2. Intégration Stripe/Lemon Squeezy pour les paiements
+3. Migration vers PostgreSQL pour la persistence
+4. Module de gestion admin (futur)

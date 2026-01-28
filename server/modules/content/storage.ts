@@ -1,3 +1,12 @@
+/**
+ * CONTENT MODULE - Storage
+ * 
+ * Gestion du stockage pour les entités de contenu:
+ * - Trips (voyages)
+ * - Testimonials (témoignages)
+ * - Portfolio (réalisations)
+ */
+
 import {
   type Trip,
   type InsertTrip,
@@ -8,22 +17,19 @@ import {
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 
-export interface IStorage {
-  // Trips
+export interface IContentStorage {
   getAllTrips(): Promise<Trip[]>;
   getTripById(id: string): Promise<Trip | undefined>;
   createTrip(trip: InsertTrip): Promise<Trip>;
 
-  // Testimonials
   getAllTestimonials(): Promise<Testimonial[]>;
   createTestimonial(testimonial: InsertTestimonial): Promise<Testimonial>;
 
-  // Portfolio
   getAllPortfolio(): Promise<Portfolio[]>;
   createPortfolio(portfolio: InsertPortfolio): Promise<Portfolio>;
 }
 
-export class MemStorage implements IStorage {
+export class ContentMemStorage implements IContentStorage {
   private trips: Map<string, Trip>;
   private testimonials: Map<string, Testimonial>;
   private portfolio: Map<string, Portfolio>;
@@ -36,7 +42,6 @@ export class MemStorage implements IStorage {
   }
 
   private seedData() {
-    // Seed trips
     const tripsData: InsertTrip[] = [
       {
         title: "Business Chine - Mars 2025",
@@ -149,7 +154,6 @@ export class MemStorage implements IStorage {
       this.trips.set(id, { ...trip, id });
     });
 
-    // Seed testimonials
     const testimonialsData: InsertTestimonial[] = [
       {
         name: "Sophie Martin",
@@ -179,7 +183,6 @@ export class MemStorage implements IStorage {
       this.testimonials.set(id, { ...testimonial, id });
     });
 
-    // Seed portfolio
     const portfolioData: InsertPortfolio[] = [
       {
         businessName: "Afrique Travel Express",
@@ -219,7 +222,6 @@ export class MemStorage implements IStorage {
     });
   }
 
-  // Trips methods
   async getAllTrips(): Promise<Trip[]> {
     return Array.from(this.trips.values());
   }
@@ -235,7 +237,6 @@ export class MemStorage implements IStorage {
     return trip;
   }
 
-  // Testimonials methods
   async getAllTestimonials(): Promise<Testimonial[]> {
     return Array.from(this.testimonials.values());
   }
@@ -249,7 +250,6 @@ export class MemStorage implements IStorage {
     return testimonial;
   }
 
-  // Portfolio methods
   async getAllPortfolio(): Promise<Portfolio[]> {
     return Array.from(this.portfolio.values());
   }
@@ -262,4 +262,4 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export const contentStorage = new ContentMemStorage();

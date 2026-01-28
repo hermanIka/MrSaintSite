@@ -62,42 +62,42 @@ export function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link href="/">
-                  <a
+                  <span
                     data-testid="link-footer-home"
-                    className="text-muted-foreground hover:text-primary transition-colors"
+                    className="text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                   >
                     Accueil
-                  </a>
+                  </span>
                 </Link>
               </li>
               <li>
                 <Link href="/facilitation-visa">
-                  <a
+                  <span
                     data-testid="link-footer-visa"
-                    className="text-muted-foreground hover:text-primary transition-colors"
+                    className="text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                   >
                     Facilitation Visa
-                  </a>
+                  </span>
                 </Link>
               </li>
               <li>
                 <Link href="/creation-agence">
-                  <a
+                  <span
                     data-testid="link-footer-agency"
-                    className="text-muted-foreground hover:text-primary transition-colors"
+                    className="text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                   >
                     Création d'agence
-                  </a>
+                  </span>
                 </Link>
               </li>
               <li>
                 <Link href="/voyages">
-                  <a
+                  <span
                     data-testid="link-footer-trips"
-                    className="text-muted-foreground hover:text-primary transition-colors"
+                    className="text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                   >
                     Voyages organisés
-                  </a>
+                  </span>
                 </Link>
               </li>
             </ul>
