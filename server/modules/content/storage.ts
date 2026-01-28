@@ -50,7 +50,7 @@ export class ContentMemStorage implements IContentStorage {
         price: 2800,
         description:
           "Voyage business exclusif en Chine. Découvrez les opportunités d'import-export, visitez les plus grands marchés et développez votre réseau avec des entrepreneurs chinois. Programme intensif de 10 jours avec interprète professionnel.",
-        imageUrl: "/attached_assets/generated_images/China_business_trip_image_98f4deaf.png",
+        imageUrl: "/images/trips/china-shanghai-tourism.png",
         itinerary: [
           "Arrivée à Shanghai - Installation à l'hôtel 5* - Briefing du voyage",
           "Visite du marché de Yiwu - Rencontre avec fournisseurs potentiels",
@@ -86,7 +86,7 @@ export class ContentMemStorage implements IContentStorage {
         price: 3200,
         description:
           "Séjour business premium à Dubaï. Explorez le hub entrepreneurial du Moyen-Orient, participez à des conférences exclusives, rencontrez des investisseurs et découvrez les opportunités d'affaires dans l'une des villes les plus dynamiques du monde.",
-        imageUrl: "/attached_assets/generated_images/Dubai_trip_destination_image_ac5e2ebb.png",
+        imageUrl: "/images/trips/dubai-tourism.png",
         itinerary: [
           "Arrivée à Dubaï - Transfert hôtel Burj Al Arab - Welcome drink",
           "Visite de Dubai Marina et JBR - Déjeuner networking au restaurant tournant",
@@ -120,7 +120,7 @@ export class ContentMemStorage implements IContentStorage {
         price: 1900,
         description:
           "Voyage d'affaires à Istanbul pour découvrir les opportunités d'import textile, maroquinerie et décoration. Visitez les plus grands grossistes, négociez directement avec les fabricants et repartez avec vos premiers contrats.",
-        imageUrl: "/attached_assets/generated_images/Istanbul_trip_destination_image_02ebbd52.png",
+        imageUrl: "/images/trips/istanbul-tourism.png",
         itinerary: [
           "Arrivée Istanbul - Installation hôtel Sultanahmet - Dîner de bienvenue",
           "Visite du Grand Bazar et marché aux épices - Initiation négociation",
