@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import OpenAI from "openai";
 import { buildSystemPrompt } from "./knowledgeBase";
+import { generateRuleBasedResponse } from "./ruleEngine";
 
 const router = Router();
 
@@ -28,18 +29,12 @@ function getOpenAIClient(): OpenAI | null {
   return openai;
 }
 
+function isAIEnabled(): boolean {
+  return !!process.env.OPENAI_API_KEY;
+}
+
 router.post("/chat", async (req: Request, res: Response) => {
   try {
-    const client = getOpenAIClient();
-    
-    if (!client) {
-      return res.status(503).json({
-        success: false,
-        error: "Service de chat temporairement indisponible. Veuillez nous contacter directement.",
-        suggestion: "Visitez notre page de contact: /contact"
-      });
-    }
-
     const { message, conversationHistory = [] }: ChatRequest = req.body;
 
     if (!message || typeof message !== "string") {
@@ -56,29 +51,42 @@ router.post("/chat", async (req: Request, res: Response) => {
       });
     }
 
-    const trimmedHistory = conversationHistory.slice(-MAX_HISTORY_LENGTH);
+    const client = getOpenAIClient();
 
-    const systemPrompt = buildSystemPrompt();
+    if (client) {
+      const trimmedHistory = conversationHistory.slice(-MAX_HISTORY_LENGTH);
+      const systemPrompt = buildSystemPrompt();
 
-    const messages: ChatMessage[] = [
-      { role: "system", content: systemPrompt },
-      ...trimmedHistory,
-      { role: "user", content: message }
-    ];
+      const messages: ChatMessage[] = [
+        { role: "system", content: systemPrompt },
+        ...trimmedHistory,
+        { role: "user", content: message }
+      ];
 
-    const completion = await client.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: messages,
-      max_tokens: 500,
-      temperature: 0.7,
-    });
+      const completion = await client.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: messages,
+        max_tokens: 500,
+        temperature: 0.7,
+      });
 
-    const assistantMessage = completion.choices[0]?.message?.content || 
-      "Je suis désolé, je n'ai pas pu traiter votre demande. Veuillez réessayer ou nous contacter directement.";
+      const assistantMessage = completion.choices[0]?.message?.content || 
+        generateRuleBasedResponse(message);
 
-    res.json({
+      return res.json({
+        success: true,
+        message: assistantMessage,
+        mode: "ai",
+        conversationId: Date.now().toString()
+      });
+    }
+
+    const ruleResponse = generateRuleBasedResponse(message);
+    
+    return res.json({
       success: true,
-      message: assistantMessage,
+      message: ruleResponse,
+      mode: "rules",
       conversationId: Date.now().toString()
     });
 
@@ -93,21 +101,26 @@ router.post("/chat", async (req: Request, res: Response) => {
       });
     }
 
-    res.status(500).json({
-      success: false,
-      error: "Une erreur est survenue. Veuillez réessayer ou nous contacter directement.",
-      suggestion: "Visitez notre page de contact: /contact"
+    const fallbackResponse = generateRuleBasedResponse(req.body.message || "aide");
+    
+    return res.json({
+      success: true,
+      message: fallbackResponse,
+      mode: "rules",
+      conversationId: Date.now().toString()
     });
   }
 });
 
 router.get("/status", (_req: Request, res: Response) => {
-  const client = getOpenAIClient();
+  const aiEnabled = isAIEnabled();
   res.json({
-    available: !!client,
-    message: client 
-      ? "Assistant disponible 24/7" 
-      : "Assistant temporairement indisponible"
+    available: true,
+    aiEnabled: aiEnabled,
+    mode: aiEnabled ? "ai" : "rules",
+    message: aiEnabled 
+      ? "Assistant IA disponible 24/7" 
+      : "Assistant disponible 24/7"
   });
 });
 

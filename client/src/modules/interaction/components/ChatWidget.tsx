@@ -8,6 +8,7 @@ interface Message {
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
+  mode?: "ai" | "rules";
 }
 
 export default function ChatWidget() {
@@ -16,6 +17,7 @@ export default function ChatWidget() {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isAvailable, setIsAvailable] = useState(true);
+  const [chatMode, setChatMode] = useState<"ai" | "rules">("rules");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -42,8 +44,10 @@ export default function ChatWidget() {
       const response = await fetch("/api/chatbot/status");
       const data = await response.json();
       setIsAvailable(data.available);
+      setChatMode(data.mode || "rules");
     } catch {
-      setIsAvailable(false);
+      setIsAvailable(true);
+      setChatMode("rules");
     }
   };
 
@@ -81,9 +85,11 @@ export default function ChatWidget() {
         const assistantMessage: Message = {
           role: "assistant",
           content: data.message,
-          timestamp: new Date()
+          timestamp: new Date(),
+          mode: data.mode
         };
         setMessages((prev) => [...prev, assistantMessage]);
+        if (data.mode) setChatMode(data.mode);
       } else {
         const errorMessage: Message = {
           role: "assistant",
@@ -157,7 +163,7 @@ export default function ChatWidget() {
               <div>
                 <CardTitle className="text-base font-heading">Assistant Mr Saint</CardTitle>
                 <p className="text-xs text-white/70">
-                  {isAvailable ? "En ligne • Répond instantanément" : "Hors ligne"}
+                  {isAvailable ? `En ligne • ${chatMode === "ai" ? "Mode IA" : "Mode FAQ"}` : "Hors ligne"}
                 </p>
               </div>
             </div>
