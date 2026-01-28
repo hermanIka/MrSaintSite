@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { Award, Globe, Users, Target, CheckCircle, Plane } from "lucide-react";
+import mrSaintPhoto from "@assets/Mr_saint_photo_profil_1769639553577.jfif";
 
 export default function AboutPage() {
   const milestones = [
@@ -70,12 +71,25 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h2
-                data-testid="text-story-title"
-                className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-6"
-              >
-                Notre Histoire
-              </h2>
+              <div className="flex items-start gap-6 mb-8">
+                <div className="flex-shrink-0">
+                  <img
+                    src={mrSaintPhoto}
+                    alt="Mr Saint - Fondateur"
+                    data-testid="img-mr-saint-profile"
+                    className="w-28 h-28 rounded-full object-cover border-4 border-primary/30"
+                  />
+                </div>
+                <div>
+                  <h2
+                    data-testid="text-story-title"
+                    className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-2"
+                  >
+                    Notre Histoire
+                  </h2>
+                  <p data-testid="text-founder-name" className="text-primary font-medium">Mr Saint, Fondateur</p>
+                </div>
+              </div>
               <div className="space-y-4 text-muted-foreground leading-relaxed">
                 <p>
                   Mr Saint est né d'une passion profonde pour le voyage et d'une volonté 
