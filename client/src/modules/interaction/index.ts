@@ -6,3 +6,4 @@
 
 export { default as ContactPage } from "./components/ContactPage";
 export { default as FAQPage } from "./components/FAQPage";
+export { default as ChatWidget } from "./components/ChatWidget";
