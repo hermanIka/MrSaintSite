@@ -159,7 +159,17 @@ npm run db:push  # Synchronisation schema DB
 
 ## Notes de Développement
 
-### Dernière Mise à Jour (Module 1 - Structure & Base)
+### Dernière Mise à Jour (Module 3 - Chatbot Hybride)
+- Ajout du ChatWidget flottant intégré au Layout
+- Système de chatbot hybride :
+  - **Mode Règles** (par défaut) : Fonctionne sans API externe, utilise le matching de mots-clés avec la FAQ
+  - **Mode IA** : Activé automatiquement quand OPENAI_API_KEY est configurée
+- Moteur de règles avec 15+ catégories de réponses prédéfinies
+- Base de connaissances complète sur les services Mr Saint
+- Fallback automatique vers le mode règles en cas d'erreur IA
+- Indicateur de mode visible dans l'en-tête du chat (FAQ / IA)
+
+### Module 1 (Complété)
 - Ajout de AboutPage (À propos)
 - Ajout de ServicesPage (Offres de services)
 - Ajout de FAQPage (Foire aux questions)
