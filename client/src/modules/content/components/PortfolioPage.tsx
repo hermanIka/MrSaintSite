@@ -70,19 +70,14 @@ export default function PortfolioPage() {
       <section className="py-20 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {isLoading ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {[1, 2, 3, 4].map((i) => (
-                <Card key={i}>
-                  <CardContent className="p-6">
-                    <div className="flex gap-4">
-                      <Skeleton className="w-32 h-32 rounded-lg flex-shrink-0" />
-                      <div className="flex-1 space-y-3">
-                        <Skeleton className="h-6 w-3/4" />
-                        <Skeleton className="h-4 w-1/2" />
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-full" />
-                      </div>
-                    </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <Card key={i} className="overflow-hidden">
+                  <Skeleton className="w-full h-48" />
+                  <CardContent className="p-4 space-y-3">
+                    <Skeleton className="h-5 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                    <Skeleton className="h-4 w-full" />
                   </CardContent>
                 </Card>
               ))}
@@ -101,59 +96,54 @@ export default function PortfolioPage() {
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {portfolioItems.map((item) => (
                 <Card
                   key={item.id}
                   data-testid={`card-portfolio-${item.id}`}
-                  className="overflow-hidden hover-elevate transition-all duration-300 border-primary/10"
+                  className="overflow-hidden hover-elevate transition-all duration-300 border-primary/10 group"
                 >
-                  <CardContent className="p-0">
-                    <div className="flex flex-col sm:flex-row">
-                      <div className="relative w-full sm:w-48 h-48 sm:h-auto flex-shrink-0">
-                        <img
-                          src={item.imageUrl}
-                          alt={item.businessName}
-                          className="w-full h-full object-cover"
-                        />
-                        {item.clientLogo && (
-                          <div className="absolute bottom-2 right-2 bg-white rounded-lg p-1 shadow-md">
-                            <img 
-                              src={item.clientLogo} 
-                              alt={`Logo ${item.businessName}`}
-                              className="w-8 h-8 object-contain"
-                            />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 p-6">
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          <Badge className="bg-primary text-primary-foreground">
-                            {SERVICE_TYPES.find(t => t.value === item.serviceType)?.label || item.serviceType}
-                          </Badge>
-                          <Badge variant="outline">{item.category}</Badge>
-                        </div>
-                        
-                        <h3 className="text-xl font-heading font-semibold mb-2">
-                          {item.businessName}
-                        </h3>
-                        
-                        <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                          {item.description}
-                        </p>
-                        
-                        <div className="flex items-start gap-2 mb-3 p-3 bg-primary/5 rounded-lg">
-                          <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                          <p className="text-sm font-medium text-foreground">
-                            {item.result}
-                          </p>
-                        </div>
-                        
-                        <div className="flex items-center text-sm text-muted-foreground">
-                          <Calendar className="w-4 h-4 mr-1" />
+                  <div className="relative h-52 overflow-hidden">
+                    <img
+                      src={item.imageUrl}
+                      alt={item.businessName}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    <div className="absolute bottom-3 left-3 right-3">
+                      <div className="flex flex-wrap gap-1.5">
+                        <Badge className="bg-primary text-primary-foreground text-xs">
+                          {SERVICE_TYPES.find(t => t.value === item.serviceType)?.label || item.serviceType}
+                        </Badge>
+                        <Badge variant="secondary" className="bg-white/90 text-black text-xs">
                           {item.year}
-                        </div>
+                        </Badge>
                       </div>
+                    </div>
+                    {item.clientLogo && (
+                      <div className="absolute top-3 right-3 bg-white rounded-lg p-1.5 shadow-md">
+                        <img 
+                          src={item.clientLogo} 
+                          alt={`Logo ${item.businessName}`}
+                          className="w-6 h-6 object-contain"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <CardContent className="p-4">
+                    <h3 className="text-lg font-heading font-semibold mb-2 line-clamp-1">
+                      {item.businessName}
+                    </h3>
+                    
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                      {item.description}
+                    </p>
+                    
+                    <div className="flex items-start gap-2 p-2.5 bg-primary/5 rounded-lg">
+                      <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                      <p className="text-xs font-medium text-foreground line-clamp-2">
+                        {item.result}
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
