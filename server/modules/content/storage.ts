@@ -14,12 +14,14 @@ import {
   type InsertTestimonial,
   type Portfolio,
   type InsertPortfolio,
+  type Service,
   trips,
   testimonials,
   portfolio,
+  services,
 } from "@shared/schema";
 import { db } from "../../db";
-import { eq, and } from "drizzle-orm";
+import { eq, and, asc } from "drizzle-orm";
 
 export interface IContentStorage {
   getAllTrips(): Promise<Trip[]>;
@@ -41,6 +43,9 @@ export interface IContentStorage {
   createPortfolio(portfolio: InsertPortfolio): Promise<Portfolio>;
   updatePortfolio(id: string, portfolio: Partial<InsertPortfolio>): Promise<Portfolio | undefined>;
   deletePortfolio(id: string): Promise<boolean>;
+
+  getPublishedServices(): Promise<Service[]>;
+  getServiceBySlug(slug: string): Promise<Service | undefined>;
 }
 
 export class ContentDbStorage implements IContentStorage {
@@ -167,6 +172,22 @@ export class ContentDbStorage implements IContentStorage {
       .where(eq(portfolio.id, id))
       .returning();
     return result.length > 0;
+  }
+
+  async getPublishedServices(): Promise<Service[]> {
+    return await db
+      .select()
+      .from(services)
+      .where(eq(services.status, "published"))
+      .orderBy(asc(services.order));
+  }
+
+  async getServiceBySlug(slug: string): Promise<Service | undefined> {
+    const [service] = await db
+      .select()
+      .from(services)
+      .where(and(eq(services.slug, slug), eq(services.status, "published")));
+    return service;
   }
 }
 

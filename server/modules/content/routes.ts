@@ -58,4 +58,25 @@ export function registerContentRoutes(app: Express): void {
       res.status(500).json({ error: "Failed to fetch portfolio" });
     }
   });
+
+  app.get("/api/services", async (_req, res) => {
+    try {
+      const services = await contentStorage.getPublishedServices();
+      res.json(services);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch services" });
+    }
+  });
+
+  app.get("/api/services/:slug", async (req, res) => {
+    try {
+      const service = await contentStorage.getServiceBySlug(req.params.slug);
+      if (!service) {
+        return res.status(404).json({ error: "Service not found" });
+      }
+      res.json(service);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch service" });
+    }
+  });
 }
