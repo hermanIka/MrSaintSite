@@ -156,8 +156,8 @@ modules/
 ### Backend
 - **Express.js** avec TypeScript
 - **Architecture modulaire** par domaines
-- **In-Memory Storage** (MemStorage) actuellement
-- **Drizzle ORM** préparé pour PostgreSQL
+- **PostgreSQL** avec Drizzle ORM (données persistantes)
+- **@neondatabase/serverless** pour la connexion DB
 
 ### Design System
 - Palette: Gold (#F2C94C), Black (#000000), Gray (#1A1A1A)
@@ -199,7 +199,14 @@ npm run db:push  # Synchronisation schema DB
 
 ## Notes de Développement
 
-### Dernière Mise à Jour (Module Portfolio Dynamique - Janvier 2026)
+### Dernière Mise à Jour (Migration PostgreSQL - Janvier 2026)
+- Migration complète vers PostgreSQL avec Drizzle ORM
+- 6 tables : trips, testimonials, portfolio, faqs, admins, activity_logs
+- Script de seed avec données initiales (3 voyages, 3 témoignages, 6 portfolio, 6 FAQ)
+- Données persistantes entre redémarrages du serveur
+- Pour exécuter le seed : `npx tsx server/seed.ts`
+
+### Module Portfolio Dynamique (Janvier 2026)
 - Portfolio enrichi avec champs : description, serviceType, result, year, status, clientLogo
 - Filtrage dynamique par type de service (visa, agence, voyage)
 - Système de statut draft/published - seuls les projets publiés sont visibles au public
@@ -241,7 +248,6 @@ npm run db:push  # Synchronisation schema DB
 - Fichiers de contexte mis à jour pour chaque module
 
 ### Prochaines Étapes
-1. Intégration Calendly pour les réservations
-2. Intégration Stripe/Lemon Squeezy pour les paiements
-3. Migration vers PostgreSQL pour la persistence
-4. Module de gestion admin (futur)
+1. Intégration Stripe/Lemon Squeezy pour les paiements
+2. Intégration Calendly pour les réservations
+3. Amélioration chatbot avec OpenAI (optionnel)

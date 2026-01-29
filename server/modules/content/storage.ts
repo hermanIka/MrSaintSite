@@ -19,7 +19,7 @@ import {
   portfolio,
 } from "@shared/schema";
 import { db } from "../../db";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 export interface IContentStorage {
   getAllTrips(): Promise<Trip[]>;
@@ -121,11 +121,15 @@ export class ContentDbStorage implements IContentStorage {
   }
 
   async getPortfolioByServiceType(serviceType: string): Promise<Portfolio[]> {
-    const all = await db
+    return await db
       .select()
       .from(portfolio)
-      .where(eq(portfolio.status, "published"));
-    return all.filter((item) => item.serviceType === serviceType);
+      .where(
+        and(
+          eq(portfolio.status, "published"),
+          eq(portfolio.serviceType, serviceType)
+        )
+      );
   }
 
   async getPortfolioById(id: string): Promise<Portfolio | undefined> {
