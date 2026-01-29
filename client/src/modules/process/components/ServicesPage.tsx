@@ -92,111 +92,93 @@ export default function ServicesPage() {
 
       <section className="py-24 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="space-y-24">
-            {services.map((service, index) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {services.map((service) => {
               const Icon = service.icon;
-              const isEven = index % 2 === 0;
               
               return (
-                <div
+                <Card
                   key={service.id}
                   data-testid={`section-service-${service.id}`}
-                  className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${
-                    isEven ? "" : "lg:flex-row-reverse"
-                  }`}
+                  className="border-primary/20 flex flex-col h-full transition-all duration-300 hover:border-primary/40 hover:shadow-lg"
                 >
-                  <div className={isEven ? "" : "lg:order-2"}>
-                    <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-4">
-                      <Icon className="w-4 h-4" />
-                      <span data-testid={`text-service-subtitle-${service.id}`} className="text-sm font-medium">{service.subtitle}</span>
+                  <CardHeader className="bg-primary/5 border-b border-primary/10">
+                    <div className="w-14 h-14 rounded-lg bg-primary flex items-center justify-center mb-4">
+                      <Icon className="w-7 h-7 text-primary-foreground" />
                     </div>
-                    <h2 data-testid={`text-service-title-${service.id}`} className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-4">
-                      {service.title}
-                    </h2>
-                    <p data-testid={`text-service-desc-${service.id}`} className="text-lg text-muted-foreground mb-6 leading-relaxed">
+                    <CardTitle>
+                      <div data-testid={`text-service-title-${service.id}`} className="text-2xl font-heading mb-1">{service.title}</div>
+                      <div data-testid={`text-service-subtitle-${service.id}`} className="text-sm text-muted-foreground font-normal">
+                        {service.subtitle}
+                      </div>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6 flex-1 flex flex-col">
+                    <p data-testid={`text-service-desc-${service.id}`} className="text-muted-foreground mb-6 leading-relaxed">
                       {service.description}
                     </p>
                     
-                    <ul className="space-y-3 mb-8">
-                      {service.features.map((feature, i) => (
-                        <li key={i} data-testid={`text-feature-${service.id}-${i}`} className="flex items-start gap-3">
-                          <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                    <ul className="space-y-2 mb-6 flex-1">
+                      {service.features.slice(0, 4).map((feature, i) => (
+                        <li key={i} data-testid={`text-feature-${service.id}-${i}`} className="flex items-start gap-2 text-sm">
+                          <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                           <span className="text-muted-foreground">{feature}</span>
                         </li>
                       ))}
                     </ul>
 
-                    <div className="flex flex-wrap items-center gap-4">
+                    {"destinations" in service && service.destinations && (
+                      <div className="mb-4">
+                        <div data-testid={`text-destinations-label-${service.id}`} className="text-xs font-medium text-foreground mb-2">
+                          Destinations populaires
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {service.destinations.slice(0, 3).map((dest) => (
+                            <span
+                              key={dest}
+                              data-testid={`chip-destination-${dest.toLowerCase().replace(/\s+/g, '-')}`}
+                              className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full"
+                            >
+                              {dest}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {"benefits" in service && service.benefits && (
+                      <div className="mb-4">
+                        <div data-testid={`text-benefits-label-${service.id}`} className="text-xs font-medium text-foreground mb-2">
+                          Avantages
+                        </div>
+                        <div className="flex flex-wrap gap-1">
+                          {service.benefits.map((benefit) => (
+                            <span
+                              key={benefit}
+                              data-testid={`chip-benefit-${benefit.toLowerCase().replace(/\s+/g, '-')}`}
+                              className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full"
+                            >
+                              {benefit}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="pt-4 border-t border-primary/10 mt-auto">
+                      <div data-testid={`text-service-price-${service.id}`} className="text-lg font-semibold text-primary mb-4">{service.price}</div>
                       <Link href={service.link}>
                         <Button
                           data-testid={`button-service-${service.id}`}
-                          size="lg"
-                          className="gap-2"
+                          className="w-full gap-2"
                         >
                           En savoir plus
                           <ArrowRight className="w-4 h-4" />
                         </Button>
                       </Link>
-                      <span data-testid={`text-service-price-${service.id}`} className="text-lg font-semibold text-primary">{service.price}</span>
                     </div>
-                  </div>
-
-                  <div className={isEven ? "lg:order-2" : ""}>
-                    <Card className="border-primary/20 overflow-hidden">
-                      <CardHeader className="bg-primary/5 border-b border-primary/10">
-                        <CardTitle className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center">
-                            <Icon className="w-6 h-6 text-primary-foreground" />
-                          </div>
-                          <div>
-                            <div data-testid={`text-card-title-${service.id}`} className="text-xl font-heading">{service.title}</div>
-                            <div data-testid={`text-card-subtitle-${service.id}`} className="text-sm text-muted-foreground font-normal">
-                              {service.subtitle}
-                            </div>
-                          </div>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="p-6">
-                        {"destinations" in service && service.destinations && (
-                          <div className="mb-4">
-                            <div data-testid={`text-destinations-label-${service.id}`} className="text-sm font-medium text-foreground mb-2">
-                              Destinations populaires
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              {service.destinations.map((dest) => (
-                                <span
-                                  key={dest}
-                                  data-testid={`chip-destination-${dest.toLowerCase().replace(/\s+/g, '-')}`}
-                                  className="px-3 py-1 bg-primary/10 text-primary text-sm rounded-full"
-                                >
-                                  {dest}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        {"benefits" in service && service.benefits && (
-                          <div>
-                            <div data-testid={`text-benefits-label-${service.id}`} className="text-sm font-medium text-foreground mb-2">
-                              Avantages
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              {service.benefits.map((benefit) => (
-                                <span
-                                  key={benefit}
-                                  data-testid={`chip-benefit-${benefit.toLowerCase().replace(/\s+/g, '-')}`}
-                                  className="px-3 py-1 bg-primary/10 text-primary text-sm rounded-full"
-                                >
-                                  {benefit}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               );
             })}
           </div>
