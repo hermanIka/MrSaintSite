@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Layout } from "@/modules/foundation";
+import { SEO } from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -103,6 +104,11 @@ export default function FAQPage() {
 
   return (
     <Layout>
+      <SEO 
+        title="Questions Fréquentes"
+        description="Trouvez les réponses à vos questions sur les visas, la création d'agence de voyage et les voyages organisés. FAQ complète Mr Saint."
+        keywords="FAQ, questions visa, création agence, voyages, aide, support"
+      />
       <section className="relative py-32 text-white overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"

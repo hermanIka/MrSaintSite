@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Layout } from "@/modules/foundation";
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +30,11 @@ export default function PortfolioPage() {
 
   return (
     <Layout>
+      <SEO 
+        title="Portfolio & Réalisations"
+        description="Découvrez les success stories des entrepreneurs accompagnés par Mr Saint. Témoignages, projets réalisés et parcours inspirants."
+        keywords="portfolio, réalisations, témoignages, entrepreneurs, success stories"
+      />
       <section
         className="relative py-32 text-white overflow-hidden"
         style={{ marginTop: "80px" }}
@@ -114,6 +120,7 @@ export default function PortfolioPage() {
                       src={item.imageUrl}
                       alt={item.businessName}
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      loading="lazy"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <div className="absolute bottom-3 left-3 right-3">
@@ -132,6 +139,7 @@ export default function PortfolioPage() {
                           src={item.clientLogo} 
                           alt={`Logo ${item.businessName}`}
                           className="w-6 h-6 object-contain"
+                          loading="lazy"
                         />
                       </div>
                     )}

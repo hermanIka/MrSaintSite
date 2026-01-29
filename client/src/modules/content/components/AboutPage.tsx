@@ -1,4 +1,5 @@
 import { Layout } from "@/modules/foundation";
+import { SEO } from "@/components/SEO";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -46,6 +47,11 @@ export default function AboutPage() {
 
   return (
     <Layout>
+      <SEO 
+        title="À Propos"
+        description="Découvrez Mr Saint, expert voyagiste depuis 2018. Plus de 500 clients accompagnés, 50+ agences créées. Une vision premium du tourisme et de l'accompagnement business."
+        keywords="Mr Saint, expert voyage, histoire, parcours, agence voyage premium"
+      />
       <section className="relative py-32 bg-black text-white overflow-hidden">
         <div className="absolute inset-0">
           <img 
@@ -86,6 +92,7 @@ export default function AboutPage() {
                     alt="Mr Saint - Fondateur"
                     data-testid="img-mr-saint-profile"
                     className="w-28 h-28 rounded-full object-cover border-4 border-primary/30"
+                    loading="lazy"
                   />
                 </div>
                 <div>

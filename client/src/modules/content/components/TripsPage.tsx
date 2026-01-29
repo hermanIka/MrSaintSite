@@ -1,4 +1,5 @@
 import { Layout } from "@/modules/foundation";
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +17,11 @@ export default function TripsPage() {
 
   return (
     <Layout>
+      <SEO 
+        title="Voyages Organisés"
+        description="Découvrez nos voyages business exclusifs vers Dubaï, Istanbul, Chine et plus. Expériences premium, destinations prestigieuses et accompagnement sur mesure."
+        keywords="voyages business, Dubaï, Istanbul, Chine, voyage organisé, voyage premium"
+      />
       <section
         className="relative py-24 bg-black text-white overflow-hidden"
         style={{ marginTop: "80px" }}
@@ -82,6 +88,7 @@ export default function TripsPage() {
                       src={trip.imageUrl}
                       alt={trip.title}
                       className="w-full h-full object-cover"
+                      loading="lazy"
                     />
                     <div className="absolute top-4 right-4">
                       <Badge className="bg-primary text-primary-foreground">

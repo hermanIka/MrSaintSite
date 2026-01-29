@@ -1,4 +1,5 @@
 import { Layout } from "@/modules/foundation";
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -55,6 +56,12 @@ export default function TripDetailPage() {
 
   return (
     <Layout>
+      <SEO 
+        title={trip.title}
+        description={trip.description.substring(0, 160)}
+        keywords={`voyage ${trip.destination}, voyage business, ${trip.destination}`}
+        image={trip.imageUrl}
+      />
       <div className="pt-24">
         <div
           className="relative h-96 bg-cover bg-center"

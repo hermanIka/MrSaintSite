@@ -1,4 +1,5 @@
 import { Layout } from "@/modules/foundation";
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, FileText, Plane } from "lucide-react";
@@ -47,6 +48,11 @@ export default function FacilitationVisaPage() {
 
   return (
     <Layout>
+      <SEO 
+        title="Facilitation Visa"
+        description="Service de facilitation visa pour Dubaï, Canada, États-Unis, Europe. Taux de réussite 95%. Accompagnement complet de votre dossier."
+        keywords="visa, facilitation visa, Dubaï, Canada, États-Unis, Europe, Chine, démarches visa"
+      />
       <section
         className="relative h-[50vh] flex items-center justify-center overflow-hidden"
         style={{ marginTop: "80px" }}

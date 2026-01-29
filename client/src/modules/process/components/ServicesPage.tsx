@@ -1,4 +1,5 @@
 import { Layout } from "@/modules/foundation";
+import { SEO } from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -83,6 +84,11 @@ export default function ServicesPage() {
 
   return (
     <Layout>
+      <SEO 
+        title="Nos Services"
+        description="Découvrez nos services: facilitation visa, création d'agence de voyage, voyages business organisés et consultation stratégique. Solutions complètes."
+        keywords="services, visa, agence voyage, voyages business, consultation, formation"
+      />
       <section className="relative py-32 bg-black text-white overflow-hidden">
         <div className="absolute inset-0">
           <img 

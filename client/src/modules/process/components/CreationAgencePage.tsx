@@ -1,4 +1,5 @@
 import { Layout } from "@/modules/foundation";
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, TrendingUp, Users, Rocket, DollarSign } from "lucide-react";
@@ -53,6 +54,11 @@ export default function CreationAgencePage() {
 
   return (
     <Layout>
+      <SEO 
+        title="Création d'Agence de Voyage"
+        description="Formation complète pour créer votre agence de voyage. Coaching, parrainage et financement. +50 entrepreneurs accompagnés, 85% de taux de réussite."
+        keywords="création agence voyage, formation tourisme, coaching, parrainage, entrepreneur voyage"
+      />
       <section
         className="relative h-[50vh] flex items-center justify-center overflow-hidden"
         style={{ marginTop: "80px" }}

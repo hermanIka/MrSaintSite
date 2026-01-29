@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Layout } from "@/modules/foundation";
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -62,6 +63,11 @@ export default function ContactPage() {
 
   return (
     <Layout>
+      <SEO 
+        title="Contact"
+        description="Contactez Mr Saint pour vos projets de visa, création d'agence ou voyages business. Réponse rapide garantie. Email: matandusaint@gmail.com"
+        keywords="contact, Mr Saint, demande visa, agence voyage, consultation"
+      />
       <section
         className="relative py-24 text-white overflow-hidden"
         style={{ marginTop: "80px" }}

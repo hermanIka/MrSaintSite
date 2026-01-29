@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Layout } from "@/modules/foundation";
+import { SEO } from "@/components/SEO";
 import { useQuery } from "@tanstack/react-query";
 import type { Testimonial } from "@shared/schema";
 import { Plane, FileText, Briefcase, Shield, Users, Globe, ChevronLeft, ChevronRight } from "lucide-react";
@@ -77,6 +78,11 @@ export default function HomePage() {
 
   return (
     <Layout>
+      <SEO 
+        title="Accueil"
+        description="Mr Saint, expert voyagiste avec 7 ans d'expérience. Facilitation visa, création d'agence de voyage, voyages business organisés. Votre partenaire de confiance."
+        keywords="visa, agence de voyage, voyages business, Dubaï, Canada, formation tourisme"
+      />
       <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center"
@@ -255,6 +261,7 @@ export default function HomePage() {
                       alt={testimonials[testimonialIndex]?.name}
                       className="w-20 h-20 rounded-full object-cover mb-6"
                       data-testid="img-testimonial-avatar"
+                      loading="lazy"
                     />
                     <p
                       data-testid="text-testimonial-content"

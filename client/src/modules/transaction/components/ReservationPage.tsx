@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Layout } from "@/modules/foundation";
+import { SEO } from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -64,6 +65,11 @@ export default function ReservationPage() {
 
   return (
     <Layout>
+      <SEO 
+        title="Réservation"
+        description="Réservez votre consultation avec Mr Saint. Paiement sécurisé, choix du créneau et confirmation instantanée. Démarrez votre projet dès maintenant."
+        keywords="réservation, consultation, paiement, rendez-vous, Mr Saint"
+      />
       <section className="relative py-32 bg-black text-white overflow-hidden">
         <img 
           src={reservationHero} 
