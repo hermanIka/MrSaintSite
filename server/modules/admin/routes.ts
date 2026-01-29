@@ -29,6 +29,7 @@ import {
   insertPortfolioSchema,
   insertFaqSchema,
 } from "@shared/schema";
+import { ObjectStorageService } from "../../replit_integrations/object_storage";
 
 export function registerAdminRoutes(app: Express) {
   // ============ AUTH ============
@@ -482,6 +483,54 @@ export function registerAdminRoutes(app: Express) {
       res.json(logs);
     } catch (error) {
       res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+  
+  // ============ UPLOAD (Protected) ============
+  
+  const objectStorageService = new ObjectStorageService();
+  
+  /**
+   * Request a presigned URL for admin file upload.
+   * Protected by auth middleware - only admins can upload.
+   */
+  app.post("/api/admin/upload/request-url", authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { name, size, contentType } = req.body;
+
+      if (!name || typeof name !== "string") {
+        return res.status(400).json({ error: "Nom de fichier requis" });
+      }
+
+      if (!contentType || typeof contentType !== "string" || !contentType.startsWith("image/")) {
+        return res.status(400).json({ error: "Seules les images sont acceptées" });
+      }
+
+      const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+      if (typeof size !== "number" || size <= 0 || size > MAX_SIZE) {
+        return res.status(400).json({ error: "Taille de fichier invalide (max 5 Mo)" });
+      }
+
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
+
+      await adminStorage.createLog({
+        action: "UPLOAD",
+        entityType: "file",
+        entityId: objectPath,
+        details: `Upload de fichier: ${name}`,
+        adminId: req.admin!.adminId,
+        createdAt: new Date().toISOString(),
+      });
+
+      res.json({
+        uploadURL,
+        objectPath,
+        metadata: { name, size, contentType },
+      });
+    } catch (error) {
+      console.error("Error generating upload URL:", error);
+      res.status(500).json({ error: "Erreur lors de la génération de l'URL d'upload" });
     }
   });
 }

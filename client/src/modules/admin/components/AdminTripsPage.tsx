@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminLayout } from "./AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,7 +14,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAdminAuth } from "../hooks/useAdminAuth";
-import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Upload, Image as ImageIcon } from "lucide-react";
 import type { Trip } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
@@ -49,6 +49,9 @@ export function AdminTripsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTrip, setEditingTrip] = useState<Trip | null>(null);
   const [formData, setFormData] = useState<TripFormData>(emptyFormData);
+  const [isUploading, setIsUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: trips, isLoading } = useQuery<Trip[]>({
     queryKey: ["/api/admin/trips"],
@@ -124,6 +127,59 @@ export function AdminTripsPage() {
     setIsDialogOpen(false);
     setEditingTrip(null);
     setFormData(emptyFormData);
+    setImagePreview(null);
+  };
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Veuillez sélectionner une image", variant: "destructive" });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "L'image ne doit pas dépasser 5 Mo", variant: "destructive" });
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const urlRes = await fetch("/api/admin/upload/request-url", {
+        method: "POST",
+        headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: file.name,
+          size: file.size,
+          contentType: file.type,
+        }),
+      });
+
+      if (!urlRes.ok) {
+        throw new Error("Erreur lors de la demande d'upload");
+      }
+
+      const { uploadURL, objectPath } = await urlRes.json();
+
+      const uploadRes = await fetch(uploadURL, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type },
+      });
+
+      if (!uploadRes.ok) {
+        throw new Error("Erreur lors de l'upload");
+      }
+
+      setFormData((p) => ({ ...p, imageUrl: objectPath }));
+      setImagePreview(URL.createObjectURL(file));
+      toast({ title: "Image uploadée avec succès" });
+    } catch (error) {
+      toast({ title: "Erreur lors de l'upload de l'image", variant: "destructive" });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const openEditDialog = (trip: Trip) => {
@@ -139,6 +195,7 @@ export function AdminTripsPage() {
       included: trip.included.length > 0 ? trip.included : [""],
       notIncluded: trip.notIncluded.length > 0 ? trip.notIncluded : [""],
     });
+    setImagePreview(trip.imageUrl);
     setIsDialogOpen(true);
   };
 
@@ -217,8 +274,53 @@ export function AdminTripsPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="imageUrl">URL de l'image</Label>
-                  <Input id="imageUrl" value={formData.imageUrl} onChange={(e) => setFormData((p) => ({ ...p, imageUrl: e.target.value }))} placeholder="/images/trips/..." required data-testid="input-trip-image" />
+                  <Label>Image du voyage</Label>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    data-testid="input-trip-image-file"
+                  />
+                  <div className="flex items-center gap-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploading}
+                      data-testid="button-upload-image"
+                    >
+                      {isUploading ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <Upload className="w-4 h-4 mr-2" />
+                      )}
+                      {isUploading ? "Upload en cours..." : "Choisir une image"}
+                    </Button>
+                    {(imagePreview || formData.imageUrl) && (
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={imagePreview || formData.imageUrl}
+                          alt="Aperçu"
+                          className="w-16 h-16 object-cover rounded border"
+                          data-testid="img-trip-preview"
+                        />
+                        <span className="text-sm text-muted-foreground">Image sélectionnée</span>
+                      </div>
+                    )}
+                    {!imagePreview && !formData.imageUrl && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <ImageIcon className="w-4 h-4" />
+                        <span className="text-sm">Aucune image</span>
+                      </div>
+                    )}
+                  </div>
+                  {formData.imageUrl && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Chemin: {formData.imageUrl}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
