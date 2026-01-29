@@ -2,11 +2,29 @@ import { Layout } from "@/modules/foundation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { FileText, Briefcase, Plane, CheckCircle, ArrowRight } from "lucide-react";
+import { FileText, Briefcase, Plane, CheckCircle, ArrowRight, MessageSquare } from "lucide-react";
 import servicesHeroBanner from "@/assets/images/services-hero-banner.png";
 
 export default function ServicesPage() {
   const services = [
+    {
+      id: "consultation",
+      icon: MessageSquare,
+      title: "Consultation Stratégique",
+      subtitle: "Votre projet mérite un expert",
+      description:
+        "Une session personnalisée avec Mr Saint pour analyser votre projet, répondre à vos questions et définir une feuille de route claire. Idéal pour démarrer du bon pied.",
+      features: [
+        "Appel vidéo privé de 45 minutes",
+        "Analyse personnalisée de votre situation",
+        "Recommandations concrètes et actionnables",
+        "Accès à des ressources exclusives",
+        "Suivi par email pendant 7 jours",
+      ],
+      benefits: ["Clarté immédiate", "Gain de temps", "Expertise reconnue"],
+      link: "/reservation",
+      price: "95€ / session",
+    },
     {
       id: "visa",
       icon: FileText,
