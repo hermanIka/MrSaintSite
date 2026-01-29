@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { FileText, Briefcase, Plane, CheckCircle, Calendar, CreditCard, Lock, ArrowLeft } from "lucide-react";
-import CalendarBooking from "./CalendarBooking";
+import CalendlyEmbed from "./CalendlyEmbed";
 import reservationHero from "@/assets/images/reservation-hero.png";
 
 type ServiceType = "visa" | "agence" | "voyage" | null;
@@ -239,12 +239,9 @@ export default function ReservationPage() {
                 Retour aux services
               </Button>
               
-              <CalendarBooking
+              <CalendlyEmbed
                 serviceType={selectedService}
                 serviceName={services.find((s) => s.id === selectedService)?.title || ""}
-                onSlotSelected={(date, time) => {
-                  console.log("Slot selected:", date, time);
-                }}
               />
             </div>
           )}

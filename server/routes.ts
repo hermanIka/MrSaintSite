@@ -27,6 +27,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Module Chatbot
   app.use("/api/chatbot", chatbotRoutes);
 
+  // Configuration endpoint for Calendly URL
+  app.get("/api/config/calendly", (req, res) => {
+    res.json({
+      url: process.env.CALENDLY_URL || null,
+      configured: !!process.env.CALENDLY_URL && process.env.CALENDLY_URL !== "https://calendly.com/your-calendly-link",
+    });
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

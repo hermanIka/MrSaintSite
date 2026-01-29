@@ -247,7 +247,13 @@ npm run db:push  # Synchronisation schema DB
 - Navigation mise à jour avec nouvelles pages
 - Fichiers de contexte mis à jour pour chaque module
 
+### Intégration Calendly (Janvier 2026)
+- Widget Calendly intégré via CalendlyEmbed component
+- Configuration via variable d'environnement CALENDLY_URL
+- Message informatif affiché si Calendly non configuré
+- Endpoint API: GET /api/config/calendly (vérifie la configuration)
+- Pour configurer: Modifier CALENDLY_URL avec le lien Calendly du client
+
 ### Prochaines Étapes
-1. Intégration Stripe/Lemon Squeezy pour les paiements
-2. Intégration Calendly pour les réservations
-3. Amélioration chatbot avec OpenAI (optionnel)
+1. Intégration Stripe/Lemon Squeezy pour les paiements (en attente des clés API du client)
+2. Amélioration chatbot avec OpenAI (optionnel)
