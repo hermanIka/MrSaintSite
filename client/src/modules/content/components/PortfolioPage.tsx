@@ -9,7 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { Portfolio } from "@shared/schema";
 import { SERVICE_TYPES } from "@shared/schema";
 import { CheckCircle, Calendar, ArrowRight } from "lucide-react";
-import portfolioBanner from "@assets/images/portfolio-banner.png";
+import portfolioBanner from "@/assets/images/portfolio-banner.png";
 
 export default function PortfolioPage() {
   const [activeFilter, setActiveFilter] = useState<string>("all");
