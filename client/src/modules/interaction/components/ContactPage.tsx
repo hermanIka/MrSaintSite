@@ -10,6 +10,7 @@ import { z } from "zod";
 import { Phone, Mail, MapPin, Clock, Calendar } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import { Link } from "wouter";
+import contactHeroBanner from "@/assets/images/contact-hero-banner.png";
 
 const contactFormSchema = z.object({
   name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
@@ -38,10 +39,15 @@ export default function ContactPage() {
   return (
     <Layout>
       <section
-        className="py-24 bg-black text-white"
+        className="relative py-24 text-white overflow-hidden"
         style={{ marginTop: "80px" }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${contactHeroBanner})` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <h1
               data-testid="text-page-title"
