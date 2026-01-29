@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { FileText, Briefcase, Plane, CheckCircle, Calendar, CreditCard, Lock, ArrowLeft } from "lucide-react";
 import CalendarBooking from "./CalendarBooking";
-import reservationHero from "@assets/images/reservation-hero.png";
+import reservationHero from "@/assets/images/reservation-hero.png";
 
 type ServiceType = "visa" | "agence" | "voyage" | null;
 type Step = "select" | "calendar";
