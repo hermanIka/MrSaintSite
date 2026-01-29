@@ -129,7 +129,7 @@ export default function HomePage() {
                 size="lg"
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
-                Mes Clients
+                Clients Accompagnés
               </Button>
             </Link>
           </div>
