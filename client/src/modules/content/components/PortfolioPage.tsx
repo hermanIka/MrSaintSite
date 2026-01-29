@@ -202,7 +202,7 @@ export default function PortfolioPage() {
                 variant="outline"
                 className="text-lg px-8 py-6 rounded-full bg-white text-primary border-white hover:bg-white/90"
               >
-                Découvrir la formation
+                Commencer la formation
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
