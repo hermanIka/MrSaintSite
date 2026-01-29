@@ -62,7 +62,7 @@ function ServiceCardSkeleton() {
 }
 
 export default function ServicesPage() {
-  const { data: services, isLoading } = useQuery<Service[]>({
+  const { data: services, isLoading, isError } = useQuery<Service[]>({
     queryKey: ["/api/services"],
   });
 
@@ -108,6 +108,10 @@ export default function ServicesPage() {
                 <ServiceCardSkeleton />
                 <ServiceCardSkeleton />
               </>
+            ) : isError ? (
+              <div className="col-span-full text-center py-12 text-muted-foreground">
+                Une erreur est survenue lors du chargement des services. Veuillez réessayer.
+              </div>
             ) : services && services.length > 0 ? (
               services.map((service) => {
                 const Icon = iconMap[service.iconName || "FileText"] || FileText;
