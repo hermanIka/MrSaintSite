@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { FileText, Briefcase, Plane, CheckCircle, Calendar, CreditCard, Lock, ArrowLeft } from "lucide-react";
 import CalendarBooking from "./CalendarBooking";
+import reservationHero from "@assets/images/reservation-hero.png";
 
 type ServiceType = "visa" | "agence" | "voyage" | null;
 type Step = "select" | "calendar";
@@ -64,7 +65,12 @@ export default function ReservationPage() {
   return (
     <Layout>
       <section className="relative py-32 bg-black text-white overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent" />
+        <img 
+          src={reservationHero} 
+          alt="Entrepreneur au téléphone" 
+          className="absolute inset-0 w-full h-full object-cover opacity-40"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-transparent" />
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div data-testid="badge-secure-payment" className="inline-flex items-center gap-2 bg-white/10 text-white/80 px-4 py-2 rounded-full mb-6">
             <Lock className="w-4 h-4" />
