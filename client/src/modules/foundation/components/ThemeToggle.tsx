@@ -14,9 +14,9 @@ export function ThemeToggle() {
       className="hover-elevate active-elevate-2"
     >
       {theme === "light" ? (
-        <Moon className="w-5 h-5" />
+        <Moon className="w-5 h-5 text-white" />
       ) : (
-        <Sun className="w-5 h-5" />
+        <Sun className="w-5 h-5 text-white" />
       )}
       <span className="sr-only">Toggle theme</span>
     </Button>
