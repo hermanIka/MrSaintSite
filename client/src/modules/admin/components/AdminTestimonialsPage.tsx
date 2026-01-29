@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminLayout } from "./AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,9 +14,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useAdminAuth } from "../hooks/useAdminAuth";
-import { Plus, Pencil, Trash2, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Upload, Image } from "lucide-react";
 import type { Testimonial } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
+import { useUpload } from "@/hooks/use-upload";
 
 interface FormData {
   name: string;
@@ -39,6 +40,27 @@ export function AdminTestimonialsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Testimonial | null>(null);
   const [formData, setFormData] = useState<FormData>(emptyFormData);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const { uploadFile, isUploading } = useUpload({
+    onSuccess: (response) => {
+      setFormData((p) => ({ ...p, imageUrl: response.objectPath }));
+      toast({ title: "Photo téléchargée avec succès" });
+    },
+    onError: () => {
+      toast({ title: "Erreur lors du téléchargement", variant: "destructive" });
+    },
+  });
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const localPreview = URL.createObjectURL(file);
+      setPreviewUrl(localPreview);
+      await uploadFile(file);
+    }
+  };
 
   const { data: testimonials, isLoading } = useQuery<Testimonial[]>({
     queryKey: ["/api/admin/testimonials"],
@@ -113,6 +135,10 @@ export function AdminTestimonialsPage() {
     setIsDialogOpen(false);
     setEditing(null);
     setFormData(emptyFormData);
+    setPreviewUrl(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const openEditDialog = (item: Testimonial) => {
@@ -123,6 +149,7 @@ export function AdminTestimonialsPage() {
       content: item.content,
       imageUrl: item.imageUrl,
     });
+    setPreviewUrl(item.imageUrl);
     setIsDialogOpen(true);
   };
 
@@ -135,7 +162,7 @@ export function AdminTestimonialsPage() {
     }
   };
 
-  const isPending = createMutation.isPending || updateMutation.isPending;
+  const isPending = createMutation.isPending || updateMutation.isPending || isUploading;
 
   return (
     <AdminLayout title="Gestion des Témoignages">
@@ -166,8 +193,53 @@ export function AdminTestimonialsPage() {
                   <Textarea id="content" value={formData.content} onChange={(e) => setFormData((p) => ({ ...p, content: e.target.value }))} rows={4} required data-testid="input-testimonial-content" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="imageUrl">URL de la photo</Label>
-                  <Input id="imageUrl" value={formData.imageUrl} onChange={(e) => setFormData((p) => ({ ...p, imageUrl: e.target.value }))} placeholder="https://..." required data-testid="input-testimonial-image" />
+                  <Label>Photo</Label>
+                  <div className="flex items-center gap-4">
+                    {(previewUrl || formData.imageUrl) ? (
+                      <img 
+                        src={previewUrl || formData.imageUrl} 
+                        alt="Aperçu" 
+                        className="w-16 h-16 rounded-full object-cover border"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+                        <Image className="w-6 h-6 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="hidden"
+                        id="testimonial-image"
+                        data-testid="input-testimonial-image"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isUploading}
+                        className="w-full"
+                      >
+                        {isUploading ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Téléchargement...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="w-4 h-4 mr-2" />
+                            {formData.imageUrl ? "Changer la photo" : "Choisir une photo"}
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  {!formData.imageUrl && !isUploading && (
+                    <p className="text-xs text-muted-foreground">Formats acceptés: JPG, PNG, GIF</p>
+                  )}
                 </div>
                 <div className="flex justify-end gap-2 pt-4">
                   <Button type="button" variant="outline" onClick={closeDialog}>Annuler</Button>
