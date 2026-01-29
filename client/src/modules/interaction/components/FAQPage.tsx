@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { ChevronDown, ChevronUp, Search, HelpCircle, FileText, Briefcase, Plane } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import faqHeroBanner from "@/assets/images/faq-hero-banner.png";
 
 interface FAQItem {
   question: string;
@@ -102,9 +103,13 @@ export default function FAQPage() {
 
   return (
     <Layout>
-      <section className="relative py-32 bg-black text-white overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent" />
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="relative py-32 text-white overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${faqHeroBanner})` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1
             data-testid="text-faq-title"
             className="text-4xl sm:text-5xl lg:text-6xl font-heading font-bold mb-6"
