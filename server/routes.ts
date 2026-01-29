@@ -11,12 +11,14 @@ import { registerContentRoutes } from "./modules/content";
 import { registerTransactionRoutes } from "./modules/transaction";
 import { registerAdminRoutes } from "./modules/admin";
 import { chatbotRoutes } from "./modules/chatbot";
+import { registerInteractionRoutes } from "./modules/interaction";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Enregistrement des routes par module
   registerContentRoutes(app);
   registerTransactionRoutes(app);
   registerAdminRoutes(app);
+  registerInteractionRoutes(app);
   
   // Module Chatbot
   app.use("/api/chatbot", chatbotRoutes);

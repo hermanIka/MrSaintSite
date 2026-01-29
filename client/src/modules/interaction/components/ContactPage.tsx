@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Layout } from "@/modules/foundation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,9 +8,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Phone, Mail, MapPin, Clock, Calendar } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, Calendar, Loader2, CheckCircle } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import { Link } from "wouter";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import contactHeroBanner from "@/assets/images/contact-hero-banner.png";
 
 const contactFormSchema = z.object({
@@ -22,6 +25,10 @@ const contactFormSchema = z.object({
 type ContactFormValues = z.infer<typeof contactFormSchema>;
 
 export default function ContactPage() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const { toast } = useToast();
+  
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
@@ -32,8 +39,25 @@ export default function ContactPage() {
     },
   });
 
-  const onSubmit = (data: ContactFormValues) => {
-    console.log("Form data:", data);
+  const onSubmit = async (data: ContactFormValues) => {
+    setIsSubmitting(true);
+    try {
+      await apiRequest("POST", "/api/contact", data);
+      setIsSuccess(true);
+      toast({
+        title: "Message envoyé !",
+        description: "Nous vous répondrons dans les plus brefs délais.",
+      });
+      form.reset();
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -156,12 +180,22 @@ export default function ContactPage() {
                         data-testid="button-send-message"
                         size="lg"
                         className="w-full sm:w-auto rounded-full px-8"
+                        disabled={isSubmitting}
                       >
-                        Envoyer le message
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Envoi en cours...
+                          </>
+                        ) : isSuccess ? (
+                          <>
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                            Message envoyé !
+                          </>
+                        ) : (
+                          "Envoyer le message"
+                        )}
                       </Button>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        * Formulaire de contact disponible prochainement
-                      </p>
                     </form>
                   </Form>
                 </CardContent>
