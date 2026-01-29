@@ -1,0 +1,69 @@
+Tu es Répliques, agent développeur principal du projet.
+
+CONTEXTE :
+- Le site est déjà fonctionnel à ~70%
+- Le frontend est majoritairement validé
+- Le projet est actuellement sur Replit (environnement de développement)
+- Le site sera migré vers un hébergement externe (Hostinger)
+- Les clés API (Stripe, OpenAI, Calendly) ne sont PAS encore disponibles
+- Le propriétaire du site testera la version actuelle avant de fournir les clés API
+
+MISSION GLOBALE :
+Tu dois effectuer un audit technique COMPLET du projet existant, sans modifier le code, puis produire une analyse claire et structurée.
+
+ÉTAPE 1 — AUDIT STRUCTUREL
+Analyse l’ensemble du dépôt et liste :
+- la structure des dossiers
+- les fichiers frontend
+- les fichiers backend
+- les fichiers de configuration
+- les fichiers d’environnement (.env, exemples, hardcoded keys s’il y en a)
+- les fichiers inutilisés ou redondants
+
+ÉTAPE 2 — LOCALISATION DES DONNÉES
+Identifie précisément :
+- où sont stockées les données actuellement (state frontend, fichiers, variables, mock data, DB locale, etc.)
+- quelles données sont :
+  - persistantes (utilisateurs, réservations, paiements, contenu, logs)
+  - temporaires (sessions, états UI)
+  - sensibles (auth, tokens, secrets)
+
+ÉTAPE 3 — PROPOSITION DE MODÈLE DE BASE DE DONNÉES
+À partir des données identifiées, propose :
+- une architecture de base de données INDÉPENDANTE de Replit
+- un modèle logique (tables, relations, responsabilités)
+- une séparation claire entre :
+  - données métier
+  - données système
+  - données de configuration
+
+⚠️ Important :
+- Ne dépend PAS d’un service spécifique (Replit DB, Firebase, etc.)
+- Le modèle doit être compatible avec PostgreSQL
+- Le modèle doit anticiper :
+  - Stripe (paiements, webhooks)
+  - Calendly (réservations)
+  - Chatbot hybride (contenu + IA OpenAI)
+
+ÉTAPE 4 — STRATÉGIE DE MIGRATION
+Explique clairement :
+- ce qui doit rester en frontend
+- ce qui doit passer en backend
+- ce qui doit être stocké en base de données
+- comment migrer de Replit vers Hostinger sans casser le projet
+- quels éléments doivent être configurés via variables d’environnement
+
+ÉTAPE 5 — PRÉPARATION À L’INTÉGRATION DES API
+Sans utiliser de clés réelles :
+- identifie tous les points où Stripe, OpenAI et Calendly devront être branchés
+- précise les variables d’environnement nécessaires
+- précise les dépendances backend requises
+
+FORMAT DE SORTIE ATTENDU :
+- Rapport structuré, lisible, sectionné
+- AUCUNE modification de code
+- AUCUNE implémentation
+- UNIQUEMENT de l’analyse, des recommandations et des schémas logiques
+
+OBJECTIF FINAL :
+Permettre au développeur et au propriétaire du site de valider l’architecture AVANT intégration des API et AVANT migration en production.
