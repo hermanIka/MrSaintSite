@@ -37,10 +37,13 @@ export function generateToken(adminId: string, username: string): string {
   return token;
 }
 
+// Set to track invalidated tokens (for logout functionality)
+const invalidatedTokens: Set<string> = new Set();
+
 export function verifyToken(token: string): TokenPayload | null {
   try {
-    // First check if token exists in active sessions (ensures logout invalidation works)
-    if (!activeSessions.has(token)) {
+    // Check if token was explicitly invalidated (logout)
+    if (invalidatedTokens.has(token)) {
       return null;
     }
     
@@ -54,15 +57,18 @@ export function verifyToken(token: string): TokenPayload | null {
       .digest("hex");
     
     if (signature !== expectedSignature) {
-      activeSessions.delete(token);
       return null;
     }
     
     const payload: TokenPayload = JSON.parse(tokenData);
     
     if (payload.exp < Date.now()) {
-      activeSessions.delete(token);
       return null;
+    }
+    
+    // Re-add to active sessions if valid (supports server restarts)
+    if (!activeSessions.has(token)) {
+      activeSessions.set(token, payload);
     }
     
     return payload;
@@ -73,6 +79,7 @@ export function verifyToken(token: string): TokenPayload | null {
 
 export function invalidateToken(token: string): void {
   activeSessions.delete(token);
+  invalidatedTokens.add(token);
 }
 
 export interface AuthenticatedRequest extends Request {
