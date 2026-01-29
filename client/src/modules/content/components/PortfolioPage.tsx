@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { Portfolio } from "@shared/schema";
 import { SERVICE_TYPES } from "@shared/schema";
 import { CheckCircle, Calendar, ArrowRight } from "lucide-react";
+import portfolioBanner from "@assets/images/portfolio-banner.png";
 
 export default function PortfolioPage() {
   const [activeFilter, setActiveFilter] = useState<string>("all");
@@ -29,10 +30,15 @@ export default function PortfolioPage() {
   return (
     <Layout>
       <section
-        className="py-24 bg-black text-white"
+        className="relative py-32 text-white overflow-hidden"
         style={{ marginTop: "80px" }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${portfolioBanner})` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <h1
               data-testid="text-page-title"
@@ -40,7 +46,7 @@ export default function PortfolioPage() {
             >
               Réalisations et Entrepreneurs Accompagnés
             </h1>
-            <p className="text-lg sm:text-xl text-white/80 leading-relaxed">
+            <p className="text-lg sm:text-xl text-white/90 leading-relaxed">
               Découvrez les success stories des entrepreneurs que j'ai accompagnés. 
               Chaque projet est une preuve concrète de résultats.
             </p>
