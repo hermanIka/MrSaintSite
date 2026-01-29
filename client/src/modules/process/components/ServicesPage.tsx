@@ -190,7 +190,7 @@ export default function ServicesPage() {
                           data-testid={`button-service-${service.id}`}
                           className="w-full gap-2"
                         >
-                          En savoir plus
+                          Commencer Maintenant
                           <ArrowRight className="w-4 h-4" />
                         </Button>
                       </Link>
