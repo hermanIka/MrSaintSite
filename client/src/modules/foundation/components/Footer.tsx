@@ -37,7 +37,9 @@ export function Footer() {
                 <Instagram className="w-5 h-5" />
               </a>
               <a
-                href="#"
+                href="https://www.linkedin.com/in/mr-saint/"
+                target="_blank"
+                rel="noopener noreferrer"
                 data-testid="link-linkedin"
                 className="w-10 h-10 flex items-center justify-center rounded-md bg-white/5 hover-elevate active-elevate-2 text-white hover:text-primary transition-colors"
                 aria-label="LinkedIn"
