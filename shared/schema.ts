@@ -117,3 +117,39 @@ export const insertFaqSchema = createInsertSchema(faqs).omit({
 
 export type InsertFaq = z.infer<typeof insertFaqSchema>;
 export type Faq = typeof faqs.$inferSelect;
+
+// Services schema - for admin-managed services with dynamic pricing
+export const services = pgTable("services", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  slug: text("slug").notNull().unique(), // visa, agence, consultation, voyage
+  shortDescription: text("short_description").notNull(),
+  fullDescription: text("full_description").notNull(),
+  price: integer("price").notNull(), // Prix en euros (entier)
+  priceLabel: text("price_label").notNull(), // "À partir de", "Programme complet", etc.
+  priceUnit: text("price_unit"), // "/ session", "/ personne", null
+  category: text("category").notNull(), // visa, formation, consultation, voyage
+  features: text("features").array().notNull(), // Liste des avantages
+  imageUrl: text("image_url"),
+  iconName: text("icon_name").notNull(), // Nom de l'icône lucide
+  ctaText: text("cta_text").notNull(), // Texte du bouton d'action
+  ctaLink: text("cta_link").notNull(), // Lien du bouton
+  order: integer("order").notNull().default(0),
+  status: text("status").notNull().default("published"), // draft, published
+  createdAt: text("created_at").notNull(),
+});
+
+export const insertServiceSchema = createInsertSchema(services).omit({
+  id: true,
+});
+
+export type InsertService = z.infer<typeof insertServiceSchema>;
+export type Service = typeof services.$inferSelect;
+
+// Service categories
+export const SERVICE_CATEGORIES = [
+  { value: "visa", label: "Facilitation Visa" },
+  { value: "formation", label: "Formation / Coaching" },
+  { value: "consultation", label: "Consultation" },
+  { value: "voyage", label: "Voyages" },
+] as const;

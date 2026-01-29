@@ -14,9 +14,12 @@ import {
   type InsertActivityLog,
   type Faq,
   type InsertFaq,
+  type Service,
+  type InsertService,
   admins,
   activityLogs,
   faqs,
+  services,
 } from "@shared/schema";
 import { db } from "../../db";
 import { eq, desc } from "drizzle-orm";
@@ -36,6 +39,13 @@ export interface IAdminStorage {
   createFaq(faq: InsertFaq): Promise<Faq>;
   updateFaq(id: string, faq: Partial<InsertFaq>): Promise<Faq | undefined>;
   deleteFaq(id: string): Promise<boolean>;
+
+  getAllServices(): Promise<Service[]>;
+  getServiceById(id: string): Promise<Service | undefined>;
+  getServiceBySlug(slug: string): Promise<Service | undefined>;
+  createService(service: InsertService): Promise<Service>;
+  updateService(id: string, service: Partial<InsertService>): Promise<Service | undefined>;
+  deleteService(id: string): Promise<boolean>;
 }
 
 export class AdminDbStorage implements IAdminStorage {
@@ -107,6 +117,44 @@ export class AdminDbStorage implements IAdminStorage {
 
   async deleteFaq(id: string): Promise<boolean> {
     const result = await db.delete(faqs).where(eq(faqs.id, id)).returning();
+    return result.length > 0;
+  }
+
+  // ============ SERVICES ============
+
+  async getAllServices(): Promise<Service[]> {
+    return await db.select().from(services).orderBy(services.order);
+  }
+
+  async getServiceById(id: string): Promise<Service | undefined> {
+    const [service] = await db.select().from(services).where(eq(services.id, id));
+    return service;
+  }
+
+  async getServiceBySlug(slug: string): Promise<Service | undefined> {
+    const [service] = await db.select().from(services).where(eq(services.slug, slug));
+    return service;
+  }
+
+  async createService(service: InsertService): Promise<Service> {
+    const [newService] = await db
+      .insert(services)
+      .values({ ...service, order: service.order ?? 0, status: service.status ?? "published" })
+      .returning();
+    return newService;
+  }
+
+  async updateService(id: string, serviceData: Partial<InsertService>): Promise<Service | undefined> {
+    const [updated] = await db
+      .update(services)
+      .set(serviceData)
+      .where(eq(services.id, id))
+      .returning();
+    return updated;
+  }
+
+  async deleteService(id: string): Promise<boolean> {
+    const result = await db.delete(services).where(eq(services.id, id)).returning();
     return result.length > 0;
   }
 }
