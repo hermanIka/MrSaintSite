@@ -117,6 +117,15 @@ export default function HomePage() {
                 Créer mon agence
               </Button>
             </Link>
+            <Link href="/portfolio">
+              <Button
+                data-testid="button-hero-clients"
+                size="lg"
+                className="bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                Mes Clients
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
