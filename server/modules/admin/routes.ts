@@ -28,6 +28,7 @@ import {
   insertTestimonialSchema,
   insertPortfolioSchema,
   insertFaqSchema,
+  insertServiceSchema,
 } from "@shared/schema";
 import { ObjectStorageService } from "../../replit_integrations/object_storage";
 
@@ -481,6 +482,119 @@ export function registerAdminRoutes(app: Express) {
     try {
       const logs = await adminStorage.getAllLogs();
       res.json(logs);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  // ============ SERVICES ============
+
+  // Public endpoint to get all published services
+  app.get("/api/services", async (_req, res) => {
+    try {
+      const allServices = await adminStorage.getAllServices();
+      const publishedServices = allServices.filter(s => s.status === "published");
+      res.json(publishedServices);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  // Public endpoint to get a service by slug
+  app.get("/api/services/:slug", async (req, res) => {
+    try {
+      const service = await adminStorage.getServiceBySlug(req.params.slug);
+      if (!service || service.status !== "published") {
+        return res.status(404).json({ error: "Service non trouvé" });
+      }
+      res.json(service);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  // Admin - get all services (including drafts)
+  app.get("/api/admin/services", authMiddleware, async (_req, res) => {
+    try {
+      const services = await adminStorage.getAllServices();
+      res.json(services);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.post("/api/admin/services", authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const validatedData = insertServiceSchema.parse(req.body);
+      const service = await adminStorage.createService(validatedData);
+
+      await adminStorage.createLog({
+        action: "CREATE",
+        entityType: "service",
+        entityId: service.id,
+        details: `Service créé: ${service.name}`,
+        adminId: req.admin!.adminId,
+        createdAt: new Date().toISOString(),
+      });
+
+      res.status(201).json(service);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      }
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.put("/api/admin/services/:id", authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { id } = req.params;
+      const validatedData = insertServiceSchema.partial().parse(req.body);
+      const service = await adminStorage.updateService(id, validatedData);
+
+      if (!service) {
+        return res.status(404).json({ error: "Service non trouvé" });
+      }
+
+      await adminStorage.createLog({
+        action: "UPDATE",
+        entityType: "service",
+        entityId: service.id,
+        details: `Service modifié: ${service.name}`,
+        adminId: req.admin!.adminId,
+        createdAt: new Date().toISOString(),
+      });
+
+      res.json(service);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      }
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.delete("/api/admin/services/:id", authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { id } = req.params;
+      const service = await adminStorage.getServiceById(id);
+
+      if (!service) {
+        return res.status(404).json({ error: "Service non trouvé" });
+      }
+
+      await adminStorage.deleteService(id);
+
+      await adminStorage.createLog({
+        action: "DELETE",
+        entityType: "service",
+        entityId: id,
+        details: `Service supprimé: ${service.name}`,
+        adminId: req.admin!.adminId,
+        createdAt: new Date().toISOString(),
+      });
+
+      res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: "Erreur serveur" });
     }

@@ -8,5 +8,6 @@ export { AdminTripsPage } from "./components/AdminTripsPage";
 export { AdminTestimonialsPage } from "./components/AdminTestimonialsPage";
 export { AdminPortfolioPage } from "./components/AdminPortfolioPage";
 export { AdminFaqPage } from "./components/AdminFaqPage";
+export { AdminServicesPage } from "./components/AdminServicesPage";
 export { AdminLogsPage } from "./components/AdminLogsPage";
 export { useAdminAuth } from "./hooks/useAdminAuth";

@@ -17,6 +17,7 @@ import {
   AdminTestimonialsPage,
   AdminPortfolioPage,
   AdminFaqPage,
+  AdminServicesPage,
   AdminLogsPage,
 } from "@/modules/admin";
 
@@ -40,6 +41,7 @@ function Router() {
       <Route path="/admin/testimonials" component={AdminTestimonialsPage} />
       <Route path="/admin/portfolio" component={AdminPortfolioPage} />
       <Route path="/admin/faq" component={AdminFaqPage} />
+      <Route path="/admin/services" component={AdminServicesPage} />
       <Route path="/admin/logs" component={AdminLogsPage} />
       <Route component={NotFoundPage} />
     </Switch>
