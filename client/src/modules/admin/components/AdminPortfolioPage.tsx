@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminLayout } from "./AdminLayout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAdminAuth } from "../hooks/useAdminAuth";
-import { Plus, Pencil, Trash2, Loader2, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Eye, EyeOff, Upload, Image as ImageIcon } from "lucide-react";
 import type { Portfolio } from "@shared/schema";
 import { SERVICE_TYPES } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
@@ -58,6 +58,81 @@ export function AdminPortfolioPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Portfolio | null>(null);
   const [formData, setFormData] = useState<FormData>(emptyFormData);
+  
+  // Upload states
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = async (
+    file: File,
+    setUploading: (v: boolean) => void,
+    setPreview: (v: string | null) => void,
+    fieldName: "imageUrl" | "clientLogo"
+  ) => {
+    const MAX_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      toast({ title: "Fichier trop volumineux (max 5 Mo)", variant: "destructive" });
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Seules les images sont acceptées", variant: "destructive" });
+      return;
+    }
+
+    setUploading(true);
+    setPreview(URL.createObjectURL(file));
+
+    try {
+      const response = await fetch("/api/admin/upload/request-url", {
+        method: "POST",
+        headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({ name: file.name, size: file.size, contentType: file.type }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Erreur lors de la demande d'upload");
+      }
+
+      const { uploadURL, objectPath } = await response.json();
+
+      const uploadResponse = await fetch(uploadURL, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type },
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error("Erreur lors de l'upload du fichier");
+      }
+
+      setFormData((p) => ({ ...p, [fieldName]: objectPath }));
+      toast({ title: "Image uploadée avec succès" });
+    } catch (error) {
+      toast({ title: error instanceof Error ? error.message : "Erreur d'upload", variant: "destructive" });
+      setPreview(null);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileUpload(file, setIsUploadingImage, setImagePreview, "imageUrl");
+    }
+  };
+
+  const handleLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileUpload(file, setIsUploadingLogo, setLogoPreview, "clientLogo");
+    }
+  };
 
   const { data: portfolio, isLoading } = useQuery<Portfolio[]>({
     queryKey: ["/api/admin/portfolio"],
@@ -163,6 +238,8 @@ export function AdminPortfolioPage() {
     setIsDialogOpen(false);
     setEditing(null);
     setFormData(emptyFormData);
+    setImagePreview(null);
+    setLogoPreview(null);
   };
 
   const openEditDialog = (item: Portfolio) => {
@@ -178,11 +255,21 @@ export function AdminPortfolioPage() {
       clientLogo: item.clientLogo || "",
       status: item.status,
     });
+    setImagePreview(null);
+    setLogoPreview(null);
     setIsDialogOpen(true);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isUploadingImage || isUploadingLogo) {
+      toast({ title: "Veuillez attendre la fin de l'upload", variant: "destructive" });
+      return;
+    }
+    if (!formData.imageUrl) {
+      toast({ title: "Une image est requise", variant: "destructive" });
+      return;
+    }
     if (editing) {
       updateMutation.mutate({ id: editing.id, data: formData });
     } else {
@@ -191,6 +278,7 @@ export function AdminPortfolioPage() {
   };
 
   const isPending = createMutation.isPending || updateMutation.isPending;
+  const isUploading = isUploadingImage || isUploadingLogo;
 
   const getServiceLabel = (value: string) => {
     return SERVICE_TYPES.find(t => t.value === value)?.label || value;
@@ -297,27 +385,93 @@ export function AdminPortfolioPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="imageUrl">URL de l'image *</Label>
-                    <Input 
-                      id="imageUrl" 
-                      value={formData.imageUrl} 
-                      onChange={(e) => setFormData((p) => ({ ...p, imageUrl: e.target.value }))} 
-                      placeholder="https://..." 
-                      required 
-                      data-testid="input-portfolio-image" 
-                    />
+                <div className="space-y-2">
+                  <Label>Image du projet *</Label>
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageSelect}
+                    className="hidden"
+                    data-testid="input-portfolio-image-file"
+                  />
+                  <div className="flex items-center gap-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => imageInputRef.current?.click()}
+                      disabled={isUploadingImage}
+                      data-testid="button-upload-portfolio-image"
+                    >
+                      {isUploadingImage ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <Upload className="w-4 h-4 mr-2" />
+                      )}
+                      {isUploadingImage ? "Upload en cours..." : "Choisir une image"}
+                    </Button>
+                    {(imagePreview || formData.imageUrl) && (
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={imagePreview || formData.imageUrl}
+                          alt="Aperçu"
+                          className="w-16 h-16 object-cover rounded border"
+                          data-testid="img-portfolio-preview"
+                        />
+                        <span className="text-sm text-muted-foreground">Image sélectionnée</span>
+                      </div>
+                    )}
+                    {!imagePreview && !formData.imageUrl && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <ImageIcon className="w-4 h-4" />
+                        <span className="text-sm">Aucune image</span>
+                      </div>
+                    )}
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="clientLogo">Logo client (optionnel)</Label>
-                    <Input 
-                      id="clientLogo" 
-                      value={formData.clientLogo} 
-                      onChange={(e) => setFormData((p) => ({ ...p, clientLogo: e.target.value }))} 
-                      placeholder="https://..." 
-                      data-testid="input-portfolio-logo" 
-                    />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Logo client (optionnel)</Label>
+                  <input
+                    ref={logoInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoSelect}
+                    className="hidden"
+                    data-testid="input-portfolio-logo-file"
+                  />
+                  <div className="flex items-center gap-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => logoInputRef.current?.click()}
+                      disabled={isUploadingLogo}
+                      data-testid="button-upload-portfolio-logo"
+                    >
+                      {isUploadingLogo ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <Upload className="w-4 h-4 mr-2" />
+                      )}
+                      {isUploadingLogo ? "Upload en cours..." : "Choisir un logo"}
+                    </Button>
+                    {(logoPreview || formData.clientLogo) && (
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={logoPreview || formData.clientLogo}
+                          alt="Logo"
+                          className="w-12 h-12 object-contain rounded border"
+                          data-testid="img-portfolio-logo-preview"
+                        />
+                        <span className="text-sm text-muted-foreground">Logo sélectionné</span>
+                      </div>
+                    )}
+                    {!logoPreview && !formData.clientLogo && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <ImageIcon className="w-4 h-4" />
+                        <span className="text-sm">Aucun logo</span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -339,7 +493,7 @@ export function AdminPortfolioPage() {
 
                 <div className="flex justify-end gap-2 pt-4">
                   <Button type="button" variant="outline" onClick={closeDialog}>Annuler</Button>
-                  <Button type="submit" disabled={isPending} data-testid="button-save-portfolio">
+                  <Button type="submit" disabled={isPending || isUploading} data-testid="button-save-portfolio">
                     {isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                     {editing ? "Modifier" : "Créer"}
                   </Button>
