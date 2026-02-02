@@ -1,0 +1,150 @@
+SERVICE « VOYAGE À CRÉDIT »
+
+🎯 CONTEXTE GÉNÉRAL
+Tu es l’agent codeur du projet.
+Le site dispose déjà :
+d’un module Services
+d’offres classiques déjà fonctionnelles
+d’une architecture front + back existante
+Nous devons ajouter un NOUVEAU SERVICE, sans casser l’existant.
+
+1️⃣ DÉFINITION DU SERVICE
+Créer un nouveau service nommé :
+Voyage à crédit
+⚠️ Ce service n’est pas une simple page statique.
+C’est un service interactif, avec formulaire + logique métier + stockage des données.
+
+2️⃣ COMPORTEMENT FRONTEND
+📌 Parcours utilisateur
+L’utilisateur va dans Services
+Il clique sur Voyage à crédit
+Une page/service dédiée s’ouvre avec :
+une section explicative
+une section avantages
+un bouton « Faire une demande »
+Le bouton ouvre un formulaire structuré
+L’utilisateur remplit le formulaire + upload des documents
+Il soumet la demande
+Message de confirmation affiché
+
+🧾 CONTENU EXPLICATIF À AFFICHER (UI)
+Inclure un texte expliquant :
+le principe du voyage à crédit
+que la demande est étudiée par Monsieur Santhe
+que l’acceptation n’est pas automatique
+que la réponse intervient sous 48 à 72 heures
+
+🌟 AVANTAGES (UI)
+Afficher une section avantages avec icônes ou blocs :
+Paiement échelonné
+Accompagnement personnalisé
+Accès à des voyages autrement inaccessibles
+Étude humaine et confidentielle
+Flexibilité adaptée au profil du client
+
+3️⃣ FORMULAIRE — STRUCTURE DÉTAILLÉE
+🧍‍♂️ SECTION 1 — INFORMATIONS PERSONNELLES
+Champs obligatoires :
+Nom
+Prénom
+Date de naissance
+Nationalité
+Pays de résidence
+Téléphone / WhatsApp
+Email
+Adresse actuelle
+
+💼 SECTION 2 — SITUATION PROFESSIONNELLE
+Champs :
+Statut professionnel (select)
+Salarié
+Indépendant
+Fonctionnaire
+Entrepreneur
+Étudiant
+Profession / activité
+Revenu mensuel estimé
+Ancienneté professionnelle
+
+✈️ SECTION 3 — PROJET DE VOYAGE
+Champs :
+Destination souhaitée
+Type de voyage (select)
+Tourisme
+Études
+Soins
+Regroupement familial
+Autre
+Date de départ souhaitée
+Durée du séjour
+Budget estimé
+Montant demandé à crédit
+Apport personnel (oui/non + montant)
+
+💳 SECTION 4 — REMBOURSEMENT
+Champs :
+Durée du crédit (select)
+3 mois / 6 mois / 9 mois / 12 mois
+Mode de remboursement (select)
+Mobile Money
+Virement bancaire
+Fréquence de remboursement
+Mensuelle
+Bimensuelle
+
+📂 SECTION 5 — DOCUMENTS (UPLOAD OBLIGATOIRE)
+Prévoir upload sécurisé de fichiers :
+Pièce d’identité (Passeport ou Carte)
+Justificatif de revenus
+Justificatif de domicile
+Photo récente
+Lettre explicative (optionnelle)
+
+✅ SECTION 6 — CONDITIONS
+Case à cocher obligatoire :
+Acceptation des conditions
+Exactitude des informations fournies
+
+4️⃣ BACKEND & BASE DE DONNÉES
+📦 Créer une nouvelle table :
+credit_travel_requests
+Champs recommandés :
+id
+user_id (si applicable)
+données personnelles (JSON ou champs séparés)
+données professionnelles
+données projet voyage
+modalités remboursement
+documents (chemins sécurisés)
+status :
+pending (par défaut)
+approved
+rejected
+created_at
+updated_at
+
+5️⃣ ADMIN / BACKOFFICE
+Prévoir côté admin :
+Liste des demandes de voyage à crédit
+Consultation détaillée d’une demande
+Téléchargement des documents
+Changement du statut (pending / approved / rejected)
+
+6️⃣ CONTRAINTES TECHNIQUES IMPORTANTES
+Ne pas modifier les services existants
+Ne pas casser l’architecture actuelle
+Utiliser une structure extensible
+Sécuriser les uploads
+Prévoir la compatibilité future avec :
+paiements
+notifications
+validation humaine
+
+7️⃣ OBJECTIF FINAL
+Ce service doit être :
+professionnel
+crédible juridiquement
+réaliste pour l’Afrique et la diaspora
+prêt pour validation humaine par le consultant
+
+

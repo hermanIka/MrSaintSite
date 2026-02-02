@@ -29,6 +29,7 @@ import {
   insertPortfolioSchema,
   insertFaqSchema,
   insertServiceSchema,
+  insertCreditTravelRequestSchema,
 } from "@shared/schema";
 import { ObjectStorageService } from "../../replit_integrations/object_storage";
 
@@ -645,6 +646,121 @@ export function registerAdminRoutes(app: Express) {
     } catch (error) {
       console.error("Error generating upload URL:", error);
       res.status(500).json({ error: "Erreur lors de la génération de l'URL d'upload" });
+    }
+  });
+
+  // ============ PUBLIC UPLOAD FOR CREDIT REQUESTS ============
+  
+  app.post("/api/upload/request-url", async (req, res) => {
+    try {
+      const { name, size, contentType } = req.body;
+
+      if (!name || typeof name !== "string") {
+        return res.status(400).json({ error: "Nom de fichier requis" });
+      }
+
+      const allowedTypes = ["image/jpeg", "image/png", "image/webp", "application/pdf"];
+      if (!contentType || !allowedTypes.includes(contentType)) {
+        return res.status(400).json({ error: "Type de fichier non supporté (images ou PDF uniquement)" });
+      }
+
+      const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+      if (typeof size !== "number" || size <= 0 || size > MAX_SIZE) {
+        return res.status(400).json({ error: "Taille de fichier invalide (max 10 Mo)" });
+      }
+
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
+
+      res.json({
+        uploadURL,
+        objectPath,
+        metadata: { name, size, contentType },
+      });
+    } catch (error) {
+      console.error("Error generating upload URL:", error);
+      res.status(500).json({ error: "Erreur lors de la génération de l'URL d'upload" });
+    }
+  });
+
+  // ============ CREDIT TRAVEL REQUESTS (Public submission) ============
+
+  app.post("/api/credit-requests", async (req, res) => {
+    try {
+      const now = new Date().toISOString();
+      const requestData = {
+        ...req.body,
+        createdAt: now,
+        updatedAt: now,
+      };
+      
+      const validatedData = insertCreditTravelRequestSchema.parse(requestData);
+      const request = await adminStorage.createCreditRequest(validatedData);
+      
+      res.status(201).json({ 
+        success: true, 
+        message: "Votre demande a été soumise avec succès. Nous vous contacterons sous 48 à 72 heures.",
+        requestId: request.id 
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      }
+      console.error("Error creating credit request:", error);
+      res.status(500).json({ error: "Erreur lors de la soumission de votre demande" });
+    }
+  });
+
+  // ============ CREDIT TRAVEL REQUESTS (Admin) ============
+
+  app.get("/api/admin/credit-requests", authMiddleware, async (_req, res) => {
+    try {
+      const requests = await adminStorage.getAllCreditRequests();
+      res.json(requests);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.get("/api/admin/credit-requests/:id", authMiddleware, async (req, res) => {
+    try {
+      const request = await adminStorage.getCreditRequestById(req.params.id);
+      if (!request) {
+        return res.status(404).json({ error: "Demande non trouvée" });
+      }
+      res.json(request);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.put("/api/admin/credit-requests/:id/status", authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { id } = req.params;
+      const { status, adminNotes } = req.body;
+
+      if (!["pending", "approved", "rejected"].includes(status)) {
+        return res.status(400).json({ error: "Statut invalide" });
+      }
+
+      const request = await adminStorage.updateCreditRequestStatus(id, status, adminNotes);
+      
+      if (!request) {
+        return res.status(404).json({ error: "Demande non trouvée" });
+      }
+
+      await adminStorage.createLog({
+        action: "UPDATE",
+        entityType: "credit_request",
+        entityId: id,
+        details: `Demande de crédit voyage mise à jour: ${status}`,
+        adminId: req.admin!.adminId,
+        createdAt: new Date().toISOString(),
+      });
+
+      res.json(request);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
     }
   });
 }

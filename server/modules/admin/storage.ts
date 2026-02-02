@@ -16,10 +16,13 @@ import {
   type InsertFaq,
   type Service,
   type InsertService,
+  type CreditTravelRequest,
+  type InsertCreditTravelRequest,
   admins,
   activityLogs,
   faqs,
   services,
+  creditTravelRequests,
 } from "@shared/schema";
 import { db } from "../../db";
 import { eq, desc } from "drizzle-orm";
@@ -46,6 +49,12 @@ export interface IAdminStorage {
   createService(service: InsertService): Promise<Service>;
   updateService(id: string, service: Partial<InsertService>): Promise<Service | undefined>;
   deleteService(id: string): Promise<boolean>;
+
+  // Credit Travel Requests
+  getAllCreditRequests(): Promise<CreditTravelRequest[]>;
+  getCreditRequestById(id: string): Promise<CreditTravelRequest | undefined>;
+  createCreditRequest(request: InsertCreditTravelRequest): Promise<CreditTravelRequest>;
+  updateCreditRequestStatus(id: string, status: string, adminNotes?: string): Promise<CreditTravelRequest | undefined>;
 }
 
 export class AdminDbStorage implements IAdminStorage {
@@ -156,6 +165,51 @@ export class AdminDbStorage implements IAdminStorage {
   async deleteService(id: string): Promise<boolean> {
     const result = await db.delete(services).where(eq(services.id, id)).returning();
     return result.length > 0;
+  }
+
+  // ============ CREDIT TRAVEL REQUESTS ============
+
+  async getAllCreditRequests(): Promise<CreditTravelRequest[]> {
+    return await db
+      .select()
+      .from(creditTravelRequests)
+      .orderBy(desc(creditTravelRequests.createdAt));
+  }
+
+  async getCreditRequestById(id: string): Promise<CreditTravelRequest | undefined> {
+    const [request] = await db
+      .select()
+      .from(creditTravelRequests)
+      .where(eq(creditTravelRequests.id, id));
+    return request;
+  }
+
+  async createCreditRequest(request: InsertCreditTravelRequest): Promise<CreditTravelRequest> {
+    const [newRequest] = await db
+      .insert(creditTravelRequests)
+      .values({
+        ...request,
+        status: "pending",
+      })
+      .returning();
+    return newRequest;
+  }
+
+  async updateCreditRequestStatus(
+    id: string, 
+    status: string, 
+    adminNotes?: string
+  ): Promise<CreditTravelRequest | undefined> {
+    const [updated] = await db
+      .update(creditTravelRequests)
+      .set({ 
+        status, 
+        adminNotes: adminNotes ?? null,
+        updatedAt: new Date().toISOString() 
+      })
+      .where(eq(creditTravelRequests.id, id))
+      .returning();
+    return updated;
   }
 }
 

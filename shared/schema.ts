@@ -154,3 +154,99 @@ export const SERVICE_CATEGORIES = [
   { value: "consultation", label: "Consultation" },
   { value: "voyage", label: "Voyages" },
 ] as const;
+
+// Credit Travel Request schema
+export const creditTravelRequests = pgTable("credit_travel_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  
+  // Section 1 - Informations personnelles
+  lastName: text("last_name").notNull(),
+  firstName: text("first_name").notNull(),
+  birthDate: text("birth_date").notNull(),
+  nationality: text("nationality").notNull(),
+  countryOfResidence: text("country_of_residence").notNull(),
+  phone: text("phone").notNull(),
+  email: text("email").notNull(),
+  address: text("address").notNull(),
+  
+  // Section 2 - Situation professionnelle
+  professionalStatus: text("professional_status").notNull(),
+  profession: text("profession").notNull(),
+  monthlyIncome: text("monthly_income").notNull(),
+  professionalSeniority: text("professional_seniority").notNull(),
+  
+  // Section 3 - Projet de voyage
+  destination: text("destination").notNull(),
+  tripType: text("trip_type").notNull(),
+  departureDate: text("departure_date").notNull(),
+  stayDuration: text("stay_duration").notNull(),
+  estimatedBudget: integer("estimated_budget").notNull(),
+  creditAmount: integer("credit_amount").notNull(),
+  hasPersonalContribution: boolean("has_personal_contribution").notNull().default(false),
+  personalContributionAmount: integer("personal_contribution_amount"),
+  
+  // Section 4 - Remboursement
+  creditDuration: text("credit_duration").notNull(),
+  repaymentMethod: text("repayment_method").notNull(),
+  repaymentFrequency: text("repayment_frequency").notNull(),
+  
+  // Section 5 - Documents (chemins sécurisés)
+  identityDocumentUrl: text("identity_document_url").notNull(),
+  incomeProofUrl: text("income_proof_url").notNull(),
+  addressProofUrl: text("address_proof_url").notNull(),
+  recentPhotoUrl: text("recent_photo_url").notNull(),
+  explanatoryLetterUrl: text("explanatory_letter_url"),
+  
+  // Métadonnées
+  status: text("status").notNull().default("pending"),
+  adminNotes: text("admin_notes"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export const insertCreditTravelRequestSchema = createInsertSchema(creditTravelRequests).omit({
+  id: true,
+});
+
+export type InsertCreditTravelRequest = z.infer<typeof insertCreditTravelRequestSchema>;
+export type CreditTravelRequest = typeof creditTravelRequests.$inferSelect;
+
+// Constants for Credit Travel Request
+export const PROFESSIONAL_STATUS_OPTIONS = [
+  { value: "salarie", label: "Salarié" },
+  { value: "independant", label: "Indépendant" },
+  { value: "fonctionnaire", label: "Fonctionnaire" },
+  { value: "entrepreneur", label: "Entrepreneur" },
+  { value: "etudiant", label: "Étudiant" },
+] as const;
+
+export const TRIP_TYPE_OPTIONS = [
+  { value: "tourisme", label: "Tourisme" },
+  { value: "etudes", label: "Études" },
+  { value: "soins", label: "Soins médicaux" },
+  { value: "regroupement_familial", label: "Regroupement familial" },
+  { value: "autre", label: "Autre" },
+] as const;
+
+export const CREDIT_DURATION_OPTIONS = [
+  { value: "3", label: "3 mois" },
+  { value: "6", label: "6 mois" },
+  { value: "9", label: "9 mois" },
+  { value: "12", label: "12 mois" },
+] as const;
+
+export const REPAYMENT_METHOD_OPTIONS = [
+  { value: "mobile_money", label: "Mobile Money" },
+  { value: "virement", label: "Virement bancaire" },
+] as const;
+
+export const REPAYMENT_FREQUENCY_OPTIONS = [
+  { value: "mensuelle", label: "Mensuelle" },
+  { value: "bimensuelle", label: "Bimensuelle" },
+] as const;
+
+export const CREDIT_REQUEST_STATUS = [
+  { value: "pending", label: "En attente", color: "bg-yellow-500" },
+  { value: "approved", label: "Approuvée", color: "bg-green-500" },
+  { value: "rejected", label: "Rejetée", color: "bg-red-500" },
+] as const;
