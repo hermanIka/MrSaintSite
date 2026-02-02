@@ -69,13 +69,14 @@ export default function CalendarBooking({
   const eventType = eventTypesData?.eventTypes?.[0];
   const eventTypeId = eventType?.uri?.split('/').pop();
 
-  const { data: availableTimesData, isLoading: loadingSlots, refetch: refetchSlots } = useQuery<{
+  const { data: availableTimesData, isLoading: loadingSlots, isError: slotsError, refetch: refetchSlots } = useQuery<{
     success: boolean;
     availableTimes: Record<string, TimeSlot[]>;
     totalSlots: number;
   }>({
     queryKey: ['/api/calendly/available-times', eventTypeId],
     enabled: !!eventTypeId,
+    retry: 2,
   });
 
   const getDaysInMonth = (month: number, year: number) => {

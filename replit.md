@@ -166,8 +166,12 @@ PAYPAL_ENV=sandbox  # ou production
 5. Accès à la réservation (Calendly)
 6. Confirmation finale
 
-### Intégration Calendly
-- **Calendly** - Réservation de créneaux (intégré via CALENDLY_URL)
+### Intégration Calendly (Active)
+- **API Calendly v2** - Intégrée avec clé API
+- Récupération automatique des types d'événements
+- Affichage des créneaux disponibles en temps réel
+- Redirection vers Calendly pour finaliser la réservation
+- Endpoints: GET /api/calendly/status, /api/calendly/event-types, /api/calendly/available-times/:id
 
 ## Stack Technique
 
