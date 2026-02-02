@@ -7,3 +7,4 @@
 export { default as FacilitationVisaPage } from "./components/FacilitationVisaPage";
 export { default as CreationAgencePage } from "./components/CreationAgencePage";
 export { default as ServicesPage } from "./components/ServicesPage";
+export { VoyageCreditPage } from "./components/VoyageCreditPage";

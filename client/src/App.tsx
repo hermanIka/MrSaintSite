@@ -8,7 +8,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "@/modules/foundation";
 import { HomePage, AboutPage, TripsPage, TripDetailPage, PortfolioPage, NotFoundPage } from "@/modules/content";
 import { ContactPage, FAQPage } from "@/modules/interaction";
-import { FacilitationVisaPage, CreationAgencePage, ServicesPage } from "@/modules/process";
+import { FacilitationVisaPage, CreationAgencePage, ServicesPage, VoyageCreditPage } from "@/modules/process";
 import { ReservationPage } from "@/modules/transaction";
 import {
   AdminLoginPage,
@@ -31,6 +31,7 @@ function Router() {
       <Route path="/reservation" component={ReservationPage} />
       <Route path="/facilitation-visa" component={FacilitationVisaPage} />
       <Route path="/creation-agence" component={CreationAgencePage} />
+      <Route path="/voyage-credit" component={VoyageCreditPage} />
       <Route path="/voyages" component={TripsPage} />
       <Route path="/voyages/:id" component={TripDetailPage} />
       <Route path="/portfolio" component={PortfolioPage} />
