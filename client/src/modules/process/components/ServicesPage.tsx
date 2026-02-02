@@ -10,6 +10,7 @@ import {
   CheckCircle, 
   ArrowRight, 
   MessageCircle,
+  CreditCard,
   type LucideIcon 
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -22,6 +23,7 @@ const iconMap: Record<string, LucideIcon> = {
   Briefcase,
   Plane,
   MessageCircle,
+  CreditCard,
 };
 
 function formatPrice(service: Service): string {

@@ -408,6 +408,30 @@ export async function autoSeed(): Promise<void> {
         status: "published",
         createdAt: new Date().toISOString(),
       },
+      {
+        name: "Voyage à Crédit",
+        slug: "voyage-credit",
+        shortDescription: "Réalisez votre rêve de voyage avec un financement flexible",
+        fullDescription: "Notre solution de financement vous permet d'étaler le coût de votre voyage sur plusieurs mois. Votre demande est étudiée personnellement et une réponse vous est donnée sous 48 à 72 heures.",
+        price: 0,
+        priceLabel: "Financement sur mesure",
+        priceUnit: null,
+        category: "financement",
+        features: [
+          "Paiement échelonné sur plusieurs mois",
+          "Étude personnalisée de votre dossier",
+          "Réponse sous 48 à 72 heures",
+          "Accompagnement dédié",
+          "Destinations accessibles",
+        ],
+        imageUrl: null,
+        iconName: "CreditCard",
+        ctaText: "Faire une demande",
+        ctaLink: "/voyage-credit",
+        order: 5,
+        status: "published",
+        createdAt: new Date().toISOString(),
+      },
     ];
     await db.insert(services).values(servicesData);
 
