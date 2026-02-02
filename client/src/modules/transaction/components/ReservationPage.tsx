@@ -4,18 +4,25 @@ import { SEO } from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link, useSearch } from "wouter";
-import { FileText, Briefcase, Plane, CheckCircle, Calendar, CreditCard, Lock, ArrowLeft, PartyPopper } from "lucide-react";
-import CalendlyEmbed from "./CalendlyEmbed";
+import { FileText, Briefcase, Plane, CheckCircle, Calendar as CalendarIcon, CreditCard, Lock, ArrowLeft, PartyPopper, Clock } from "lucide-react";
+import CalendarBooking from "./CalendarBooking";
 import { PaymentMethodSelector } from "./PaymentMethodSelector";
 import reservationHero from "@/assets/images/reservation-hero.png";
 
 type ServiceType = "visa" | "agence" | "voyage" | null;
-type Step = "select" | "payment" | "calendar" | "success";
+type Step = "select" | "calendar" | "payment" | "success";
+
+interface SelectedSlotInfo {
+  date: Date;
+  time: string;
+  schedulingUrl: string;
+}
 
 export default function ReservationPage() {
   const [selectedService, setSelectedService] = useState<ServiceType>(null);
   const [currentStep, setCurrentStep] = useState<Step>("select");
   const [paymentId, setPaymentId] = useState<string | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<SelectedSlotInfo | null>(null);
   const searchString = useSearch();
 
   useEffect(() => {
@@ -25,6 +32,19 @@ export default function ReservationPage() {
     
     if (paymentStatus === "success" && id) {
       setPaymentId(id);
+      const savedSlot = localStorage.getItem('mr-saint-selected-slot');
+      if (savedSlot) {
+        try {
+          const parsed = JSON.parse(savedSlot);
+          setSelectedSlot({
+            date: new Date(parsed.date),
+            time: parsed.time,
+            schedulingUrl: parsed.schedulingUrl
+          });
+        } catch (e) {
+          console.error('Failed to parse saved slot:', e);
+        }
+      }
       setCurrentStep("success");
     } else if (paymentStatus === "cancelled" || paymentStatus === "failed") {
       setCurrentStep("select");
@@ -80,7 +100,7 @@ export default function ReservationPage() {
       number: 3,
       title: "Réservation confirmée",
       description: "Choisissez votre créneau et recevez votre confirmation",
-      icon: Calendar,
+      icon: CalendarIcon,
       active: currentStep === "calendar" || currentStep === "success",
     },
   ];
@@ -89,7 +109,31 @@ export default function ReservationPage() {
 
   const handlePaymentSuccess = (id: string) => {
     setPaymentId(id);
-    setCurrentStep("calendar");
+    if (selectedSlot) {
+      localStorage.setItem('mr-saint-selected-slot', JSON.stringify({
+        date: selectedSlot.date.toISOString(),
+        time: selectedSlot.time,
+        schedulingUrl: selectedSlot.schedulingUrl
+      }));
+    }
+    setCurrentStep("success");
+  };
+
+  const handleSlotSelected = (date: Date, time: string, schedulingUrl: string) => {
+    const slotInfo = { date, time, schedulingUrl };
+    setSelectedSlot(slotInfo);
+    localStorage.setItem('mr-saint-selected-slot', JSON.stringify({
+      date: date.toISOString(),
+      time: time,
+      schedulingUrl: schedulingUrl
+    }));
+    setCurrentStep("payment");
+  };
+
+  const handleContactFirst = () => {
+    if (selectedService) {
+      setCurrentStep("calendar");
+    }
   };
 
   return (
@@ -172,7 +216,7 @@ export default function ReservationPage() {
                   Votre paiement a été confirmé. Vous pouvez maintenant réserver votre créneau.
                 </p>
                 <Button onClick={() => setCurrentStep("calendar")} data-testid="button-book-slot">
-                  <Calendar className="w-5 h-5 mr-2" />
+                  <CalendarIcon className="w-5 h-5 mr-2" />
                   Réserver mon créneau
                 </Button>
               </CardContent>
@@ -266,15 +310,15 @@ export default function ReservationPage() {
                         <CreditCard className="w-5 h-5" />
                         Procéder au paiement
                       </Button>
-                      <Link href="/contact">
-                        <Button
+                      <Button
                           data-testid="button-contact-first"
                           variant="outline"
                           size="lg"
+                          onClick={handleContactFirst}
                         >
+                          <CalendarIcon className="w-5 h-5 mr-2" />
                           Me contacter d'abord
                         </Button>
-                      </Link>
                     </div>
                   </CardContent>
                 </Card>
@@ -284,14 +328,32 @@ export default function ReservationPage() {
                 <div className="space-y-6">
                   <Button
                     variant="ghost"
-                    onClick={() => setCurrentStep("select")}
+                    onClick={() => setCurrentStep("calendar")}
                     className="gap-2"
-                    data-testid="button-back-to-services"
+                    data-testid="button-back-to-calendar"
                   >
                     <ArrowLeft className="w-4 h-4" />
-                    Retour aux services
+                    Retour au calendrier
                   </Button>
                   
+                  {selectedSlot && (
+                    <Card className="border-primary/20 bg-card mb-6">
+                      <CardContent className="p-4">
+                        <h3 className="font-heading font-semibold mb-3">Créneau sélectionné</h3>
+                        <div className="flex flex-wrap gap-4 text-sm">
+                          <div className="flex items-center gap-2">
+                            <CalendarIcon className="w-4 h-4 text-primary" />
+                            <span>{selectedSlot.date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-primary" />
+                            <span>{selectedSlot.time}</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
                   <Card className="border-primary/20 bg-card">
                     <CardHeader>
                       <CardTitle className="text-xl font-heading">
@@ -313,7 +375,7 @@ export default function ReservationPage() {
             </>
           )}
 
-          {(currentStep === "calendar" || (currentStep === "success" && paymentId)) && selectedService && (
+          {currentStep === "calendar" && selectedService && (
             <div className="space-y-6">
               <Button
                 variant="ghost"
@@ -325,11 +387,74 @@ export default function ReservationPage() {
                 Retour aux services
               </Button>
               
-              <CalendlyEmbed
+              <div className="text-center mb-6">
+                <h2 className="text-2xl font-heading font-bold text-foreground mb-2">
+                  Réserver selon votre créneau
+                </h2>
+                <p className="text-muted-foreground">
+                  Sélectionnez une date et un créneau disponible pour {selectedServiceData?.title}
+                </p>
+              </div>
+
+              <CalendarBooking
                 serviceType={selectedService}
                 serviceName={selectedServiceData?.title || ""}
+                onSlotSelected={handleSlotSelected}
               />
             </div>
+          )}
+
+          {currentStep === "success" && (
+            <Card className="border-green-500/20 bg-card">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
+                  <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+                </div>
+                <h2 data-testid="text-final-success-title" className="text-2xl font-heading font-bold text-foreground mb-4">
+                  Réservation confirmée !
+                </h2>
+                <p className="text-muted-foreground mb-6">
+                  Votre paiement a été effectué et votre créneau est réservé. Finalisez votre réservation sur Calendly dans la nouvelle fenêtre.
+                </p>
+                {selectedSlot && (
+                  <div className="bg-muted/50 rounded-lg p-4 mb-6 inline-block text-left">
+                    <div className="flex items-center gap-2 mb-2">
+                      <CalendarIcon className="w-4 h-4 text-primary" />
+                      <span className="font-medium">
+                        {selectedSlot.date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-primary" />
+                      <span className="font-medium">{selectedSlot.time}</span>
+                    </div>
+                  </div>
+                )}
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  {selectedSlot && (
+                    <Button 
+                      onClick={() => window.open(selectedSlot.schedulingUrl, '_blank')}
+                      className="gap-2"
+                    >
+                      <CalendarIcon className="w-5 h-5" />
+                      Ouvrir Calendly
+                    </Button>
+                  )}
+                  <Button 
+                    variant="outline"
+                    onClick={() => {
+                      localStorage.removeItem('mr-saint-selected-slot');
+                      setCurrentStep("select");
+                      setSelectedService(null);
+                      setSelectedSlot(null);
+                      setPaymentId(null);
+                    }}
+                  >
+                    Nouvelle réservation
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           )}
         </div>
       </section>
@@ -350,7 +475,7 @@ export default function ReservationPage() {
             </div>
             <div data-testid="feature-confirmation">
               <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                <Calendar className="w-6 h-6 text-primary" />
+                <CalendarIcon className="w-6 h-6 text-primary" />
               </div>
               <h3 data-testid="text-feature-confirm-title" className="font-heading font-semibold text-foreground mb-2">
                 Confirmation immédiate

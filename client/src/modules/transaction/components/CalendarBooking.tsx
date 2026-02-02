@@ -11,7 +11,8 @@ import {
   CheckCircle,
   Globe,
   Loader2,
-  ExternalLink
+  ExternalLink,
+  CreditCard
 } from "lucide-react";
 
 interface TimeSlot {
@@ -154,9 +155,12 @@ export default function CalendarBooking({
 
   const handleConfirmBooking = () => {
     if (selectedDate && selectedTime && selectedSlotUrl) {
-      window.open(selectedSlotUrl, '_blank');
-      setBookingConfirmed(true);
-      onSlotSelected?.(selectedDate, selectedTime, selectedSlotUrl);
+      if (onSlotSelected) {
+        onSlotSelected(selectedDate, selectedTime, selectedSlotUrl);
+      } else {
+        window.open(selectedSlotUrl, '_blank');
+        setBookingConfirmed(true);
+      }
     }
   };
 
@@ -189,6 +193,10 @@ export default function CalendarBooking({
         day === today.getDate() && 
         currentMonth === today.getMonth() && 
         currentYear === today.getFullYear();
+      
+      const slotsForDay = hasSlots ? (availableTimesData?.availableTimes[formatDateKey(date)]?.length || 0) : 0;
+      const isBusy = inFuture && !hasSlots;
+      const hasLimitedSlots = hasSlots && slotsForDay > 0 && slotsForDay <= 3;
 
       days.push(
         <button
@@ -200,16 +208,20 @@ export default function CalendarBooking({
             h-10 w-10 rounded-md text-sm font-medium transition-colors relative
             ${selected 
               ? "bg-primary text-primary-foreground" 
-              : inFuture 
-                ? "hover-elevate cursor-pointer" 
-                : "text-muted-foreground/50 cursor-not-allowed"
+              : hasSlots
+                ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 hover-elevate cursor-pointer"
+                : isBusy
+                  ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 cursor-pointer hover-elevate"
+                  : "text-muted-foreground/50 cursor-not-allowed"
             }
-            ${isToday && !selected ? "ring-1 ring-primary" : ""}
+            ${isToday && !selected ? "ring-2 ring-primary" : ""}
           `}
         >
           {day}
-          {hasSlots && !selected && (
-            <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-green-500" />
+          {hasLimitedSlots && !selected && (
+            <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-500 text-white text-[10px] flex items-center justify-center font-bold">
+              {slotsForDay}
+            </span>
           )}
         </button>
       );
@@ -345,16 +357,18 @@ export default function CalendarBooking({
               {renderCalendar()}
             </div>
 
-            <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
+            <div className="mt-4 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700" />
+                <span>Libre</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 rounded bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700" />
+                <span>Occupé</span>
+              </div>
               <div className="flex items-center gap-1">
                 <div className="w-3 h-3 rounded bg-primary" />
                 <span>Sélectionné</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded bg-muted relative">
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-green-500" />
-                </div>
-                <span>Disponible</span>
               </div>
             </div>
 
@@ -413,8 +427,17 @@ export default function CalendarBooking({
                           onClick={handleConfirmBooking}
                           data-testid="button-confirm-booking"
                         >
-                          <ExternalLink className="w-4 h-4" />
-                          Réserver sur Calendly
+                          {onSlotSelected ? (
+                            <>
+                              <CreditCard className="w-4 h-4" />
+                              Valider et passer au paiement
+                            </>
+                          ) : (
+                            <>
+                              <ExternalLink className="w-4 h-4" />
+                              Réserver sur Calendly
+                            </>
+                          )}
                         </Button>
                       </div>
                     )}
