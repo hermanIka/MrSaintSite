@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,34 +9,36 @@ import {
   Clock, 
   Calendar as CalendarIcon,
   CheckCircle,
-  Globe
+  Globe,
+  Loader2,
+  ExternalLink
 } from "lucide-react";
 
 interface TimeSlot {
   time: string;
-  available: boolean;
+  schedulingUrl: string;
+}
+
+interface EventType {
+  uri: string;
+  name: string;
+  slug: string;
+  duration: number;
+  schedulingUrl: string;
+  description: string | null;
+  color: string;
 }
 
 interface CalendarBookingProps {
   serviceType: string;
   serviceName: string;
-  onSlotSelected?: (date: Date, time: string) => void;
+  onSlotSelected?: (date: Date, time: string, schedulingUrl: string) => void;
 }
 
 const DAYS_FR = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"];
 const MONTHS_FR = [
   "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
   "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
-];
-
-const MOCK_SLOTS: TimeSlot[] = [
-  { time: "09:00", available: true },
-  { time: "10:00", available: true },
-  { time: "11:00", available: false },
-  { time: "14:00", available: true },
-  { time: "15:00", available: true },
-  { time: "16:00", available: false },
-  { time: "17:00", available: true },
 ];
 
 export default function CalendarBooking({ 
@@ -48,7 +51,32 @@ export default function CalendarBooking({
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [selectedSlotUrl, setSelectedSlotUrl] = useState<string | null>(null);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
+
+  const { data: calendlyStatus } = useQuery<{ configured: boolean }>({
+    queryKey: ['/api/calendly/status'],
+  });
+
+  const { data: eventTypesData, isLoading: loadingEventTypes } = useQuery<{ 
+    success: boolean; 
+    eventTypes: EventType[] 
+  }>({
+    queryKey: ['/api/calendly/event-types'],
+    enabled: calendlyStatus?.configured === true,
+  });
+
+  const eventType = eventTypesData?.eventTypes?.[0];
+  const eventTypeId = eventType?.uri?.split('/').pop();
+
+  const { data: availableTimesData, isLoading: loadingSlots, refetch: refetchSlots } = useQuery<{
+    success: boolean;
+    availableTimes: Record<string, TimeSlot[]>;
+    totalSlots: number;
+  }>({
+    queryKey: ['/api/calendly/available-times', eventTypeId],
+    enabled: !!eventTypeId,
+  });
 
   const getDaysInMonth = (month: number, year: number) => {
     return new Date(year, month + 1, 0).getDate();
@@ -58,11 +86,28 @@ export default function CalendarBooking({
     return new Date(year, month, 1).getDay();
   };
 
+  const formatDateKey = (date: Date) => {
+    return date.toISOString().split('T')[0];
+  };
+
+  const hasAvailableSlots = (date: Date): boolean => {
+    if (!availableTimesData?.availableTimes) return false;
+    const dateKey = formatDateKey(date);
+    const slots = availableTimesData.availableTimes[dateKey];
+    return slots && slots.length > 0;
+  };
+
   const isDateAvailable = (date: Date) => {
     const dayOfWeek = date.getDay();
     if (dayOfWeek === 0 || dayOfWeek === 6) return false;
     if (date < today) return false;
-    return true;
+    return hasAvailableSlots(date);
+  };
+
+  const isDateInFuture = (date: Date) => {
+    const dayOfWeek = date.getDay();
+    if (dayOfWeek === 0 || dayOfWeek === 6) return false;
+    return date >= today;
   };
 
   const isDateSelected = (day: number) => {
@@ -76,9 +121,10 @@ export default function CalendarBooking({
 
   const handleDateClick = (day: number) => {
     const date = new Date(currentYear, currentMonth, day);
-    if (isDateAvailable(date)) {
+    if (isDateInFuture(date)) {
       setSelectedDate(date);
       setSelectedTime(null);
+      setSelectedSlotUrl(null);
     }
   };
 
@@ -100,20 +146,28 @@ export default function CalendarBooking({
     }
   };
 
-  const handleTimeSelect = (time: string) => {
-    setSelectedTime(time);
+  const handleTimeSelect = (slot: TimeSlot) => {
+    setSelectedTime(slot.time);
+    setSelectedSlotUrl(slot.schedulingUrl);
   };
 
   const handleConfirmBooking = () => {
-    if (selectedDate && selectedTime) {
+    if (selectedDate && selectedTime && selectedSlotUrl) {
+      window.open(selectedSlotUrl, '_blank');
       setBookingConfirmed(true);
-      onSlotSelected?.(selectedDate, selectedTime);
+      onSlotSelected?.(selectedDate, selectedTime, selectedSlotUrl);
     }
   };
 
   const formatSelectedDate = () => {
     if (!selectedDate) return "";
     return `${DAYS_FR[selectedDate.getDay()]} ${selectedDate.getDate()} ${MONTHS_FR[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`;
+  };
+
+  const getSlotsForSelectedDate = (): TimeSlot[] => {
+    if (!selectedDate || !availableTimesData?.availableTimes) return [];
+    const dateKey = formatDateKey(selectedDate);
+    return availableTimesData.availableTimes[dateKey] || [];
   };
 
   const renderCalendar = () => {
@@ -127,7 +181,8 @@ export default function CalendarBooking({
 
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(currentYear, currentMonth, day);
-      const available = isDateAvailable(date);
+      const hasSlots = hasAvailableSlots(date);
+      const inFuture = isDateInFuture(date);
       const selected = isDateSelected(day);
       const isToday = 
         day === today.getDate() && 
@@ -139,12 +194,12 @@ export default function CalendarBooking({
           key={day}
           data-testid={`calendar-day-${day}`}
           onClick={() => handleDateClick(day)}
-          disabled={!available}
+          disabled={!inFuture}
           className={`
-            h-10 w-10 rounded-md text-sm font-medium transition-colors
+            h-10 w-10 rounded-md text-sm font-medium transition-colors relative
             ${selected 
               ? "bg-primary text-primary-foreground" 
-              : available 
+              : inFuture 
                 ? "hover-elevate cursor-pointer" 
                 : "text-muted-foreground/50 cursor-not-allowed"
             }
@@ -152,12 +207,43 @@ export default function CalendarBooking({
           `}
         >
           {day}
+          {hasSlots && !selected && (
+            <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-green-500" />
+          )}
         </button>
       );
     }
 
     return days;
   };
+
+  if (!calendlyStatus?.configured) {
+    return (
+      <Card className="w-full max-w-2xl mx-auto" data-testid="card-calendly-not-configured">
+        <CardContent className="p-8 text-center">
+          <CalendarIcon className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+          <h2 className="text-xl font-heading font-bold mb-2">
+            Calendrier non disponible
+          </h2>
+          <p className="text-muted-foreground">
+            Le système de réservation est en cours de configuration.
+            Veuillez nous contacter directement pour prendre rendez-vous.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (loadingEventTypes) {
+    return (
+      <Card className="w-full max-w-2xl mx-auto">
+        <CardContent className="p-8 text-center">
+          <Loader2 className="w-8 h-8 mx-auto mb-4 animate-spin text-primary" />
+          <p className="text-muted-foreground">Chargement du calendrier...</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (bookingConfirmed) {
     return (
@@ -167,10 +253,10 @@ export default function CalendarBooking({
             <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
           </div>
           <h2 className="text-2xl font-heading font-bold mb-2">
-            Rendez-vous confirmé !
+            Réservation en cours !
           </h2>
           <p className="text-muted-foreground mb-6">
-            Votre consultation a été réservée avec succès.
+            Finalisez votre réservation sur Calendly dans la nouvelle fenêtre.
           </p>
           <div className="bg-muted/50 rounded-lg p-4 mb-6 text-left space-y-2">
             <div className="flex items-center gap-2">
@@ -185,9 +271,16 @@ export default function CalendarBooking({
               <Badge variant="secondary">{serviceName}</Badge>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground">
-            Un email de confirmation vous a été envoyé avec les détails du rendez-vous.
-          </p>
+          {selectedSlotUrl && (
+            <Button 
+              variant="outline" 
+              onClick={() => window.open(selectedSlotUrl, '_blank')}
+              className="gap-2"
+            >
+              <ExternalLink className="w-4 h-4" />
+              Ouvrir Calendly
+            </Button>
+          )}
         </CardContent>
       </Card>
     );
@@ -207,6 +300,11 @@ export default function CalendarBooking({
                 <span>Fuseau: Paris (GMT+1)</span>
               </div>
             </div>
+            {eventType && (
+              <p className="text-sm text-muted-foreground">
+                {eventType.name} - {eventType.duration} min
+              </p>
+            )}
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between mb-4">
@@ -252,14 +350,19 @@ export default function CalendarBooking({
                 <span>Sélectionné</span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded bg-muted" />
+                <div className="w-3 h-3 rounded bg-muted relative">
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-green-500" />
+                </div>
                 <span>Disponible</span>
               </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 rounded bg-muted/30" />
-                <span>Indisponible</span>
-              </div>
             </div>
+
+            {loadingSlots && (
+              <div className="mt-4 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Chargement des créneaux...</span>
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -275,46 +378,51 @@ export default function CalendarBooking({
           <CardContent>
             {selectedDate ? (
               <>
-                <div className="grid grid-cols-2 gap-2 mb-6">
-                  {MOCK_SLOTS.map((slot) => (
-                    <Button
-                      key={slot.time}
-                      variant={selectedTime === slot.time ? "default" : "outline"}
-                      disabled={!slot.available}
-                      onClick={() => handleTimeSelect(slot.time)}
-                      className="justify-start gap-2"
-                      data-testid={`button-slot-${slot.time.replace(":", "")}`}
-                    >
-                      <Clock className="w-4 h-4" />
-                      {slot.time}
-                      {!slot.available && (
-                        <Badge variant="secondary" className="ml-auto text-xs">
-                          Réservé
-                        </Badge>
-                      )}
-                    </Button>
-                  ))}
-                </div>
-
-                {selectedTime && (
-                  <div className="space-y-4">
-                    <div className="bg-muted/50 rounded-lg p-4">
-                      <h4 className="font-medium mb-2">Récapitulatif</h4>
-                      <div className="space-y-1 text-sm">
-                        <p><span className="text-muted-foreground">Service:</span> {serviceName}</p>
-                        <p><span className="text-muted-foreground">Date:</span> {formatSelectedDate()}</p>
-                        <p><span className="text-muted-foreground">Heure:</span> {selectedTime}</p>
-                        <p><span className="text-muted-foreground">Durée:</span> 30 minutes</p>
-                      </div>
+                {getSlotsForSelectedDate().length > 0 ? (
+                  <>
+                    <div className="grid grid-cols-2 gap-2 mb-6">
+                      {getSlotsForSelectedDate().map((slot) => (
+                        <Button
+                          key={slot.time}
+                          variant={selectedTime === slot.time ? "default" : "outline"}
+                          onClick={() => handleTimeSelect(slot)}
+                          className="justify-start gap-2"
+                          data-testid={`button-slot-${slot.time.replace(":", "")}`}
+                        >
+                          <Clock className="w-4 h-4" />
+                          {slot.time}
+                        </Button>
+                      ))}
                     </div>
-                    <Button 
-                      className="w-full" 
-                      size="lg"
-                      onClick={handleConfirmBooking}
-                      data-testid="button-confirm-booking"
-                    >
-                      Confirmer le rendez-vous
-                    </Button>
+
+                    {selectedTime && (
+                      <div className="space-y-4">
+                        <div className="bg-muted/50 rounded-lg p-4">
+                          <h4 className="font-medium mb-2">Récapitulatif</h4>
+                          <div className="space-y-1 text-sm">
+                            <p><span className="text-muted-foreground">Service:</span> {serviceName}</p>
+                            <p><span className="text-muted-foreground">Date:</span> {formatSelectedDate()}</p>
+                            <p><span className="text-muted-foreground">Heure:</span> {selectedTime}</p>
+                            <p><span className="text-muted-foreground">Durée:</span> {eventType?.duration || 30} minutes</p>
+                          </div>
+                        </div>
+                        <Button 
+                          className="w-full gap-2" 
+                          size="lg"
+                          onClick={handleConfirmBooking}
+                          data-testid="button-confirm-booking"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                          Réserver sur Calendly
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="h-48 flex flex-col items-center justify-center text-center text-muted-foreground">
+                    <Clock className="w-12 h-12 mb-3 opacity-50" />
+                    <p>Aucun créneau disponible pour cette date</p>
+                    <p className="text-sm mt-2">Essayez une autre date</p>
                   </div>
                 )}
               </>
