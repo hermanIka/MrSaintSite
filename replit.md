@@ -160,21 +160,41 @@ PAYPAL_CLIENT_SECRET=
 PAYPAL_ENV=sandbox  # ou production
 ```
 
-### Correspondants PawaPay Disponibles
-| Pays | Opérateur | Code API |
-|------|-----------|----------|
-| Cameroun | MTN | MTN_MOMO_CMR |
-| Cameroun | Orange | ORANGE_CMR |
-| Côte d'Ivoire | MTN | MTN_MOMO_CIV |
-| Côte d'Ivoire | Orange | ORANGE_CIV |
-| Bénin | MTN | MTN_MOMO_BEN |
-| Ghana | MTN | MTN_MOMO_GHA |
-| Kenya | M-Pesa | MPESA_KEN |
-| Ouganda | MTN | MTN_MOMO_UGA |
+### Pays PawaPay Supportés (19 pays)
+Configuration complète dans `shared/pawapay-countries.ts` avec :
+- Sélection dynamique du pays par l'utilisateur
+- Filtrage automatique des opérateurs Mobile Money disponibles
+- Conversion automatique EUR → devise locale
+- Préfixe téléphonique adapté au pays
 
-### Flux de Paiement
+| Pays | Devise | Taux EUR | Opérateurs |
+|------|--------|----------|------------|
+| Cameroun | XAF | 656 | MTN, Orange |
+| Côte d'Ivoire | XOF | 656 | MTN, Orange |
+| Sénégal | XOF | 656 | Orange, Free |
+| Bénin | XOF | 656 | MTN, Moov |
+| Ghana | GHS | 16.5 | MTN, Vodafone, AirtelTigo |
+| Kenya | KES | 165 | M-Pesa |
+| Ouganda | UGX | 4100 | MTN, Airtel |
+| Rwanda | RWF | 1380 | MTN, Airtel |
+| Tanzanie | TZS | 2800 | Vodacom, Airtel, Tigo |
+| Zambie | ZMW | 28 | MTN, Airtel |
+| RD Congo | CDF | 2950 | Vodacom, Orange, Airtel |
+| + 8 autres pays... | | | |
+
+### Flux de Paiement Mobile Money
 1. Sélection du service par l'utilisateur
-2. Choix du mode de paiement (Carte, Mobile Money, PayPal)
+2. Choix du mode de paiement (Mobile Money)
+3. **Sélection du pays** (dropdown avec 19 pays)
+4. **Sélection de l'opérateur** (filtré selon le pays)
+5. Saisie du numéro de téléphone (préfixe automatique)
+6. Affichage du montant en devise locale
+7. Paiement via PawaPay
+8. Confirmation sur le téléphone de l'utilisateur
+
+### Flux de Paiement Carte/PayPal
+1. Sélection du service par l'utilisateur
+2. Choix du mode de paiement (Carte ou PayPal)
 3. Paiement via le provider sélectionné
 4. Confirmation du paiement (backend uniquement)
 5. Accès à la réservation (Calendly)
