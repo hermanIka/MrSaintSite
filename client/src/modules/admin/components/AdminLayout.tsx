@@ -12,6 +12,7 @@ import {
   Menu,
   X,
   Settings,
+  CreditCard,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -24,6 +25,7 @@ const navItems = [
   { href: "/admin/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
   { href: "/admin/services", label: "Services & Prix", icon: Settings },
   { href: "/admin/trips", label: "Voyages", icon: Plane },
+  { href: "/admin/credit-requests", label: "Demandes crédit", icon: CreditCard },
   { href: "/admin/testimonials", label: "Témoignages", icon: MessageSquare },
   { href: "/admin/portfolio", label: "Portfolio", icon: Briefcase },
   { href: "/admin/faq", label: "FAQ", icon: HelpCircle },
