@@ -9,7 +9,7 @@
  * - Coordination avec le module de paiement
  * 
  * NOTE: Les paiements sont gérés par le module /server/modules/payment/
- * qui supporte 3 providers : PowerPay, LemonSqueezy, PayPal
+ * qui supporte 3 providers : PawaPay, LemonSqueezy, PayPal
  * 
  * RÈGLES DE SÉCURITÉ:
  * - Toutes les clés API sont stockées en secrets

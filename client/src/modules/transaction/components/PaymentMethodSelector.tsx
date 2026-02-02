@@ -9,7 +9,7 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-type PaymentProvider = "powerpay" | "lemonsqueezy" | "paypal";
+type PaymentProvider = "pawapay" | "lemonsqueezy" | "paypal";
 
 interface PaymentMethodSelectorProps {
   serviceId: string;
@@ -38,9 +38,9 @@ const paymentMethods = [
     icon: CreditCard,
   },
   {
-    id: "powerpay" as PaymentProvider,
+    id: "pawapay" as PaymentProvider,
     label: "Mobile Money",
-    description: "Orange Money, MTN, etc.",
+    description: "Orange Money, MTN, Airtel, etc.",
     icon: Smartphone,
   },
   {
@@ -128,7 +128,7 @@ export function PaymentMethodSelector({
       return;
     }
 
-    if (selectedMethod === "powerpay" && !customerPhone) {
+    if (selectedMethod === "pawapay" && !customerPhone) {
       toast({
         title: "Téléphone requis",
         description: "Veuillez entrer votre numéro de téléphone pour Mobile Money.",
@@ -207,14 +207,14 @@ export function PaymentMethodSelector({
           </div>
         </div>
         
-        {selectedMethod === "powerpay" && (
+        {selectedMethod === "pawapay" && (
           <div className="space-y-2">
             <Label htmlFor="customerPhone">Numéro de téléphone (Mobile Money) *</Label>
             <Input
               id="customerPhone"
               type="tel"
               data-testid="input-customer-phone"
-              placeholder="+225 XX XX XX XX XX"
+              placeholder="237 6XX XX XX XX"
               value={customerPhone}
               onChange={(e) => setCustomerPhone(e.target.value)}
               required

@@ -46,7 +46,7 @@ export function registerPaymentRoutes(app: Express): void {
         });
       }
 
-      const validProviders: PaymentProvider[] = ["powerpay", "lemonsqueezy", "paypal"];
+      const validProviders: PaymentProvider[] = ["pawapay", "lemonsqueezy", "paypal"];
       if (!validProviders.includes(provider)) {
         return res.status(400).json({
           success: false,
@@ -141,18 +141,18 @@ export function registerPaymentRoutes(app: Express): void {
     }
   });
 
-  app.post("/api/webhooks/powerpay", async (req: Request, res: Response) => {
+  app.post("/api/webhooks/pawapay", async (req: Request, res: Response) => {
     try {
-      const result = await paymentService.handleWebhook("powerpay", {
-        provider: "powerpay",
-        event: req.body.event || "payment.update",
+      const result = await paymentService.handleWebhook("pawapay", {
+        provider: "pawapay",
+        event: req.body.event || "deposit.completed",
         data: req.body,
-        signature: req.headers["x-powerpay-signature"] as string,
+        signature: req.headers["x-pawapay-signature"] as string,
       });
 
       res.json(result);
     } catch (error) {
-      console.error("[Webhook] PowerPay error:", error);
+      console.error("[Webhook] PawaPay error:", error);
       res.status(500).json({ success: false, message: "Erreur webhook" });
     }
   });

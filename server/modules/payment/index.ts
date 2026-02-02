@@ -2,7 +2,7 @@
  * PAYMENT MODULE - Entry Point
  * 
  * Système de paiement modulaire avec 3 providers :
- * - PowerPay (Mobile Money)
+ * - PawaPay (Mobile Money - Afrique)
  * - LemonSqueezy (Carte bancaire)
  * - PayPal
  */

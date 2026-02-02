@@ -4,7 +4,7 @@
  * Domaine: Système de paiement modulaire
  * 
  * PROVIDERS SUPPORTÉS:
- * - PowerPay (Mobile Money) - Paiements africains
+ * - PawaPay (Mobile Money) - Paiements africains (MTN, Orange, Airtel, M-Pesa)
  * - LemonSqueezy (Carte bancaire) - Paiements internationaux
  * - PayPal - Paiements universels
  * 
@@ -16,15 +16,16 @@
  * 
  * VARIABLES D'ENVIRONNEMENT:
  * 
- * PowerPay:
- * - POWERPAY_API_KEY
- * - POWERPAY_BASE_URL
+ * PawaPay:
+ * - PAWAPAY_API_TOKEN
+ * - PAWAPAY_ENV (sandbox | production)
+ * - PAWAPAY_CORRESPONDENT (ex: MTN_MOMO_CMR, ORANGE_CMR)
  * 
  * LemonSqueezy:
  * - LEMONSQUEEZY_API_KEY
  * - LEMONSQUEEZY_STORE_ID
- * - LEMONSQUEEZY_VARIANT_ID (optionnel)
- * - LEMONSQUEEZY_WEBHOOK_SECRET
+ * - LEMONSQUEEZY_VARIANT_ID
+ * - LEMONSQUEEZY_WEBHOOK_SECRET (optionnel)
  * 
  * PayPal:
  * - PAYPAL_CLIENT_ID
@@ -36,7 +37,7 @@
  * - POST /api/payments/init - Initialiser un paiement
  * - GET /api/payments/verify/:paymentId - Vérifier un paiement
  * - GET /api/payments/paypal/capture - Callback PayPal
- * - POST /api/webhooks/powerpay - Webhook PowerPay
+ * - POST /api/webhooks/pawapay - Webhook PawaPay
  * - POST /api/webhooks/lemonsqueezy - Webhook LemonSqueezy
  * - POST /api/webhooks/paypal - Webhook PayPal
  * 
@@ -50,13 +51,13 @@ export const PAYMENT_MODULE = {
   name: "payment",
   description: "Système de paiement modulaire multi-providers",
   status: "active",
-  providers: ["powerpay", "lemonsqueezy", "paypal"],
+  providers: ["pawapay", "lemonsqueezy", "paypal"],
   routes: [
     "GET /api/payments/providers",
     "POST /api/payments/init",
     "GET /api/payments/verify/:paymentId",
     "GET /api/payments/paypal/capture",
-    "POST /api/webhooks/powerpay",
+    "POST /api/webhooks/pawapay",
     "POST /api/webhooks/lemonsqueezy",
     "POST /api/webhooks/paypal",
   ],

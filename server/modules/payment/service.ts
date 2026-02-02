@@ -2,7 +2,7 @@
  * PAYMENT SERVICE - Service Central
  * 
  * Service centralisé pour la gestion des paiements.
- * Orchestre les 3 providers : PowerPay, LemonSqueezy, PayPal
+ * Orchestre les 3 providers : PawaPay, LemonSqueezy, PayPal
  */
 
 import type {
@@ -15,7 +15,7 @@ import type {
   WebhookPayload,
   PaymentRecord,
 } from "./types";
-import { powerPayProvider } from "./providers/powerpay.provider";
+import { pawaPayProvider } from "./providers/pawapay.provider";
 import { lemonSqueezyProvider } from "./providers/lemonsqueezy.provider";
 import { payPalProvider } from "./providers/paypal.provider";
 
@@ -27,7 +27,7 @@ class PaymentService {
     this.providers = new Map();
     this.payments = new Map();
     
-    this.providers.set("powerpay", powerPayProvider);
+    this.providers.set("pawapay", pawaPayProvider);
     this.providers.set("lemonsqueezy", lemonSqueezyProvider);
     this.providers.set("paypal", payPalProvider);
   }
@@ -44,8 +44,8 @@ class PaymentService {
         label: "Carte bancaire",
       },
       {
-        provider: "powerpay",
-        configured: powerPayProvider.isConfigured(),
+        provider: "pawapay",
+        configured: pawaPayProvider.isConfigured(),
         label: "Mobile Money",
       },
       {
@@ -169,7 +169,7 @@ class PaymentService {
 
   private getProviderLabel(provider: PaymentProvider): string {
     const labels: Record<PaymentProvider, string> = {
-      powerpay: "Mobile Money",
+      pawapay: "Mobile Money",
       lemonsqueezy: "Carte bancaire",
       paypal: "PayPal",
     };

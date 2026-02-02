@@ -23,7 +23,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerAdminRoutes(app);
   registerInteractionRoutes(app);
   
-  // Module de paiement (PowerPay, LemonSqueezy, PayPal)
+  // Module de paiement (PawaPay, LemonSqueezy, PayPal)
   registerPaymentRoutes(app);
   
   // Object Storage routes

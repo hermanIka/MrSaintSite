@@ -96,7 +96,7 @@ modules/
    - Les contextes sont mis à jour à chaque modification majeure
 
 4. **Système de paiement modulaire**
-   - 3 providers supportés : PowerPay (Mobile Money), LemonSqueezy (Carte), PayPal
+   - 3 providers supportés : PawaPay (Mobile Money), LemonSqueezy (Carte), PayPal
    - Architecture extensible pour ajouter d'autres providers
    - Toute la logique de paiement est côté serveur
 
@@ -113,7 +113,7 @@ modules/
 - `POST /api/payments/init` - Initialiser un paiement
 - `GET /api/payments/verify/:paymentId` - Vérifier un paiement
 - `GET /api/payments/paypal/capture` - Callback PayPal
-- `POST /api/webhooks/powerpay` - Webhook PowerPay
+- `POST /api/webhooks/pawapay` - Webhook PawaPay
 - `POST /api/webhooks/lemonsqueezy` - Webhook LemonSqueezy
 - `POST /api/webhooks/paypal` - Webhook PayPal
 
@@ -137,26 +137,40 @@ modules/
 ## Système de Paiement
 
 ### Providers Actifs
-- **PowerPay** - Mobile Money (Orange Money, MTN, etc.)
+- **PawaPay** - Mobile Money Afrique (MTN, Orange, Airtel, M-Pesa - 19 pays)
 - **LemonSqueezy** - Carte bancaire (Visa, Mastercard)
 - **PayPal** - Paiement PayPal
 
 ### Variables d'Environnement Requises
 ```
-# PowerPay (Mobile Money)
-POWERPAY_API_KEY=
-POWERPAY_BASE_URL=
+# PawaPay (Mobile Money Afrique)
+PAWAPAY_API_TOKEN=          # Token API depuis le dashboard PawaPay
+PAWAPAY_ENV=sandbox         # sandbox ou production
+PAWAPAY_CORRESPONDENT=MTN_MOMO_CMR  # Opérateur par défaut (MTN_MOMO_CMR, ORANGE_CMR, etc.)
 
 # LemonSqueezy (Carte bancaire)
-LEMONSQUEEZY_API_KEY=
-LEMONSQUEEZY_STORE_ID=
-LEMONSQUEEZY_WEBHOOK_SECRET=
+LEMONSQUEEZY_API_KEY=       # Clé API depuis Settings > API Keys
+LEMONSQUEEZY_STORE_ID=      # ID du store (Settings > Store)
+LEMONSQUEEZY_VARIANT_ID=    # ID du variant/produit à utiliser
+LEMONSQUEEZY_WEBHOOK_SECRET= # Secret webhook (optionnel)
 
 # PayPal
 PAYPAL_CLIENT_ID=
 PAYPAL_CLIENT_SECRET=
 PAYPAL_ENV=sandbox  # ou production
 ```
+
+### Correspondants PawaPay Disponibles
+| Pays | Opérateur | Code API |
+|------|-----------|----------|
+| Cameroun | MTN | MTN_MOMO_CMR |
+| Cameroun | Orange | ORANGE_CMR |
+| Côte d'Ivoire | MTN | MTN_MOMO_CIV |
+| Côte d'Ivoire | Orange | ORANGE_CIV |
+| Bénin | MTN | MTN_MOMO_BEN |
+| Ghana | MTN | MTN_MOMO_GHA |
+| Kenya | M-Pesa | MPESA_KEN |
+| Ouganda | MTN | MTN_MOMO_UGA |
 
 ### Flux de Paiement
 1. Sélection du service par l'utilisateur
@@ -261,7 +275,7 @@ npm run db:push  # Synchronisation schema DB
 - Fuseau horaire affiché (Paris GMT+1)
 - Flow complet : sélection service → paiement → calendrier → créneau → confirmation
 - Préparé pour intégration Calendly API (créneaux actuellement mockés)
-- Système de paiement multi-providers intégré (PowerPay, LemonSqueezy, PayPal)
+- Système de paiement multi-providers intégré (PawaPay, LemonSqueezy, PayPal)
 
 ### Module 3 (Chatbot Hybride - Complété)
 - ChatWidget flottant intégré au Layout
@@ -285,5 +299,5 @@ npm run db:push  # Synchronisation schema DB
 - Pour configurer: Modifier CALENDLY_URL avec le lien Calendly du client
 
 ### Prochaines Étapes
-1. Configuration des clés API des providers de paiement (PowerPay, LemonSqueezy, PayPal)
+1. Configuration des clés API des providers de paiement (PawaPay, LemonSqueezy, PayPal)
 2. Amélioration chatbot avec OpenAI (optionnel)

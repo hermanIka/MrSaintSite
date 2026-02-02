@@ -7,16 +7,16 @@
  * - Page de réservation (ReservationPage)
  * - Intégration Calendly pour les réservations
  * - Système de paiement multi-providers
- * - Gestion du flux de paiement AVANT réservation
+ * - Gestion du flux de paiement APRÈS sélection de créneau
  * - Confirmation de transaction
  * 
  * PROVIDERS DE PAIEMENT:
- * - PowerPay (Mobile Money)
+ * - PawaPay (Mobile Money - Afrique)
  * - LemonSqueezy (Carte bancaire)
  * - PayPal
  * 
  * RÈGLES STRICTES:
- * - Paiement OBLIGATOIRE avant réservation
+ * - Sélection de créneau AVANT paiement
  * - Confirmation uniquement via backend
  * - Aucune clé API exposée côté frontend
  * - Architecture modulaire et extensible
@@ -29,17 +29,17 @@ export const TRANSACTION_MODULE = {
   description: 'Paiements et réservations',
   status: 'active',
   pages: ['ReservationPage'],
-  paymentProviders: ['powerpay', 'lemonsqueezy', 'paypal'],
+  paymentProviders: ['pawapay', 'lemonsqueezy', 'paypal'],
   integrations: {
-    current: ['powerpay', 'lemonsqueezy', 'paypal'],
+    current: ['pawapay', 'lemonsqueezy', 'paypal'],
     planned: ['calendly'],
   },
   flow: [
     '1. Sélection du service (ReservationPage)',
-    '2. Choix du mode de paiement (Carte, Mobile Money, PayPal)',
-    '3. Paiement via le provider sélectionné',
-    '4. Confirmation paiement (backend)',
-    '5. Réservation créneau (Calendly)',
-    '6. Confirmation finale'
+    '2. Sélection du créneau (CalendarBooking)',
+    '3. Choix du mode de paiement (Carte, Mobile Money, PayPal)',
+    '4. Paiement via le provider sélectionné',
+    '5. Confirmation paiement (backend)',
+    '6. Finalisation réservation (Calendly)'
   ]
 } as const;

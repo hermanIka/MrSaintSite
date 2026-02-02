@@ -4,23 +4,23 @@
  * Ce module gère les paiements et réservations.
  * 
  * PROVIDERS DE PAIEMENT:
- * - PowerPay (Mobile Money)
+ * - PawaPay (Mobile Money - Afrique)
  * - LemonSqueezy (Carte bancaire)
  * - PayPal
  * 
  * INTÉGRATIONS:
- * - Calendly (réservation) - INTÉGRÉ via variable CALENDLY_URL
+ * - Calendly (réservation) - INTÉGRÉ via API Calendly v2
  * 
- * FLUX DE PAIEMENT:
+ * FLUX DE RÉSERVATION:
  * 1. Sélection du service
- * 2. Choix du mode de paiement
- * 3. Paiement via le provider choisi
- * 4. Confirmation backend
- * 5. Accès à la réservation Calendly
+ * 2. Sélection du créneau (Calendly)
+ * 3. Choix du mode de paiement
+ * 4. Paiement via le provider choisi
+ * 5. Confirmation backend
+ * 6. Finalisation réservation
  * 
- * CONFIGURATION CALENDLY:
- * - Variable d'environnement: CALENDLY_URL
- * - Le client doit fournir son lien Calendly personnel
+ * CONFIGURATION:
+ * - CALENDLY_API_KEY pour l'intégration API
  */
 
 export { default as ReservationPage } from "./components/ReservationPage";
@@ -30,5 +30,5 @@ export { PaymentMethodSelector } from "./components/PaymentMethodSelector";
 
 export const TRANSACTION_STATUS = {
   calendly: true,
-  paymentProviders: ['powerpay', 'lemonsqueezy', 'paypal'],
+  paymentProviders: ['pawapay', 'lemonsqueezy', 'paypal'],
 } as const;
