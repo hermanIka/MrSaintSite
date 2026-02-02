@@ -14,6 +14,7 @@ import { chatbotRoutes } from "./modules/chatbot";
 import { registerInteractionRoutes } from "./modules/interaction";
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
 import { registerPaymentRoutes } from "./modules/payment";
+import { calendlyRoutes } from "./modules/calendly";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Enregistrement des routes par module
@@ -30,14 +31,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Module Chatbot
   app.use("/api/chatbot", chatbotRoutes);
-
-  // Configuration endpoint for Calendly URL
-  app.get("/api/config/calendly", (req, res) => {
-    res.json({
-      url: process.env.CALENDLY_URL || null,
-      configured: !!process.env.CALENDLY_URL && process.env.CALENDLY_URL !== "https://calendly.com/your-calendly-link",
-    });
-  });
+  
+  // Module Calendly (intégration API)
+  app.use("/api/calendly", calendlyRoutes);
 
   const httpServer = createServer(app);
 
