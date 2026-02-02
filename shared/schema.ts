@@ -250,3 +250,43 @@ export const CREDIT_REQUEST_STATUS = [
   { value: "approved", label: "Approuvée", color: "bg-green-500" },
   { value: "rejected", label: "Rejetée", color: "bg-red-500" },
 ] as const;
+
+// ==========================================
+// CHATBOT MODULE - Tables sécurisées
+// ==========================================
+
+// Table pour stocker les conversations du chatbot
+export const chatbotConversations = pgTable("chatbot_conversations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: text("session_id").notNull(), // Identifiant de session unique
+  messages: text("messages").notNull(), // JSON stringifié des messages
+  messageCount: integer("message_count").notNull().default(0),
+  mode: text("mode").notNull().default("rules"), // "rules" ou "ai"
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export const insertChatbotConversationSchema = createInsertSchema(chatbotConversations).omit({
+  id: true,
+});
+
+export type InsertChatbotConversation = z.infer<typeof insertChatbotConversationSchema>;
+export type ChatbotConversation = typeof chatbotConversations.$inferSelect;
+
+// Table pour le prompt système du chatbot (versionnée)
+export const chatbotSystemPrompts = pgTable("chatbot_system_prompts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  version: text("version").notNull(), // ex: "1.0", "1.1", "2.0"
+  name: text("name").notNull(), // Nom descriptif du prompt
+  content: text("content").notNull(), // Contenu complet du prompt système
+  active: boolean("active").notNull().default(false), // Une seule version active à la fois
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export const insertChatbotSystemPromptSchema = createInsertSchema(chatbotSystemPrompts).omit({
+  id: true,
+});
+
+export type InsertChatbotSystemPrompt = z.infer<typeof insertChatbotSystemPromptSchema>;
+export type ChatbotSystemPrompt = typeof chatbotSystemPrompts.$inferSelect;

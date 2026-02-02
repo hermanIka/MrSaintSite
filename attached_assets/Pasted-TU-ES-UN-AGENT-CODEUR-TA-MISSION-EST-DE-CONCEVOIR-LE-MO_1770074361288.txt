@@ -1,0 +1,108 @@
+TU ES UN AGENT CODEUR. TA MISSION EST DE CONCEVOIR LE MODULE CHATBOT DU SITE, EN RESPECTANT LES CONTRAINTES SUIVANTES :
+
+---
+
+1️⃣ STRUCTURE DU MODULE
+
+1. Créer une table dédiée pour le chatbot : `chatbot`
+   - `id` (PK)
+   - `user_id` (si utilisateur connecté)
+   - `session_id`
+   - `messages` (texte ou JSON, log des conversations)
+   - `created_at`, `updated_at`
+
+2. Créer une table dédiée pour le prompt système : `chatbot_system_prompt`
+   - `id` (PK)
+   - `version` (numéro ou date)
+   - `content` (texte complet du prompt système blindé sécurité)
+   - `created_at`, `updated_at`
+   - `active` (booléen pour version courante)
+
+---
+
+2️⃣ ISOLATION ET SÉCURITÉ
+
+- Le chatbot **n’a jamais accès** :
+  - aux API de paiement
+  - aux clés secrètes
+  - au back-office / admin
+  - aux logs internes sensibles
+  - à toute donnée non affichée à l’utilisateur
+
+- Le chatbot **lit uniquement** :
+  - données publiques / visibles
+  - disponibilités publiques pour rendez-vous
+  - services affichés
+  - prix affichés
+  - cartes virtuelles Go+ publiques (nom du type et avantages visibles)
+
+- Aucun accès direct aux systèmes externes.  
+- Tout accès se fait via **backend sécurisé** avec lecture seule et filtrage.
+
+---
+
+3️⃣ INJECTION DU PROMPT SYSTEME
+
+- À chaque requête OpenAI :
+  1. Lire le **prompt système actif** depuis `chatbot_system_prompt`
+  2. Injecter ce prompt comme **system prompt** dans l’appel OpenAI
+  3. Ajouter les **données filtrées côté backend** dans `user_message` ou `context`
+
+- Ne jamais stocker les secrets dans la table du chatbot ou dans le frontend.
+
+---
+
+4️⃣ HYBRIDITÉ DU CHATBOT
+
+- Le module doit pouvoir :
+  - fonctionner en **mode FAQ statique** si la clé OpenAI n’est pas activée
+  - basculer en **mode IA OpenAI** dès que la clé est fournie
+  - respecter **strictement les règles de sécurité** à chaque mode
+
+- Le backend doit contrôler :
+  - l’injection de la clé OpenAI
+  - la lecture des données publiques uniquement
+  - la génération de réponse filtrée
+
+---
+
+5️⃣ GESTION DES CONVERSATIONS
+
+- Stocker chaque message côté backend pour analyse des logs
+- Ne jamais stocker de données sensibles (numéros de carte, mots de passe, documents)
+- Prévoir un identifiant de session pour suivre les conversations
+- Historiser les messages pour amélioration future du prompt (analyse humaine uniquement)
+
+---
+
+6️⃣ INTÉGRATION AVEC LES AUTRES MODULES
+
+- Le chatbot peut **proposer des créneaux** uniquement à partir de données visibles stockées dans la base (ex: disponibilités Calendly synchronisées)
+- Le chatbot peut **expliquer les services**, les voyages, le module Go+ (cartes virtuelles)
+- Le chatbot **ne peut jamais valider ou modifier quoi que ce soit**
+- Les liens vers paiement / réservation doivent être **toujours redirigés vers le backend officiel**
+
+---
+
+7️⃣ CRITÈRES DE VALIDATION
+
+Le module chatbot est correct si :
+
+- Le chatbot répond uniquement sur la base des informations visibles
+- Le chatbot applique le prompt système blindé sécurité
+- Aucun accès aux API sensibles ou admin
+- La table `chatbot_system_prompt` fonctionne comme source unique de vérité
+- La logique hybride fonctionne (mode statique / mode IA OpenAI)
+
+---
+
+8️⃣ BONUS POUR REPLIT (OPTIONNEL MAIS CONSEILLÉ)
+
+- Versionner les prompts système pour pouvoir tester des mises à jour
+- Prévoir un champ “active” pour sélectionner le prompt courant
+- Prévoir une API interne pour injecter uniquement des données filtrées au chatbot
+- Garantir que le frontend n’accède jamais aux secrets ou à la clé OpenAI
+
+---
+
+MISSION : Construire le module chatbot **prêt à fonctionner en production**, sécurisé, isolé, hybride, et **100 % conforme aux règles décrites**.
