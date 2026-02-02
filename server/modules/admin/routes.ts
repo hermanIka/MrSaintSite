@@ -30,7 +30,9 @@ import {
   insertFaqSchema,
   insertServiceSchema,
   insertCreditTravelRequestSchema,
+  insertChatbotSystemPromptSchema,
 } from "@shared/schema";
+import { chatbotStorage } from "../chatbot/storage";
 import { ObjectStorageService } from "../../replit_integrations/object_storage";
 
 export function registerAdminRoutes(app: Express) {
@@ -759,6 +761,141 @@ export function registerAdminRoutes(app: Express) {
       });
 
       res.json(request);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  // ============ CHATBOT SYSTEM PROMPTS ============
+
+  app.get("/api/admin/chatbot/prompts", authMiddleware, async (_req, res) => {
+    try {
+      const prompts = await chatbotStorage.getAllSystemPrompts();
+      res.json(prompts);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.get("/api/admin/chatbot/prompts/:id", authMiddleware, async (req, res) => {
+    try {
+      const prompt = await chatbotStorage.getSystemPromptById(req.params.id);
+      if (!prompt) {
+        return res.status(404).json({ error: "Prompt non trouvé" });
+      }
+      res.json(prompt);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.post("/api/admin/chatbot/prompts", authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const now = new Date().toISOString();
+      const data = insertChatbotSystemPromptSchema.parse({
+        ...req.body,
+        createdAt: now,
+        updatedAt: now,
+      });
+      
+      const prompt = await chatbotStorage.createSystemPrompt(data);
+
+      await adminStorage.createLog({
+        action: "CREATE",
+        entityType: "chatbot_prompt",
+        entityId: prompt.id,
+        details: `Prompt système créé: ${prompt.name} (v${prompt.version})`,
+        adminId: req.admin!.adminId,
+        createdAt: now,
+      });
+
+      res.status(201).json(prompt);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      }
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.put("/api/admin/chatbot/prompts/:id", authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { id } = req.params;
+      const data = insertChatbotSystemPromptSchema.partial().parse(req.body);
+      
+      const prompt = await chatbotStorage.updateSystemPrompt(id, data);
+      
+      if (!prompt) {
+        return res.status(404).json({ error: "Prompt non trouvé" });
+      }
+
+      await adminStorage.createLog({
+        action: "UPDATE",
+        entityType: "chatbot_prompt",
+        entityId: id,
+        details: `Prompt système modifié: ${prompt.name}`,
+        adminId: req.admin!.adminId,
+        createdAt: new Date().toISOString(),
+      });
+
+      res.json(prompt);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      }
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.put("/api/admin/chatbot/prompts/:id/activate", authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { id } = req.params;
+      const success = await chatbotStorage.setActivePrompt(id);
+      
+      if (!success) {
+        return res.status(404).json({ error: "Prompt non trouvé" });
+      }
+
+      await adminStorage.createLog({
+        action: "ACTIVATE",
+        entityType: "chatbot_prompt",
+        entityId: id,
+        details: "Prompt système activé",
+        adminId: req.admin!.adminId,
+        createdAt: new Date().toISOString(),
+      });
+
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.delete("/api/admin/chatbot/prompts/:id", authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { id } = req.params;
+      const prompt = await chatbotStorage.getSystemPromptById(id);
+      
+      if (!prompt) {
+        return res.status(404).json({ error: "Prompt non trouvé" });
+      }
+
+      if (prompt.active) {
+        return res.status(400).json({ error: "Impossible de supprimer le prompt actif" });
+      }
+
+      await chatbotStorage.deleteSystemPrompt(id);
+
+      await adminStorage.createLog({
+        action: "DELETE",
+        entityType: "chatbot_prompt",
+        entityId: id,
+        details: `Prompt système supprimé: ${prompt.name}`,
+        adminId: req.admin!.adminId,
+        createdAt: new Date().toISOString(),
+      });
+
+      res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: "Erreur serveur" });
     }

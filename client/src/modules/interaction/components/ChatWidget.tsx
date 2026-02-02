@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { MessageCircle, X, Send, Bot, User, Loader2 } from "lucide-react";
+import { MessageCircle, X, Send, Bot, User, Loader2, RotateCcw } from "lucide-react";
 
 interface Message {
   role: "user" | "assistant";
@@ -12,6 +12,8 @@ interface Message {
   mode?: "ai" | "rules";
 }
 
+const SESSION_STORAGE_KEY = "mr_saint_chat_session";
+
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -19,12 +21,42 @@ export default function ChatWidget() {
   const [isLoading, setIsLoading] = useState(false);
   const [isAvailable, setIsAvailable] = useState(true);
   const [chatMode, setChatMode] = useState<"ai" | "rules">("rules");
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const getStoredSession = useCallback(() => {
+    try {
+      return localStorage.getItem(SESSION_STORAGE_KEY);
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const storeSession = useCallback((id: string) => {
+    try {
+      localStorage.setItem(SESSION_STORAGE_KEY, id);
+    } catch {
+      // Ignore storage errors
+    }
+  }, []);
+
+  const clearStoredSession = useCallback(() => {
+    try {
+      localStorage.removeItem(SESSION_STORAGE_KEY);
+    } catch {
+      // Ignore storage errors
+    }
+  }, []);
+
   useEffect(() => {
     checkAvailability();
-  }, []);
+    const storedSession = getStoredSession();
+    if (storedSession) {
+      setSessionId(storedSession);
+      loadSessionHistory(storedSession);
+    }
+  }, [getStoredSession]);
 
   useEffect(() => {
     scrollToBottom();
@@ -52,6 +84,54 @@ export default function ChatWidget() {
     }
   };
 
+  const loadSessionHistory = async (sid: string) => {
+    try {
+      const response = await fetch(`/api/chatbot/session/${sid}`);
+      const data = await response.json();
+      
+      if (data.success && data.messages && data.messages.length > 0) {
+        const loadedMessages: Message[] = data.messages.map((m: any) => ({
+          role: m.role,
+          content: m.content,
+          timestamp: new Date(m.timestamp || Date.now()),
+          mode: m.mode
+        }));
+        setMessages(loadedMessages);
+        setChatMode(data.mode || "rules");
+      }
+    } catch {
+      // If loading fails, start fresh
+    }
+  };
+
+  const startNewSession = async () => {
+    clearStoredSession();
+    setSessionId(null);
+    setMessages([]);
+    
+    try {
+      const response = await fetch("/api/chatbot/session/new", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      const data = await response.json();
+      if (data.success && data.sessionId) {
+        setSessionId(data.sessionId);
+        storeSession(data.sessionId);
+      }
+    } catch {
+      // If creating new session fails, we'll create one on first message
+    }
+
+    setMessages([
+      {
+        role: "assistant",
+        content: "Bonjour ! Je suis l'assistant virtuel de Mr Saint. Comment puis-je vous aider aujourd'hui ?\n\nJe peux vous renseigner sur :\n- La facilitation de visa\n- La création d'agence de voyage\n- Nos voyages organisés\n- Le voyage à crédit",
+        timestamp: new Date()
+      }
+    ]);
+  };
+
   const sendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
 
@@ -66,23 +146,23 @@ export default function ChatWidget() {
     setIsLoading(true);
 
     try {
-      const conversationHistory = messages.map((m) => ({
-        role: m.role,
-        content: m.content
-      }));
-
       const response = await fetch("/api/chatbot/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: userMessage.content,
-          conversationHistory
+          sessionId: sessionId
         })
       });
 
       const data = await response.json();
 
       if (data.success) {
+        if (data.sessionId && data.sessionId !== sessionId) {
+          setSessionId(data.sessionId);
+          storeSession(data.sessionId);
+        }
+
         const assistantMessage: Message = {
           role: "assistant",
           content: data.message,
@@ -124,7 +204,7 @@ export default function ChatWidget() {
       setMessages([
         {
           role: "assistant",
-          content: "Bonjour ! Je suis l'assistant virtuel de Mr Saint. Comment puis-je vous aider aujourd'hui ?\n\nJe peux vous renseigner sur :\n• La facilitation de visa\n• La création d'agence de voyage\n• Nos voyages organisés",
+          content: "Bonjour ! Je suis l'assistant virtuel de Mr Saint. Comment puis-je vous aider aujourd'hui ?\n\nJe peux vous renseigner sur :\n- La facilitation de visa\n- La création d'agence de voyage\n- Nos voyages organisés\n- Le voyage à crédit",
           timestamp: new Date()
         }
       ]);
@@ -164,19 +244,31 @@ export default function ChatWidget() {
               <div>
                 <CardTitle className="text-base font-heading">Assistant Mr Saint</CardTitle>
                 <p className="text-xs text-white/70">
-                  {isAvailable ? `En ligne • ${chatMode === "ai" ? "Mode IA" : "Mode FAQ"}` : "Hors ligne"}
+                  {isAvailable ? `En ligne ${chatMode === "ai" ? "(IA)" : "(FAQ)"}` : "Hors ligne"}
                 </p>
               </div>
             </div>
-            <Button
-              data-testid="button-close-chat"
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsOpen(false)}
-              className="text-white"
-            >
-              <X className="w-5 h-5" />
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                data-testid="button-new-chat"
+                variant="ghost"
+                size="icon"
+                onClick={startNewSession}
+                className="text-white"
+                title="Nouvelle conversation"
+              >
+                <RotateCcw className="w-4 h-4" />
+              </Button>
+              <Button
+                data-testid="button-close-chat"
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsOpen(false)}
+                className="text-white"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
           </CardHeader>
 
           <CardContent className="flex-1 overflow-y-auto p-4 space-y-4 max-h-80 bg-muted/30">
