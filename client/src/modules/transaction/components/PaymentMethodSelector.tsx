@@ -65,12 +65,25 @@ export function PaymentMethodSelector({
   const [customerPhone, setCustomerPhone] = useState("");
   const { toast } = useToast();
 
+  const EUR_TO_XAF_RATE = 656;
+
+  const getAmountAndCurrency = (provider: PaymentProvider) => {
+    if (provider === "pawapay") {
+      return {
+        amount: Math.round(amount * EUR_TO_XAF_RATE),
+        currency: "XAF"
+      };
+    }
+    return { amount, currency };
+  };
+
   const initPaymentMutation = useMutation({
     mutationFn: async (provider: PaymentProvider) => {
+      const { amount: paymentAmount, currency: paymentCurrency } = getAmountAndCurrency(provider);
       const response = await apiRequest("POST", "/api/payments/init", {
         provider,
-        amount,
-        currency,
+        amount: paymentAmount,
+        currency: paymentCurrency,
         serviceId,
         serviceName,
         customerEmail,
@@ -242,9 +255,17 @@ export function PaymentMethodSelector({
         <div className="flex items-center justify-between mb-4">
           <span className="text-muted-foreground">Total à payer :</span>
           <span data-testid="text-payment-total" className="text-2xl font-bold text-primary">
-            {amount} {currency}
+            {selectedMethod === "pawapay" 
+              ? `${Math.round(amount * EUR_TO_XAF_RATE).toLocaleString()} XAF`
+              : `${amount} ${currency}`
+            }
           </span>
         </div>
+        {selectedMethod === "pawapay" && (
+          <p className="text-xs text-muted-foreground text-center mb-2">
+            Équivalent de {amount} EUR (taux: 1 EUR = {EUR_TO_XAF_RATE} XAF)
+          </p>
+        )}
         
         <Button
           data-testid="button-pay-now"
@@ -260,7 +281,10 @@ export function PaymentMethodSelector({
             </>
           ) : (
             <>
-              Payer {amount} {currency}
+              Payer {selectedMethod === "pawapay" 
+                ? `${Math.round(amount * EUR_TO_XAF_RATE).toLocaleString()} XAF`
+                : `${amount} ${currency}`
+              }
             </>
           )}
         </Button>
