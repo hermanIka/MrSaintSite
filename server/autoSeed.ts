@@ -13,6 +13,7 @@ import {
   faqs,
   admins,
   services,
+  chatbotSystemPrompts,
   type InsertTrip,
   type InsertTestimonial,
   type InsertPortfolio,
@@ -20,12 +21,26 @@ import {
   type InsertService,
 } from "@shared/schema";
 import * as crypto from "crypto";
+import { seedInitialPrompt } from "./modules/chatbot/seedPrompt";
 
 function hashPassword(password: string): string {
   return crypto.createHash("sha256").update(password).digest("hex");
 }
 
 export async function autoSeed(): Promise<void> {
+  // Always ensure chatbot prompt exists (before any early return)
+  try {
+    const existingPrompts = await db.select().from(chatbotSystemPrompts).limit(1);
+    if (existingPrompts.length === 0) {
+      console.log("🤖 No chatbot prompt found - seeding initial prompt...");
+      await seedInitialPrompt();
+    } else {
+      console.log("✓ Chatbot system prompt already exists");
+    }
+  } catch (error) {
+    console.error("⚠️ Chatbot prompt check error (non-fatal):", error);
+  }
+
   try {
     const existingTrips = await db.select().from(trips).limit(1);
     if (existingTrips.length > 0) {
@@ -434,6 +449,10 @@ export async function autoSeed(): Promise<void> {
       },
     ];
     await db.insert(services).values(servicesData);
+
+    // Seed initial chatbot system prompt
+    console.log("  → Inserting chatbot system prompt...");
+    await seedInitialPrompt();
 
     console.log("✅ Auto-seed completed successfully!");
   } catch (error) {
