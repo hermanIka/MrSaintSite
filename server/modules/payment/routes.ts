@@ -36,6 +36,8 @@ export function registerPaymentRoutes(app: Express): void {
         customerEmail,
         customerName,
         customerPhone,
+        correspondent,
+        countryCode,
         metadata,
       } = req.body;
 
@@ -63,6 +65,8 @@ export function registerPaymentRoutes(app: Express): void {
         customerEmail,
         customerName,
         customerPhone,
+        correspondent,
+        countryCode,
         metadata,
       };
 

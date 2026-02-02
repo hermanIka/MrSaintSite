@@ -18,6 +18,8 @@ export interface PaymentInitRequest {
   customerEmail: string;
   customerName?: string;
   customerPhone?: string;
+  correspondent?: string;
+  countryCode?: string;
   metadata?: Record<string, string>;
 }
 

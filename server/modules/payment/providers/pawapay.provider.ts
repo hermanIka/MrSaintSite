@@ -56,22 +56,25 @@ export class PawaPayProvider implements PaymentProviderInterface {
       const depositId = randomUUID();
       const paymentId = `pawa_${Date.now()}_${depositId.substring(0, 8)}`;
       
-      const phoneNumber = this.formatPhoneNumber(request.customerPhone || "");
+      const activeCorrespondent = request.correspondent || this.correspondent;
+      const countryPhonePrefix = this.getPhonePrefixForCountry(request.countryCode);
+      
+      const phoneNumber = this.formatPhoneNumber(request.customerPhone || "", countryPhonePrefix);
       if (!phoneNumber) {
         return {
           success: false,
           paymentId,
           provider: this.name,
           status: "failed",
-          message: "Numéro de téléphone invalide. Format requis: 237XXXXXXXXX (avec code pays)",
+          message: "Numéro de téléphone invalide. Vérifiez le format de votre numéro.",
         };
       }
 
       const depositPayload = {
         depositId,
         amount: request.amount.toString(),
-        currency: this.getCurrencyForCorrespondent(),
-        correspondent: this.correspondent,
+        currency: this.getCurrencyForCorrespondent(activeCorrespondent),
+        correspondent: activeCorrespondent,
         payer: {
           type: "MSISDN",
           address: {
@@ -222,7 +225,7 @@ export class PawaPayProvider implements PaymentProviderInterface {
     return { success: true, message: "Webhook traité" };
   }
 
-  private formatPhoneNumber(phone: string): string | null {
+  private formatPhoneNumber(phone: string, countryPrefix?: string): string | null {
     let cleaned = phone.replace(/[\s\-\+\(\)]/g, "");
     
     if (cleaned.length === 0) {
@@ -234,14 +237,15 @@ export class PawaPayProvider implements PaymentProviderInterface {
       cleaned = cleaned.substring(2);
     }
 
-    // Auto-add country code for common formats
-    // Cameroon: 6XXXXXXXX or 2XXXXXXXX (9 digits local)
-    if (cleaned.length === 9 && /^[62]/.test(cleaned)) {
-      cleaned = "237" + cleaned;
-    }
-    // With leading 0: 06XXXXXXXX (10 digits)
-    if (cleaned.length === 10 && cleaned.startsWith("0")) {
-      cleaned = "237" + cleaned.substring(1);
+    const prefix = countryPrefix || "237";
+    
+    // If phone doesn't start with the country prefix, add it
+    if (!cleaned.startsWith(prefix)) {
+      // Remove leading 0 if present
+      if (cleaned.startsWith("0")) {
+        cleaned = cleaned.substring(1);
+      }
+      cleaned = prefix + cleaned;
     }
 
     // Validate final format: 10-15 digits starting with country code
@@ -252,6 +256,31 @@ export class PawaPayProvider implements PaymentProviderInterface {
     return null;
   }
 
+  private getPhonePrefixForCountry(countryCode?: string): string {
+    const prefixMap: Record<string, string> = {
+      "CMR": "237",
+      "CIV": "225",
+      "SEN": "221",
+      "BEN": "229",
+      "BFA": "226",
+      "MLI": "223",
+      "TGO": "228",
+      "NER": "227",
+      "GHA": "233",
+      "KEN": "254",
+      "TZA": "255",
+      "UGA": "256",
+      "RWA": "250",
+      "ZMB": "260",
+      "MWI": "265",
+      "COD": "243",
+      "COG": "242",
+      "GAB": "241",
+      "MOZ": "258",
+    };
+    return prefixMap[countryCode || ""] || "237";
+  }
+
   private truncateDescription(description: string): string {
     const cleaned = description.replace(/[^a-zA-Z0-9\s]/g, "").trim();
     if (cleaned.length < 4) {
@@ -260,7 +289,7 @@ export class PawaPayProvider implements PaymentProviderInterface {
     return cleaned.substring(0, 22);
   }
 
-  private getCurrencyForCorrespondent(): string {
+  private getCurrencyForCorrespondent(correspondent?: string): string {
     const currencyMap: Record<string, string> = {
       "MTN_MOMO_CMR": "XAF",
       "ORANGE_CMR": "XAF",
@@ -275,10 +304,31 @@ export class PawaPayProvider implements PaymentProviderInterface {
       "MTN_MOMO_ZMB": "ZMW",
       "MTN_MOMO_RWA": "RWF",
       "ORANGE_SEN": "XOF",
+      "FREE_SEN": "XOF",
       "ORANGE_BFA": "XOF",
+      "MOOV_BFA": "XOF",
       "ORANGE_MLI": "XOF",
+      "MOOV_MLI": "XOF",
+      "MOOV_TGO": "XOF",
+      "AIRTEL_NER": "XOF",
+      "VODAFONE_GHA": "GHS",
+      "AIRTELTIGO_GHA": "GHS",
+      "VODACOM_TZA": "TZS",
+      "AIRTEL_TZA": "TZS",
+      "TIGO_TZA": "TZS",
+      "AIRTEL_RWA": "RWF",
+      "AIRTEL_ZMB": "ZMW",
+      "AIRTEL_MWI": "MWK",
+      "TNM_MWI": "MWK",
+      "VODACOM_COD": "CDF",
+      "ORANGE_COD": "CDF",
+      "AIRTEL_COD": "CDF",
+      "MTN_MOMO_COG": "XAF",
+      "AIRTEL_COG": "XAF",
+      "AIRTEL_GAB": "XAF",
+      "VODACOM_MOZ": "MZN",
     };
-    return currencyMap[this.correspondent || ""] || "XAF";
+    return currencyMap[correspondent || this.correspondent || ""] || "XAF";
   }
 
   private mapStatus(externalStatus: string): "pending" | "processing" | "success" | "failed" | "cancelled" {

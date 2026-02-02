@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CreditCard, Smartphone, Loader2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CreditCard, Smartphone, Loader2, Globe, Radio } from "lucide-react";
 import { SiPaypal } from "react-icons/si";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { PAWAPAY_COUNTRIES, type PawaPayCountry, type MobileOperator } from "@shared/pawapay-countries";
 
 type PaymentProvider = "pawapay" | "lemonsqueezy" | "paypal";
 
@@ -63,18 +65,45 @@ export function PaymentMethodSelector({
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState<string>("CMR");
+  const [selectedOperator, setSelectedOperator] = useState<string>("MTN_MOMO_CMR");
   const { toast } = useToast();
 
-  const EUR_TO_XAF_RATE = 656;
+  const currentCountry = useMemo(() => {
+    return PAWAPAY_COUNTRIES.find(c => c.code === selectedCountry) || PAWAPAY_COUNTRIES[0];
+  }, [selectedCountry]);
+
+  const availableOperators = useMemo(() => {
+    return currentCountry?.operators || [];
+  }, [currentCountry]);
+
+  const handleCountryChange = (countryCode: string) => {
+    setSelectedCountry(countryCode);
+    const country = PAWAPAY_COUNTRIES.find(c => c.code === countryCode);
+    if (country && country.operators.length > 0) {
+      setSelectedOperator(country.operators[0].code);
+    } else {
+      setSelectedOperator("");
+    }
+    setCustomerPhone("");
+  };
 
   const getAmountAndCurrency = (provider: PaymentProvider) => {
-    if (provider === "pawapay") {
+    if (provider === "pawapay" && currentCountry) {
       return {
-        amount: Math.round(amount * EUR_TO_XAF_RATE),
-        currency: "XAF"
+        amount: Math.round(amount * currentCountry.eurRate),
+        currency: currentCountry.currency
       };
     }
     return { amount, currency };
+  };
+
+  const getDisplayAmount = () => {
+    if (selectedMethod === "pawapay" && currentCountry) {
+      const localAmount = Math.round(amount * currentCountry.eurRate);
+      return `${localAmount.toLocaleString()} ${currentCountry.currency}`;
+    }
+    return `${amount} ${currency}`;
   };
 
   const initPaymentMutation = useMutation({
@@ -89,6 +118,8 @@ export function PaymentMethodSelector({
         customerEmail,
         customerName,
         customerPhone,
+        correspondent: provider === "pawapay" ? selectedOperator : undefined,
+        countryCode: provider === "pawapay" ? selectedCountry : undefined,
       });
       return response.json() as Promise<PaymentInitResponse>;
     },
@@ -141,21 +172,30 @@ export function PaymentMethodSelector({
       return;
     }
 
-    if (selectedMethod === "pawapay" && !customerPhone) {
-      toast({
-        title: "Téléphone requis",
-        description: "Veuillez entrer votre numéro de téléphone pour Mobile Money.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     if (selectedMethod === "pawapay") {
+      if (!selectedOperator) {
+        toast({
+          title: "Opérateur requis",
+          description: "Veuillez sélectionner votre opérateur Mobile Money.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!customerPhone) {
+        toast({
+          title: "Téléphone requis",
+          description: "Veuillez entrer votre numéro de téléphone pour Mobile Money.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const cleanPhone = customerPhone.replace(/\D/g, "");
-      if (cleanPhone.length < 9 || cleanPhone.length > 15) {
+      if (cleanPhone.length < 8 || cleanPhone.length > 15) {
         toast({
           title: "Numéro invalide",
-          description: "Le numéro doit avoir entre 9 et 15 chiffres (ex: 690123456 ou 237690123456).",
+          description: `Le numéro doit avoir entre 8 et 15 chiffres (ex: ${currentCountry?.phonePrefix}XXXXXXXX).`,
           variant: "destructive",
         });
         return;
@@ -233,20 +273,77 @@ export function PaymentMethodSelector({
         </div>
         
         {selectedMethod === "pawapay" && (
-          <div className="space-y-2">
-            <Label htmlFor="customerPhone">Numéro de téléphone (Mobile Money) *</Label>
-            <Input
-              id="customerPhone"
-              type="tel"
-              data-testid="input-customer-phone"
-              placeholder="237XXXXXXXXX"
-              value={customerPhone}
-              onChange={(e) => setCustomerPhone(e.target.value.replace(/\s/g, ""))}
-              required
-            />
-            <p className="text-xs text-muted-foreground">
-              Format: code pays + numéro sans espaces (ex: 237690123456 pour Cameroun)
-            </p>
+          <div className="space-y-4 p-4 bg-muted/30 rounded-lg border">
+            <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-2">
+              <Globe className="w-4 h-4" />
+              <span>Configuration Mobile Money</span>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="country">Pays *</Label>
+                <Select value={selectedCountry} onValueChange={handleCountryChange}>
+                  <SelectTrigger data-testid="select-country">
+                    <SelectValue placeholder="Sélectionnez votre pays" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PAWAPAY_COUNTRIES.map((country) => (
+                      <SelectItem key={country.code} value={country.code}>
+                        <span className="flex items-center gap-2">
+                          <span>{country.flag}</span>
+                          <span>{country.name}</span>
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="operator">Opérateur Mobile Money *</Label>
+                <Select 
+                  value={selectedOperator} 
+                  onValueChange={setSelectedOperator}
+                  disabled={availableOperators.length === 0}
+                >
+                  <SelectTrigger data-testid="select-operator">
+                    <SelectValue placeholder="Sélectionnez l'opérateur" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableOperators.map((op) => (
+                      <SelectItem key={op.code} value={op.code}>
+                        <span className="flex items-center gap-2">
+                          <Radio className="w-3 h-3" />
+                          <span>{op.name}</span>
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="customerPhone">Numéro de téléphone *</Label>
+              <div className="flex gap-2">
+                <div className="flex items-center px-3 bg-muted rounded-md border text-sm font-medium min-w-[70px] justify-center">
+                  +{currentCountry?.phonePrefix}
+                </div>
+                <Input
+                  id="customerPhone"
+                  type="tel"
+                  data-testid="input-customer-phone"
+                  placeholder="XXXXXXXXX"
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value.replace(/\D/g, ""))}
+                  className="flex-1"
+                  required
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Entrez votre numéro sans le code pays (ex: 690123456)
+              </p>
+            </div>
           </div>
         )}
       </div>
@@ -255,15 +352,12 @@ export function PaymentMethodSelector({
         <div className="flex items-center justify-between mb-4">
           <span className="text-muted-foreground">Total à payer :</span>
           <span data-testid="text-payment-total" className="text-2xl font-bold text-primary">
-            {selectedMethod === "pawapay" 
-              ? `${Math.round(amount * EUR_TO_XAF_RATE).toLocaleString()} XAF`
-              : `${amount} ${currency}`
-            }
+            {getDisplayAmount()}
           </span>
         </div>
-        {selectedMethod === "pawapay" && (
+        {selectedMethod === "pawapay" && currentCountry && (
           <p className="text-xs text-muted-foreground text-center mb-2">
-            Équivalent de {amount} EUR (taux: 1 EUR = {EUR_TO_XAF_RATE} XAF)
+            Équivalent de {amount} EUR (taux: 1 EUR = {currentCountry.eurRate} {currentCountry.currency})
           </p>
         )}
         
@@ -281,10 +375,7 @@ export function PaymentMethodSelector({
             </>
           ) : (
             <>
-              Payer {selectedMethod === "pawapay" 
-                ? `${Math.round(amount * EUR_TO_XAF_RATE).toLocaleString()} XAF`
-                : `${amount} ${currency}`
-              }
+              Payer {getDisplayAmount()}
             </>
           )}
         </Button>
