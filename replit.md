@@ -263,6 +263,16 @@ npm run db:push  # Synchronisation schema DB
 
 ## Notes de Développement
 
+### Voyages Phares (Février 2026)
+- Nouveau champ `isFeatured` (boolean) dans le schéma des voyages
+- Composant FeaturedTripsCarousel avec animation de défilement horizontal continu
+- Maximum 4 voyages phares affichés sur la page d'accueil
+- Bloc positionné AVANT la section "Pourquoi choisir Mr Saint"
+- Gestion admin: toggle rapide dans la liste des voyages + checkbox dans le formulaire
+- API endpoint: GET /api/trips/featured
+- Le bloc est masqué automatiquement si aucun voyage n'est marqué comme phare
+- Navigation modifiée: bouton hero "Nos voyages" (→/voyages), menu "Portfolio" (→/portfolio)
+
 ### Dernière Mise à Jour (Migration PostgreSQL - Janvier 2026)
 - Migration complète vers PostgreSQL avec Drizzle ORM
 - 6 tables : trips, testimonials, portfolio, faqs, admins, activity_logs
