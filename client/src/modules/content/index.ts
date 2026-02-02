@@ -10,3 +10,4 @@ export { default as TripsPage } from "./components/TripsPage";
 export { default as TripDetailPage } from "./components/TripDetailPage";
 export { default as PortfolioPage } from "./components/PortfolioPage";
 export { default as NotFoundPage } from "./components/NotFoundPage";
+export { FeaturedTripsCarousel } from "./components/FeaturedTripsCarousel";

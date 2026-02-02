@@ -13,8 +13,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import { useAdminAuth } from "../hooks/useAdminAuth";
-import { Plus, Pencil, Trash2, Loader2, Upload, Image as ImageIcon } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Upload, Image as ImageIcon, Star } from "lucide-react";
 import type { Trip } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
@@ -28,6 +30,7 @@ interface TripFormData {
   itinerary: string[];
   included: string[];
   notIncluded: string[];
+  isFeatured: boolean;
 }
 
 const emptyFormData: TripFormData = {
@@ -40,6 +43,7 @@ const emptyFormData: TripFormData = {
   itinerary: [""],
   included: [""],
   notIncluded: [""],
+  isFeatured: false,
 };
 
 export function AdminTripsPage() {
@@ -182,6 +186,26 @@ export function AdminTripsPage() {
     }
   };
 
+  const toggleFeaturedMutation = useMutation({
+    mutationFn: async ({ id, isFeatured }: { id: string; isFeatured: boolean }) => {
+      const res = await fetch(`/api/admin/trips/${id}`, {
+        method: "PUT",
+        headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({ isFeatured }),
+      });
+      if (!res.ok) throw new Error("Erreur de modification");
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/trips"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/trips/featured"] });
+      toast({ title: "Statut mis à jour" });
+    },
+    onError: () => {
+      toast({ title: "Erreur lors de la mise à jour", variant: "destructive" });
+    },
+  });
+
   const openEditDialog = (trip: Trip) => {
     setEditingTrip(trip);
     setFormData({
@@ -194,6 +218,7 @@ export function AdminTripsPage() {
       itinerary: trip.itinerary.length > 0 ? trip.itinerary : [""],
       included: trip.included.length > 0 ? trip.included : [""],
       notIncluded: trip.notIncluded.length > 0 ? trip.notIncluded : [""],
+      isFeatured: trip.isFeatured,
     });
     setImagePreview(trip.imageUrl);
     setIsDialogOpen(true);
@@ -373,6 +398,22 @@ export function AdminTripsPage() {
                   </Button>
                 </div>
 
+                <div className="flex items-center justify-between p-4 border rounded-lg bg-primary/5">
+                  <div className="flex items-center gap-3">
+                    <Star className="w-5 h-5 text-primary" />
+                    <div>
+                      <Label htmlFor="isFeatured" className="font-medium">Voyage Phare</Label>
+                      <p className="text-sm text-muted-foreground">Ce voyage apparaîtra dans le carrousel sur la page d'accueil</p>
+                    </div>
+                  </div>
+                  <Switch
+                    id="isFeatured"
+                    checked={formData.isFeatured}
+                    onCheckedChange={(checked) => setFormData((p) => ({ ...p, isFeatured: checked }))}
+                    data-testid="switch-featured"
+                  />
+                </div>
+
                 <div className="flex justify-end gap-2 pt-4">
                   <Button type="button" variant="outline" onClick={closeDialog}>Annuler</Button>
                   <Button type="submit" disabled={isPending} data-testid="button-save-trip">
@@ -390,21 +431,46 @@ export function AdminTripsPage() {
         ) : trips && trips.length > 0 ? (
           <div className="grid gap-4">
             {trips.map((trip) => (
-              <Card key={trip.id} data-testid={`card-trip-${trip.id}`}>
+              <Card key={trip.id} data-testid={`card-trip-${trip.id}`} className={trip.isFeatured ? "border-primary/50 bg-primary/5" : ""}>
                 <CardContent className="flex flex-wrap items-center gap-4 p-4">
-                  <img src={trip.imageUrl} alt={trip.title} className="w-20 h-20 object-cover rounded" />
+                  <div className="relative">
+                    <img src={trip.imageUrl} alt={trip.title} className="w-20 h-20 object-cover rounded" />
+                    {trip.isFeatured && (
+                      <div className="absolute -top-2 -right-2 bg-primary text-primary-foreground rounded-full p-1">
+                        <Star className="w-3 h-3" />
+                      </div>
+                    )}
+                  </div>
                   <div className="flex-1 min-w-[200px]">
-                    <h3 className="font-semibold">{trip.title}</h3>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-semibold">{trip.title}</h3>
+                      {trip.isFeatured && (
+                        <Badge variant="default" className="text-xs">
+                          Phare
+                        </Badge>
+                      )}
+                    </div>
                     <p className="text-sm text-muted-foreground">{trip.destination} • {trip.date}</p>
                     <p className="text-primary font-bold">{trip.price}€</p>
                   </div>
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="icon" onClick={() => openEditDialog(trip)} data-testid={`button-edit-trip-${trip.id}`}>
-                      <Pencil className="w-4 h-4" />
-                    </Button>
-                    <Button variant="outline" size="icon" onClick={() => deleteMutation.mutate(trip.id)} disabled={deleteMutation.isPending} data-testid={`button-delete-trip-${trip.id}`}>
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-muted-foreground hidden sm:inline">Phare</span>
+                      <Switch
+                        checked={trip.isFeatured}
+                        onCheckedChange={(checked) => toggleFeaturedMutation.mutate({ id: trip.id, isFeatured: checked })}
+                        disabled={toggleFeaturedMutation.isPending}
+                        data-testid={`switch-featured-${trip.id}`}
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="icon" onClick={() => openEditDialog(trip)} data-testid={`button-edit-trip-${trip.id}`}>
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button variant="outline" size="icon" onClick={() => deleteMutation.mutate(trip.id)} disabled={deleteMutation.isPending} data-testid={`button-delete-trip-${trip.id}`}>
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

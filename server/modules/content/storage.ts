@@ -25,6 +25,7 @@ import { eq, and, asc } from "drizzle-orm";
 
 export interface IContentStorage {
   getAllTrips(): Promise<Trip[]>;
+  getFeaturedTrips(): Promise<Trip[]>;
   getTripById(id: string): Promise<Trip | undefined>;
   createTrip(trip: InsertTrip): Promise<Trip>;
   updateTrip(id: string, trip: Partial<InsertTrip>): Promise<Trip | undefined>;
@@ -51,6 +52,10 @@ export interface IContentStorage {
 export class ContentDbStorage implements IContentStorage {
   async getAllTrips(): Promise<Trip[]> {
     return await db.select().from(trips);
+  }
+
+  async getFeaturedTrips(): Promise<Trip[]> {
+    return await db.select().from(trips).where(eq(trips.isFeatured, true));
   }
 
   async getTripById(id: string): Promise<Trip | undefined> {

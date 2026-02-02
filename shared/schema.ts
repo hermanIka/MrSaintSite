@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -15,6 +15,7 @@ export const trips = pgTable("trips", {
   itinerary: text("itinerary").array().notNull(),
   included: text("included").array().notNull(),
   notIncluded: text("not_included").array().notNull(),
+  isFeatured: boolean("is_featured").notNull().default(false),
 });
 
 export const insertTripSchema = createInsertSchema(trips).omit({

@@ -21,6 +21,15 @@ export function registerContentRoutes(app: Express): void {
     }
   });
 
+  app.get("/api/trips/featured", async (_req, res) => {
+    try {
+      const featuredTrips = await contentStorage.getFeaturedTrips();
+      res.json(featuredTrips);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch featured trips" });
+    }
+  });
+
   app.get("/api/trips/:id", async (req, res) => {
     try {
       const trip = await contentStorage.getTripById(req.params.id);

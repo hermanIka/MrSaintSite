@@ -8,6 +8,7 @@ import type { Testimonial } from "@shared/schema";
 import { Plane, FileText, Briefcase, Shield, Users, Globe, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import heroImage from "@assets/generated_images/Luxury_travel_hero_image_4477beea.png";
+import { FeaturedTripsCarousel } from "./FeaturedTripsCarousel";
 
 export default function HomePage() {
   const [testimonialIndex, setTestimonialIndex] = useState(0);
@@ -123,13 +124,13 @@ export default function HomePage() {
                 Créer mon agence
               </Button>
             </Link>
-            <Link href="/portfolio">
+            <Link href="/voyages">
               <Button
-                data-testid="button-hero-clients"
+                data-testid="button-hero-voyages"
                 size="lg"
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
-                Clients Accompagnés
+                Nos voyages
               </Button>
             </Link>
           </div>
@@ -185,6 +186,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <FeaturedTripsCarousel />
 
       <section className="py-24 bg-black text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

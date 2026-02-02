@@ -1,0 +1,112 @@
+
+🎯 PROMPT OFFICIEL — MODIFICATIONS DESIGN CIBLÉES (PAGE D’ACCUEIL)
+Contexte général (à lire AVANT d’agir)
+Le site est déjà fonctionnel.
+Il ne faut PAS recréer des pages, ni modifier la structure globale.
+👉 Objectif : ajustements précis d’ancrages (liens) et ajout d’un bloc visuel animé.
+
+🧩 MODIFICATION 1 — INVERSION DES ANCRAGES (SANS RECODAGE DES PAGES)
+🎯 Objectif fonctionnel
+Réorganiser la mise en avant des parcours utilisateurs sur la page d’accueil :
+Mettre les voyages en priorité (CTA principal)
+Déplacer le portfolio clients dans le menu
+
+🔁 Changement à effectuer (TRÈS PRÉCIS)
+A. Bouton principal sur la page d’accueil
+État actuel :
+Bouton principal (à côté de “Créer mon agence”) →
+👉 “Les clients accompagnés”
+👉 lien vers la page portfolio
+Action demandée :
+Remplacer ce bouton par :
+Texte : Nos voyages
+Lien : page existante des voyages
+❗️ Aucune modification du contenu de la page voyages
+👉 On change UNIQUEMENT le lien et le libellé du bouton.
+
+B. Menu de navigation (header)
+État actuel :
+Onglet “Voyage” présent dans le menu
+Action demandée :
+Supprimer “Voyage” du menu
+Ajouter à la place :
+Libellé : Portfolio
+Lien : page existante “Les clients accompagnés”
+👉 Là encore :
+Pas de nouvelle page
+Pas de nouveau contenu
+Simple inversion des ancrages
+
+🧠 Résumé logique (pour éviter toute erreur)
+Emplacement
+Avant
+Après
+Bouton homepage
+Clients accompagnés
+Nos voyages
+Menu header
+Voyage
+Portfolio
+
+
+🧩 MODIFICATION 2 — BLOC “VOYAGES PHARES” ANIMÉ (PAGE D’ACCUEIL)
+🎯 Objectif stratégique
+Créer une zone d’attraction visuelle forte, type panneau publicitaire, pour mettre en avant les voyages tendance, sélectionnés par l’admin.
+
+📍 Emplacement EXACT
+👉 Insérer ce bloc JUSTE AVANT la section :
+“Pourquoi choisir M. Sente”
+⚠️ Ne pas déplacer cette section
+⚠️ Ne pas modifier son contenu
+
+🧠 Logique du bloc
+Le bloc affiche 3 à 4 voyages maximum
+Ce sont des voyages marqués comme “phares / tendances” par l’admin
+Les voyages :
+défilent horizontalement
+de gauche vers la droite
+à une vitesse modérée et fluide
+en boucle continue (effet panneau publicitaire)
+👉 Référence mentale :
+Panneaux publicitaires LED / carrousels premium
+
+🎞️ Animation attendue (sans surdesign)
+Mouvement continu
+Pas agressif
+Pas trop lent
+Pas d’effet gadget
+Objectif :
+👉 attirer l’œil
+👉 créer de la curiosité
+👉 mettre en valeur la popularité des voyages
+
+🧱 Contraintes importantes
+Les voyages affichés doivent être :
+dynamiques
+gérés depuis l’admin (flag “voyage phare” ou équivalent)
+Le bloc doit être :
+responsive
+compatible mobile / desktop
+Aucun hardcoding de contenu
+
+⚠️ RÈGLES NON NÉGOCIABLES
+❌ Ne pas recréer des pages
+❌ Ne pas modifier la structure globale
+❌ Ne pas ajouter de fonctionnalités non demandées
+✅ Travailler uniquement :
+sur les liens (ancrages)
+sur un nouveau bloc visuel contrôlé par l’admin
+
+🎯 CRITÈRE DE VALIDATION
+Le travail est validé si :
+Le bouton principal mène aux voyages
+Le portfolio est accessible depuis le menu
+Les voyages phares défilent visuellement avant “Pourquoi choisir M. Sente”
+Aucune régression ailleurs sur le site
+
+Si tu veux, prochaine étape logique :
+prompt pour le modèle de données “voyage phare”
+ou prompt pour l’admin (sélection / désélection des voyages tendances)
+Tu me dis.
+Là, on est propre, précis, et orienté prod.
+
