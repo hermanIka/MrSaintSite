@@ -3,6 +3,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Layout } from "@/modules/foundation";
+import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -36,6 +38,7 @@ import {
   User,
   Briefcase,
 } from "lucide-react";
+import voyageCreditHeroBanner from "@/assets/images/voyage-credit-hero-banner.png";
 
 const formSchema = z.object({
   lastName: z.string().min(2, "Nom requis"),
@@ -668,20 +671,41 @@ export function VoyageCreditPage() {
 
   if (!showForm) {
     return (
-      <div className="min-h-screen bg-background">
-        <section className="py-20 bg-gradient-to-b from-primary/10 to-background">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto">
+      <Layout>
+        <SEO 
+          title="Voyage à Crédit - Financement de voyage"
+          description="Réalisez votre rêve de voyage avec notre solution de financement flexible. Étalez le coût sur plusieurs mois et partez sereinement."
+          keywords="voyage crédit, financement voyage, paiement échelonné, voyage à crédit"
+        />
+        <section className="relative py-32 bg-black text-white overflow-hidden">
+          <div className="absolute inset-0">
+            <img 
+              src={voyageCreditHeroBanner}
+              alt="Voyage à crédit"
+              className="w-full h-full object-cover opacity-50"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-transparent" />
+          </div>
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-2xl">
               <span className="inline-block px-4 py-1 rounded-full bg-primary/20 text-primary text-sm font-medium mb-4">
                 Nouveau Service
               </span>
-              <h1 className="text-4xl sm:text-5xl font-heading font-bold text-foreground mb-6">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-bold mb-6">
                 Voyage à Crédit
               </h1>
-              <p className="text-lg text-muted-foreground mb-8">
+              <p className="text-xl text-gray-300 mb-8">
                 Réalisez votre rêve de voyage sans attendre. Grâce à notre solution de financement
                 flexible, étalez le coût de votre voyage sur plusieurs mois et partez sereinement.
               </p>
+              <Button
+                size="lg"
+                data-testid="button-start-request-hero"
+                onClick={() => setShowForm(true)}
+              >
+                Faire une demande
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
             </div>
           </div>
         </section>
@@ -730,29 +754,35 @@ export function VoyageCreditPage() {
             </Button>
           </div>
         </section>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background py-12">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => {
-              if (step === 0) {
-                setShowForm(false);
-              } else {
-                setStep(step - 1);
-              }
-            }}
-            data-testid="button-back"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Retour
-          </Button>
-        </div>
+    <Layout>
+      <SEO 
+        title="Demande de Voyage à Crédit"
+        description="Remplissez votre demande de financement de voyage."
+        keywords="voyage crédit, financement voyage, demande crédit"
+      />
+      <div className="min-h-screen bg-background py-12">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8">
+            <Button
+              variant="ghost"
+              onClick={() => {
+                if (step === 0) {
+                  setShowForm(false);
+                } else {
+                  setStep(step - 1);
+                }
+              }}
+              data-testid="button-back"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Retour
+            </Button>
+          </div>
 
         <Card>
           <CardHeader>
@@ -819,7 +849,8 @@ export function VoyageCreditPage() {
             </form>
           </CardContent>
         </Card>
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 }
