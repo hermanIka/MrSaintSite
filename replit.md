@@ -2,332 +2,72 @@
 
 ## Overview
 
-Mr Saint is a premium travel agency website offering three core services: visa facilitation, travel agency creation consulting/coaching, and organized business trips. The site is built as a modern, full-stack web application with a luxury design aesthetic featuring gold and black color schemes.
+Mr Saint is a premium travel agency website offering visa facilitation, travel agency creation consulting, and organized business trips. The project aims to provide a modern, full-stack web application with a luxury design aesthetic, primarily using gold and black color schemes. It emphasizes a modular, domain-driven architecture to ensure clear separation between frontend and backend, organized logically by business domains.
 
-The application follows a **modular domain-driven architecture** with clear separation between frontend and backend, organized by business domains.
+Key capabilities include:
+- Comprehensive visa facilitation services.
+- Consulting and coaching for new travel agency creation.
+- Organization of tailored business trips.
+- Dynamic content management for trips, testimonials, and portfolio.
+- Multi-provider payment system (Mobile Money, Card, PayPal).
+- Integrated booking and scheduling functionality.
+- Admin dashboard for content and user management.
+- Hybrid chatbot for customer interaction.
+- A new service for travel financing ("Voyage à Crédit") with an application and approval workflow.
+- Display of "featured trips" on the homepage.
+
+The business vision is to establish Mr Saint as a leading high-end travel service provider, leveraging technology to offer a seamless and sophisticated user experience.
 
 ## User Preferences
 
 Preferred communication style: Simple, everyday language (French preferred).
 
-## Architecture Modulaire par Domaines
+## System Architecture
 
-### Structure des Modules Frontend (`client/src/modules/`)
+The application employs a modular, domain-driven architecture for both frontend and backend, promoting clear separation of concerns and maintainability.
 
-```
-modules/
-├── foundation/          # Infrastructure de base
-│   ├── components/      # Layout, Navigation, Footer, Theme
-│   ├── context/         # Contexte du module
-│   └── index.ts         # Exports du module
-│
-├── content/             # Contenu dynamique
-│   ├── components/      # HomePage, AboutPage, TripsPage, PortfolioPage, NotFoundPage
-│   ├── context/         # Contexte du module
-│   ├── api/             # Logique d'appels API (si nécessaire)
-│   └── index.ts         # Exports du module
-│
-├── interaction/         # Points de contact utilisateur
-│   ├── components/      # ContactPage, FAQPage
-│   ├── context/         # Contexte du module
-│   └── index.ts         # Exports du module
-│
-├── process/             # Processus métier
-│   ├── components/      # ServicesPage, FacilitationVisaPage, CreationAgencePage
-│   ├── context/         # Contexte du module
-│   └── index.ts         # Exports du module
-│
-├── transaction/         # Paiements et réservations
-│   ├── components/      # ReservationPage, CalendarBooking
-│   ├── context/         # Contexte du module
-│   └── index.ts         # Exports du module
-│
-└── admin/               # Administration et supervision
-    ├── components/      # AdminLoginPage, AdminDashboard, CRUD pages
-    ├── hooks/           # useAdminAuth (authentification)
-    ├── context.ts       # Documentation du module
-    └── index.ts         # Exports du module
-```
+**UI/UX Decisions:**
+- **Color Scheme:** Luxury aesthetic with gold (#F2C94C), black (#000000), and gray (#1A1A1A).
+- **Typography:** Poppins/Montserrat for titles and Inter for body text.
+- **Theming:** Supports both light and dark modes.
+- **Design System:** Built with Shadcn UI and Radix UI for components, styled with Tailwind CSS.
 
-### Structure des Modules Backend (`server/modules/`)
+**Frontend (Client/src/modules):**
+Organized into `foundation` (layout, navigation), `content` (dynamic pages like home, about, trips), `interaction` (contact, FAQ), `process` (services, visa, agency creation), `transaction` (reservations, payments), and `admin` (admin login, dashboard).
+- **Core Technologies:** React 18 with TypeScript, Vite for bundling, Wouter for routing, TanStack Query for server state management.
 
-```
-modules/
-├── content/             # API pour le contenu
-│   ├── routes.ts        # Routes API (trips, testimonials, portfolio)
-│   ├── storage.ts       # Stockage des données
-│   ├── context.ts       # Documentation du module
-│   └── index.ts         # Exports du module
-│
-├── transaction/         # API pour les paiements (EN PRÉPARATION)
-│   ├── routes.ts        # Routes API (futur)
-│   ├── context.ts       # Documentation du module
-│   └── index.ts         # Exports du module
-│
-├── chatbot/             # Chatbot hybride (règles + IA)
-│   ├── routes.ts        # API chatbot
-│   ├── ruleEngine.ts    # Moteur de règles
-│   ├── knowledgeBase.ts # Base de connaissances
-│   └── index.ts         # Exports du module
-│
-└── admin/               # Administration et supervision
-    ├── routes.ts        # Routes API protégées (CRUD admin)
-    ├── storage.ts       # Stockage admins, logs, FAQ
-    ├── auth.ts          # Authentification par token
-    ├── context.ts       # Documentation du module
-    └── index.ts         # Exports du module
-```
+**Backend (Server/modules):**
+Structured around `content` (API for trips, testimonials, portfolio), `transaction` (payment APIs), `chatbot` (hybrid chatbot logic), and `admin` (protected API for CRUD operations, authentication).
+- **Core Technologies:** Express.js with TypeScript, PostgreSQL with Drizzle ORM for persistent data, @neondatabase/serverless for DB connection.
 
-## Règles d'Architecture
+**Technical Implementations & Feature Specifications:**
+- **Modular Payment System:** Supports PawaPay (Mobile Money), LemonSqueezy (Card), and PayPal. All payment logic resides on the server. Designed for extensibility to add more providers.
+- **Calendly Integration:** Uses Calendly API v2 for event types and real-time slot availability, redirecting users to Calendly for final booking.
+- **Hybrid Chatbot:** A floating `ChatWidget` with a rule-based system by default, optionally switching to an AI mode. Includes 15+ predefined response categories.
+- **Dynamic Content:** Trips, testimonials, and portfolio items are dynamically managed via the admin panel. Portfolio includes filtering by service type and a draft/published status.
+- **Admin Module:** Token-based authentication, comprehensive dashboard with statistics, full CRUD capabilities for content, and activity logging.
+- **"Voyage à Crédit" Service:** A multi-step form for travel financing applications, including secure document uploads to object storage. Features an admin approval workflow (pending, approved, refused).
+- **Featured Trips:** A boolean flag `isFeatured` for trips allows highlighting up to 4 trips in a carousel on the homepage.
+- **Database:** PostgreSQL with Drizzle ORM, structured with tables for `trips`, `testimonials`, `portfolio`, `faqs`, `admins`, `activity_logs`, and `credit_travel_requests`. Includes a seed script for initial data.
 
-### Règles Strictes
+**Architectural Rules:**
+- Strict separation of frontend and backend: no business logic or API keys exposed client-side, server-side validation is mandatory.
+- Each component belongs to a single domain/module.
+- Every module must include a context file documenting its responsibilities.
+- Modular payment system architecture supports multiple providers with server-side payment logic.
 
-1. **Séparation Frontend/Backend**
-   - Aucune logique métier dans le frontend
-   - Les API keys ne sont JAMAIS exposées côté client
-   - Validation côté serveur obligatoire
+## External Dependencies
 
-2. **Un fichier = Un module**
-   - Chaque composant appartient à un seul domaine
-   - Pas de mélange entre modules
-
-3. **Fichiers de contexte obligatoires**
-   - Chaque module contient un fichier de contexte documentant sa responsabilité
-   - Les contextes sont mis à jour à chaque modification majeure
-
-4. **Système de paiement modulaire**
-   - 3 providers supportés : PawaPay (Mobile Money), LemonSqueezy (Carte), PayPal
-   - Architecture extensible pour ajouter d'autres providers
-   - Toute la logique de paiement est côté serveur
-
-## API Endpoints
-
-### Module Content
-- `GET /api/trips` - Liste tous les voyages
-- `GET /api/trips/:id` - Détails d'un voyage
-- `GET /api/testimonials` - Liste les témoignages
-- `GET /api/portfolio` - Liste le portfolio
-
-### Module Payment (Actif)
-- `GET /api/payments/providers` - Liste des providers disponibles
-- `POST /api/payments/init` - Initialiser un paiement
-- `GET /api/payments/verify/:paymentId` - Vérifier un paiement
-- `GET /api/payments/paypal/capture` - Callback PayPal
-- `POST /api/webhooks/pawapay` - Webhook PawaPay
-- `POST /api/webhooks/lemonsqueezy` - Webhook LemonSqueezy
-- `POST /api/webhooks/paypal` - Webhook PayPal
-
-### Module Transaction
-- `GET /api/transaction/status` - Statut du module
-
-### Module Admin (Protégé)
-- `POST /api/admin/login` - Connexion admin
-- `POST /api/admin/logout` - Déconnexion (auth requise)
-- `GET /api/admin/me` - Info admin connecté (auth requise)
-- `GET /api/admin/stats` - Statistiques dashboard (auth requise)
-- `GET/POST/PUT/DELETE /api/admin/trips` - Gestion voyages (auth requise)
-- `GET/POST/PUT/DELETE /api/admin/testimonials` - Gestion témoignages (auth requise)
-- `GET/POST/PUT/DELETE /api/admin/portfolio` - Gestion portfolio (auth requise)
-- `GET/POST/PUT/DELETE /api/admin/faqs` - Gestion FAQ (auth requise)
-- `GET /api/admin/logs` - Historique activités (auth requise)
-
-### Module FAQ (Public)
-- `GET /api/faqs` - Liste toutes les FAQ
-
-## Système de Paiement
-
-### Providers Actifs
-- **PawaPay** - Mobile Money Afrique (MTN, Orange, Airtel, M-Pesa - 19 pays)
-- **LemonSqueezy** - Carte bancaire (Visa, Mastercard)
-- **PayPal** - Paiement PayPal
-
-### Variables d'Environnement Requises
-```
-# PawaPay (Mobile Money Afrique)
-PAWAPAY_API_TOKEN=          # Token API depuis le dashboard PawaPay
-PAWAPAY_ENV=sandbox         # sandbox ou production
-PAWAPAY_CORRESPONDENT=MTN_MOMO_CMR  # Opérateur par défaut (MTN_MOMO_CMR, ORANGE_CMR, etc.)
-
-# LemonSqueezy (Carte bancaire)
-LEMONSQUEEZY_API_KEY=       # Clé API depuis Settings > API Keys
-LEMONSQUEEZY_STORE_ID=      # ID du store (Settings > Store)
-LEMONSQUEEZY_VARIANT_ID=    # ID du variant/produit à utiliser
-LEMONSQUEEZY_WEBHOOK_SECRET= # Secret webhook (optionnel)
-
-# PayPal
-PAYPAL_CLIENT_ID=
-PAYPAL_CLIENT_SECRET=
-PAYPAL_ENV=sandbox  # ou production
-```
-
-### Pays PawaPay Supportés (19 pays)
-Configuration complète dans `shared/pawapay-countries.ts` avec :
-- Sélection dynamique du pays par l'utilisateur
-- Filtrage automatique des opérateurs Mobile Money disponibles
-- Conversion automatique EUR → devise locale
-- Préfixe téléphonique adapté au pays
-
-| Pays | Devise | Taux EUR | Opérateurs |
-|------|--------|----------|------------|
-| Cameroun | XAF | 656 | MTN, Orange |
-| Côte d'Ivoire | XOF | 656 | MTN, Orange |
-| Sénégal | XOF | 656 | Orange, Free |
-| Bénin | XOF | 656 | MTN, Moov |
-| Ghana | GHS | 16.5 | MTN, Vodafone, AirtelTigo |
-| Kenya | KES | 165 | M-Pesa |
-| Ouganda | UGX | 4100 | MTN, Airtel |
-| Rwanda | RWF | 1380 | MTN, Airtel |
-| Tanzanie | TZS | 2800 | Vodacom, Airtel, Tigo |
-| Zambie | ZMW | 28 | MTN, Airtel |
-| RD Congo | CDF | 2950 | Vodacom, Orange, Airtel |
-| + 8 autres pays... | | | |
-
-### Flux de Paiement Mobile Money
-1. Sélection du service par l'utilisateur
-2. Choix du mode de paiement (Mobile Money)
-3. **Sélection du pays** (dropdown avec 19 pays)
-4. **Sélection de l'opérateur** (filtré selon le pays)
-5. Saisie du numéro de téléphone (préfixe automatique)
-6. Affichage du montant en devise locale
-7. Paiement via PawaPay
-8. Confirmation sur le téléphone de l'utilisateur
-
-### Flux de Paiement Carte/PayPal
-1. Sélection du service par l'utilisateur
-2. Choix du mode de paiement (Carte ou PayPal)
-3. Paiement via le provider sélectionné
-4. Confirmation du paiement (backend uniquement)
-5. Accès à la réservation (Calendly)
-6. Confirmation finale
-
-### Intégration Calendly (Active)
-- **API Calendly v2** - Intégrée avec clé API
-- Récupération automatique des types d'événements
-- Affichage des créneaux disponibles en temps réel
-- Redirection vers Calendly pour finaliser la réservation
-- Endpoints: GET /api/calendly/status, /api/calendly/event-types, /api/calendly/available-times/:id
-
-## Stack Technique
-
-### Frontend
-- **React 18** avec TypeScript
-- **Vite** comme bundler
-- **Wouter** pour le routing
-- **TanStack Query** pour la gestion d'état serveur
-- **Shadcn UI** + **Radix UI** pour les composants
-- **Tailwind CSS** pour le styling
-
-### Backend
-- **Express.js** avec TypeScript
-- **Architecture modulaire** par domaines
-- **PostgreSQL** avec Drizzle ORM (données persistantes)
-- **@neondatabase/serverless** pour la connexion DB
-
-### Design System
-- Palette: Gold (#F2C94C), Black (#000000), Gray (#1A1A1A)
-- Typographie: Poppins/Montserrat (titres), Inter (corps)
-- Thème: Light/Dark mode supporté
-
-## Commandes
-
-```bash
-npm run dev      # Développement avec HMR
-npm run build    # Build production
-npm run start    # Démarrer en production
-npm run check    # Vérification TypeScript
-npm run db:push  # Synchronisation schema DB
-```
-
-## Pages et Routes
-
-| Route | Page | Module |
-|-------|------|--------|
-| `/` | HomePage | content |
-| `/a-propos` | AboutPage | content |
-| `/services` | ServicesPage | process |
-| `/faq` | FAQPage | interaction |
-| `/reservation` | ReservationPage | transaction |
-| `/facilitation-visa` | FacilitationVisaPage | process |
-| `/creation-agence` | CreationAgencePage | process |
-| `/voyages` | TripsPage | content |
-| `/voyages/:id` | TripDetailPage | content |
-| `/portfolio` | PortfolioPage | content |
-| `/contact` | ContactPage | interaction |
-| `/admin` | AdminLoginPage | admin |
-| `/admin/dashboard` | AdminDashboard | admin |
-| `/admin/trips` | AdminTripsPage | admin |
-| `/admin/testimonials` | AdminTestimonialsPage | admin |
-| `/admin/portfolio` | AdminPortfolioPage | admin |
-| `/admin/faq` | AdminFaqPage | admin |
-| `/admin/logs` | AdminLogsPage | admin |
-
-## Notes de Développement
-
-### Voyages Phares (Février 2026)
-- Nouveau champ `isFeatured` (boolean) dans le schéma des voyages
-- Composant FeaturedTripsCarousel avec animation de défilement horizontal continu
-- Maximum 4 voyages phares affichés sur la page d'accueil
-- Bloc positionné AVANT la section "Pourquoi choisir Mr Saint"
-- Gestion admin: toggle rapide dans la liste des voyages + checkbox dans le formulaire
-- API endpoint: GET /api/trips/featured
-- Le bloc est masqué automatiquement si aucun voyage n'est marqué comme phare
-- Navigation modifiée: bouton hero "Nos voyages" (→/voyages), menu "Portfolio" (→/portfolio)
-
-### Dernière Mise à Jour (Migration PostgreSQL - Janvier 2026)
-- Migration complète vers PostgreSQL avec Drizzle ORM
-- 6 tables : trips, testimonials, portfolio, faqs, admins, activity_logs
-- Script de seed avec données initiales (3 voyages, 3 témoignages, 6 portfolio, 6 FAQ)
-- Données persistantes entre redémarrages du serveur
-- Pour exécuter le seed : `npx tsx server/seed.ts`
-
-### Module Portfolio Dynamique (Janvier 2026)
-- Portfolio enrichi avec champs : description, serviceType, result, year, status, clientLogo
-- Filtrage dynamique par type de service (visa, agence, voyage)
-- Système de statut draft/published - seuls les projets publiés sont visibles au public
-- Page admin avec CRUD complet et toggle de publication
-- Intégration chatbot avec exemples concrets de succès
-- 6 projets seed réalistes avec résultats mesurables
-- Statistiques affichées : 50+ projets, 95% réussite, 8+ ans d'expérience
-
-### Module 6 (Admin & Supervision)
-- Système d'authentification par token avec session active
-- Dashboard administrateur avec statistiques (voyages, témoignages, portfolio, FAQ)
-- Gestion CRUD complète pour voyages, témoignages, portfolio et FAQ
-- Historique des activités avec traçabilité des actions
-- Toutes les routes admin protégées par middleware d'authentification
-- Identifiants par défaut : admin / admin123
-- Navigation responsive avec sidebar et menu mobile
-- Convention admin : local state pour formulaires, custom queryFn avec auth headers
-
-### Module 4 (Calendrier de Réservation)
-- Composant CalendarBooking avec sélection de date et créneau horaire
-- Gestion des créneaux disponibles/réservés
-- Fuseau horaire affiché (Paris GMT+1)
-- Flow complet : sélection service → paiement → calendrier → créneau → confirmation
-- Préparé pour intégration Calendly API (créneaux actuellement mockés)
-- Système de paiement multi-providers intégré (PawaPay, LemonSqueezy, PayPal)
-
-### Module 3 (Chatbot Hybride - Complété)
-- ChatWidget flottant intégré au Layout
-- Système de chatbot hybride (Mode Règles par défaut, Mode IA avec clé API)
-- 15+ catégories de réponses prédéfinies
-- Fallback automatique vers le mode règles en cas d'erreur IA
-
-### Module 1 (Complété)
-- Ajout de AboutPage (À propos)
-- Ajout de ServicesPage (Offres de services)
-- Ajout de FAQPage (Foire aux questions)
-- Ajout de ReservationPage (Réservation avec sélection de service)
-- Navigation mise à jour avec nouvelles pages
-- Fichiers de contexte mis à jour pour chaque module
-
-### Intégration Calendly (Janvier 2026)
-- Widget Calendly intégré via CalendlyEmbed component
-- Configuration via variable d'environnement CALENDLY_URL
-- Message informatif affiché si Calendly non configuré
-- Endpoint API: GET /api/config/calendly (vérifie la configuration)
-- Pour configurer: Modifier CALENDLY_URL avec le lien Calendly du client
-
-### Prochaines Étapes
-1. Configuration des clés API des providers de paiement (PawaPay, LemonSqueezy, PayPal)
-2. Amélioration chatbot avec OpenAI (optionnel)
+- **Payment Gateways:**
+    - **PawaPay:** For Mobile Money transactions in 19 African countries (e.g., MTN, Orange, M-Pesa).
+    - **LemonSqueezy:** For credit card payments (Visa, Mastercard).
+    - **PayPal:** For PayPal transactions.
+- **Scheduling:**
+    - **Calendly API v2:** For managing and displaying booking availability.
+- **Database:**
+    - **PostgreSQL:** Primary data storage.
+    - **@neondatabase/serverless:** For serverless database connection.
+- **Chatbot (Optional):**
+    - **OpenAI:** Planned integration for advanced chatbot capabilities.
+- **Cloud Storage:**
+    - **Object Storage:** For secure document uploads related to travel financing applications.
