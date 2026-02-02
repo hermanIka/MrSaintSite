@@ -1,0 +1,143 @@
+MISSION CRITIQUE – À EXÉCUTER AVEC PRÉCISION ABSOLUE
+
+1️⃣ SUPPRESSION TOTALE DE STRIPE
+- Supprimer TOUT le code lié à Stripe, sans exception :
+  - fichiers
+  - imports
+  - variables d’environnement
+  - hooks
+  - composants UI
+  - services backend
+  - webhooks
+  - commentaires
+- Vérifier qu’AUCUNE référence à Stripe ne subsiste dans :
+  - le frontend
+  - le backend
+  - la configuration
+  - les dépendances (package.json / requirements / etc.)
+- Si Stripe est présent dans les dépendances :
+  → le retirer proprement.
+
+AUCUN fallback Stripe. Stripe doit disparaître à 100 %.
+
+---
+
+2️⃣ NOUVELLE ARCHITECTURE DE PAIEMENT (OBLIGATOIRE)
+
+Mettre en place une architecture MODULAIRE avec 3 providers de paiement :
+
+- PowerPay → Mobile Money
+- LemonSqueezy → Carte bancaire
+- PayPal → Paiement PayPal
+
+Objectif :
+- permettre à l’utilisateur de choisir son moyen de paiement
+- permettre d’ajouter ou retirer un provider plus tard sans casser le système
+
+---
+
+3️⃣ STRUCTURE TECHNIQUE ATTENDUE
+
+Créer une couche de paiement centralisée, par exemple :
+
+/payments
+  ├── payment.service.ts (ou js)
+  ├── providers/
+  │     ├── powerpay.provider.ts
+  │     ├── lemonsqueezy.provider.ts
+  │     └── paypal.provider.ts
+  └── payment.types.ts
+
+OU équivalent selon la stack existante.
+
+Chaque provider doit :
+- être isolé
+- avoir sa propre logique
+- exposer les mêmes méthodes standards :
+  - initPayment()
+  - verifyPayment()
+  - handleWebhook()
+
+---
+
+4️⃣ POWERPAY (MOBILE MONEY)
+
+- Préparer l’intégration PowerPay :
+  - aucune clé API réelle codée en dur
+  - utiliser des variables d’environnement :
+    POWERPAY_API_KEY
+    POWERPAY_BASE_URL
+- Implémenter :
+  - initialisation d’un paiement Mobile Money
+  - gestion du statut (pending / success / failed)
+  - webhook prêt à recevoir la confirmation PowerPay
+- Ne PAS simuler le paiement côté client.
+- Tout paiement doit passer par le backend.
+
+---
+
+5️⃣ LEMONSQUEEZY (CARTE BANCAIRE)
+
+- Préparer l’intégration LemonSqueezy :
+  - variables d’environnement :
+    LEMONSQUEEZY_API_KEY
+    LEMONSQUEEZY_STORE_ID
+    LEMONSQUEEZY_WEBHOOK_SECRET
+- Implémenter :
+  - création de checkout LemonSqueezy
+  - redirection utilisateur vers LemonSqueezy
+  - gestion du retour de paiement
+  - webhook de validation
+- Le frontend ne fait QUE déclencher le paiement.
+
+---
+
+6️⃣ PAYPAL
+
+- Préparer l’intégration PayPal :
+  - variables d’environnement :
+    PAYPAL_CLIENT_ID
+    PAYPAL_CLIENT_SECRET
+    PAYPAL_ENV (sandbox | production)
+- Implémenter :
+  - création de paiement PayPal
+  - validation serveur
+  - webhook PayPal prêt
+- Aucun SDK frontend direct sans validation backend.
+
+---
+
+7️⃣ INTERFACE UTILISATEUR (FRONTEND)
+
+- Modifier l’UI de paiement pour afficher clairement 3 options :
+  - 💳 Carte bancaire (LemonSqueezy)
+  - 📱 Mobile Money (PowerPay)
+  - 🅿️ PayPal
+- Le choix utilisateur doit :
+  - envoyer le provider sélectionné au backend
+  - déclencher la logique correspondante
+- UX simple, claire, sans surcharge.
+
+---
+
+8️⃣ RÈGLES STRICTES
+
+- AUCUN code mort
+- AUCUNE dépendance inutile
+- AUCUNE clé en dur
+- AUCUNE logique de paiement côté frontend
+- Code lisible, commenté, structuré
+- Respecter les standards de sécurité (webhooks, validation serveur)
+
+---
+
+9️⃣ LIVRABLE ATTENDU
+
+À la fin :
+- Stripe = 0 trace
+- 3 moyens de paiement opérationnels côté architecture
+- prêt à recevoir des clés API réelles
+- backend + frontend cohérents
+- système de paiement évolutif et maintenable
+
+EXÉCUTER SANS DISCUTER, SANS AJOUTER D’AUTRES PROVIDERS.
