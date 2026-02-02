@@ -137,6 +137,18 @@ export function PaymentMethodSelector({
       return;
     }
 
+    if (selectedMethod === "pawapay") {
+      const cleanPhone = customerPhone.replace(/\D/g, "");
+      if (cleanPhone.length < 9 || cleanPhone.length > 15) {
+        toast({
+          title: "Numéro invalide",
+          description: "Le numéro doit avoir entre 9 et 15 chiffres (ex: 690123456 ou 237690123456).",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
     initPaymentMutation.mutate(selectedMethod);
   };
 
@@ -214,11 +226,14 @@ export function PaymentMethodSelector({
               id="customerPhone"
               type="tel"
               data-testid="input-customer-phone"
-              placeholder="237 6XX XX XX XX"
+              placeholder="237XXXXXXXXX"
               value={customerPhone}
-              onChange={(e) => setCustomerPhone(e.target.value)}
+              onChange={(e) => setCustomerPhone(e.target.value.replace(/\s/g, ""))}
               required
             />
+            <p className="text-xs text-muted-foreground">
+              Format: code pays + numéro sans espaces (ex: 237690123456 pour Cameroun)
+            </p>
           </div>
         )}
       </div>

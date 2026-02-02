@@ -88,7 +88,7 @@ export class PawaPayProvider implements PaymentProviderInterface {
         ],
       };
 
-      console.log("[PawaPay] Initiating deposit:", depositId);
+      console.log("[PawaPay] Initiating deposit:", depositId, "phone:", phoneNumber, "amount:", request.amount);
 
       const response = await fetch(`${this.baseUrl}/deposits`, {
         method: "POST",
@@ -100,16 +100,17 @@ export class PawaPayProvider implements PaymentProviderInterface {
       });
 
       const responseText = await response.text();
-      console.log("[PawaPay] Response status:", response.status);
+      console.log("[PawaPay] Response status:", response.status, "body:", responseText);
 
       if (!response.ok) {
         console.error("[PawaPay] Init error:", responseText);
+        const errorMessage = this.parseErrorMessage(responseText);
         return {
           success: false,
           paymentId,
           provider: this.name,
           status: "failed",
-          message: this.parseErrorMessage(responseText) || "Erreur lors de l'initialisation du paiement Mobile Money.",
+          message: errorMessage || "Erreur lors de l'initialisation du paiement Mobile Money.",
         };
       }
 
@@ -222,12 +223,28 @@ export class PawaPayProvider implements PaymentProviderInterface {
   }
 
   private formatPhoneNumber(phone: string): string | null {
-    const cleaned = phone.replace(/[\s\-\+\(\)]/g, "");
+    let cleaned = phone.replace(/[\s\-\+\(\)]/g, "");
     
     if (cleaned.length === 0) {
       return null;
     }
 
+    // Remove leading zeros
+    if (cleaned.startsWith("00")) {
+      cleaned = cleaned.substring(2);
+    }
+
+    // Auto-add country code for common formats
+    // Cameroon: 6XXXXXXXX or 2XXXXXXXX (9 digits local)
+    if (cleaned.length === 9 && /^[62]/.test(cleaned)) {
+      cleaned = "237" + cleaned;
+    }
+    // With leading 0: 06XXXXXXXX (10 digits)
+    if (cleaned.length === 10 && cleaned.startsWith("0")) {
+      cleaned = "237" + cleaned.substring(1);
+    }
+
+    // Validate final format: 10-15 digits starting with country code
     if (/^\d{10,15}$/.test(cleaned)) {
       return cleaned;
     }
