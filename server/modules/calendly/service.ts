@@ -87,6 +87,7 @@ class CalendlyService {
 
   async getAvailableTimesForNextDays(eventTypeUri: string, days: number = 7): Promise<CalendlyAvailableTime[]> {
     const now = new Date();
+    now.setMinutes(now.getMinutes() + 5);
     const startTime = now.toISOString();
     
     const endDate = new Date(now);
