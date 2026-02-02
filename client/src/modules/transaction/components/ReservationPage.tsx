@@ -317,7 +317,7 @@ export default function ReservationPage() {
                           onClick={handleContactFirst}
                         >
                           <CalendarIcon className="w-5 h-5 mr-2" />
-                          Me contacter d'abord
+                          Consulter d'abord
                         </Button>
                     </div>
                   </CardContent>
