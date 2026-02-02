@@ -19,8 +19,11 @@ export interface PawaPayCountry {
   currency: string;
   currencySymbol: string;
   eurRate: number;
+  usdRate: number;
   operators: MobileOperator[];
 }
+
+export const EUR_TO_USD_RATE = 1.08;
 
 export const PAWAPAY_COUNTRIES: PawaPayCountry[] = [
   {
@@ -31,6 +34,7 @@ export const PAWAPAY_COUNTRIES: PawaPayCountry[] = [
     currency: "XAF",
     currencySymbol: "FCFA",
     eurRate: 656,
+    usdRate: 607,
     operators: [
       { code: "MTN_MOMO_CMR", name: "MTN Mobile Money" },
       { code: "ORANGE_CMR", name: "Orange Money" },
@@ -44,6 +48,7 @@ export const PAWAPAY_COUNTRIES: PawaPayCountry[] = [
     currency: "XOF",
     currencySymbol: "FCFA",
     eurRate: 656,
+    usdRate: 607,
     operators: [
       { code: "MTN_MOMO_CIV", name: "MTN Mobile Money" },
       { code: "ORANGE_CIV", name: "Orange Money" },
@@ -57,6 +62,7 @@ export const PAWAPAY_COUNTRIES: PawaPayCountry[] = [
     currency: "XOF",
     currencySymbol: "FCFA",
     eurRate: 656,
+    usdRate: 607,
     operators: [
       { code: "ORANGE_SEN", name: "Orange Money" },
       { code: "FREE_SEN", name: "Free Money" },
@@ -70,6 +76,7 @@ export const PAWAPAY_COUNTRIES: PawaPayCountry[] = [
     currency: "XOF",
     currencySymbol: "FCFA",
     eurRate: 656,
+    usdRate: 607,
     operators: [
       { code: "MTN_MOMO_BEN", name: "MTN Mobile Money" },
       { code: "MOOV_BEN", name: "Moov Money" },
@@ -83,6 +90,7 @@ export const PAWAPAY_COUNTRIES: PawaPayCountry[] = [
     currency: "XOF",
     currencySymbol: "FCFA",
     eurRate: 656,
+    usdRate: 607,
     operators: [
       { code: "ORANGE_BFA", name: "Orange Money" },
       { code: "MOOV_BFA", name: "Moov Money" },
@@ -96,6 +104,7 @@ export const PAWAPAY_COUNTRIES: PawaPayCountry[] = [
     currency: "XOF",
     currencySymbol: "FCFA",
     eurRate: 656,
+    usdRate: 607,
     operators: [
       { code: "ORANGE_MLI", name: "Orange Money" },
       { code: "MOOV_MLI", name: "Moov Money" },
@@ -109,6 +118,7 @@ export const PAWAPAY_COUNTRIES: PawaPayCountry[] = [
     currency: "XOF",
     currencySymbol: "FCFA",
     eurRate: 656,
+    usdRate: 607,
     operators: [
       { code: "MOOV_TGO", name: "Moov Money" },
     ],
@@ -121,6 +131,7 @@ export const PAWAPAY_COUNTRIES: PawaPayCountry[] = [
     currency: "XOF",
     currencySymbol: "FCFA",
     eurRate: 656,
+    usdRate: 607,
     operators: [
       { code: "AIRTEL_NER", name: "Airtel Money" },
     ],
@@ -133,6 +144,7 @@ export const PAWAPAY_COUNTRIES: PawaPayCountry[] = [
     currency: "GHS",
     currencySymbol: "GH₵",
     eurRate: 16.5,
+    usdRate: 15.3,
     operators: [
       { code: "MTN_MOMO_GHA", name: "MTN Mobile Money" },
       { code: "VODAFONE_GHA", name: "Vodafone Cash" },
@@ -147,6 +159,7 @@ export const PAWAPAY_COUNTRIES: PawaPayCountry[] = [
     currency: "KES",
     currencySymbol: "KSh",
     eurRate: 165,
+    usdRate: 153,
     operators: [
       { code: "MPESA_KEN", name: "M-Pesa" },
     ],
@@ -159,6 +172,7 @@ export const PAWAPAY_COUNTRIES: PawaPayCountry[] = [
     currency: "TZS",
     currencySymbol: "TSh",
     eurRate: 2800,
+    usdRate: 2593,
     operators: [
       { code: "VODACOM_TZA", name: "M-Pesa" },
       { code: "AIRTEL_TZA", name: "Airtel Money" },
@@ -173,6 +187,7 @@ export const PAWAPAY_COUNTRIES: PawaPayCountry[] = [
     currency: "UGX",
     currencySymbol: "USh",
     eurRate: 4100,
+    usdRate: 3796,
     operators: [
       { code: "MTN_MOMO_UGA", name: "MTN Mobile Money" },
       { code: "AIRTEL_OAPI_UGA", name: "Airtel Money" },
@@ -186,6 +201,7 @@ export const PAWAPAY_COUNTRIES: PawaPayCountry[] = [
     currency: "RWF",
     currencySymbol: "FRw",
     eurRate: 1380,
+    usdRate: 1278,
     operators: [
       { code: "MTN_MOMO_RWA", name: "MTN Mobile Money" },
       { code: "AIRTEL_RWA", name: "Airtel Money" },
@@ -199,6 +215,7 @@ export const PAWAPAY_COUNTRIES: PawaPayCountry[] = [
     currency: "ZMW",
     currencySymbol: "K",
     eurRate: 28,
+    usdRate: 26,
     operators: [
       { code: "MTN_MOMO_ZMB", name: "MTN Mobile Money" },
       { code: "AIRTEL_ZMB", name: "Airtel Money" },
@@ -212,6 +229,7 @@ export const PAWAPAY_COUNTRIES: PawaPayCountry[] = [
     currency: "MWK",
     currencySymbol: "MK",
     eurRate: 1850,
+    usdRate: 1713,
     operators: [
       { code: "AIRTEL_MWI", name: "Airtel Money" },
       { code: "TNM_MWI", name: "TNM Mpamba" },
@@ -225,6 +243,7 @@ export const PAWAPAY_COUNTRIES: PawaPayCountry[] = [
     currency: "CDF",
     currencySymbol: "FC",
     eurRate: 2950,
+    usdRate: 2731,
     operators: [
       { code: "VODACOM_COD", name: "M-Pesa" },
       { code: "ORANGE_COD", name: "Orange Money" },
@@ -239,6 +258,7 @@ export const PAWAPAY_COUNTRIES: PawaPayCountry[] = [
     currency: "XAF",
     currencySymbol: "FCFA",
     eurRate: 656,
+    usdRate: 607,
     operators: [
       { code: "MTN_MOMO_COG", name: "MTN Mobile Money" },
       { code: "AIRTEL_COG", name: "Airtel Money" },
@@ -252,6 +272,7 @@ export const PAWAPAY_COUNTRIES: PawaPayCountry[] = [
     currency: "XAF",
     currencySymbol: "FCFA",
     eurRate: 656,
+    usdRate: 607,
     operators: [
       { code: "AIRTEL_GAB", name: "Airtel Money" },
     ],
@@ -264,6 +285,7 @@ export const PAWAPAY_COUNTRIES: PawaPayCountry[] = [
     currency: "MZN",
     currencySymbol: "MT",
     eurRate: 69,
+    usdRate: 64,
     operators: [
       { code: "VODACOM_MOZ", name: "M-Pesa" },
     ],

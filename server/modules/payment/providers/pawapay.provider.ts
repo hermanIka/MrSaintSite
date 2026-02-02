@@ -19,6 +19,7 @@ import type {
   WebhookPayload,
 } from "../types";
 import { randomUUID } from "crypto";
+import { getCountryByCode, getOperatorByCode } from "@shared/pawapay-countries";
 
 export class PawaPayProvider implements PaymentProviderInterface {
   name = "pawapay" as const;
@@ -70,10 +71,20 @@ export class PawaPayProvider implements PaymentProviderInterface {
         };
       }
 
+      const localCurrency = this.getCurrencyForCorrespondent(activeCorrespondent);
+      const localAmount = this.convertToLocalCurrency(
+        request.amount,
+        request.currency || "EUR",
+        request.countryCode,
+        activeCorrespondent
+      );
+
+      console.log("[PawaPay] Converting:", request.amount, request.currency, "->", localAmount, localCurrency);
+
       const depositPayload = {
         depositId,
-        amount: request.amount.toString(),
-        currency: this.getCurrencyForCorrespondent(activeCorrespondent),
+        amount: localAmount.toString(),
+        currency: localCurrency,
         correspondent: activeCorrespondent,
         payer: {
           type: "MSISDN",
@@ -120,12 +131,14 @@ export class PawaPayProvider implements PaymentProviderInterface {
       const data = JSON.parse(responseText);
 
       if (data.status === "REJECTED") {
+        const rejectionCode = data.rejectionReason?.rejectionCode;
+        const rejectionMessage = data.rejectionReason?.rejectionMessage;
         return {
           success: false,
           paymentId,
           provider: this.name,
           status: "failed",
-          message: data.rejectionReason?.rejectionMessage || "Paiement rejeté par l'opérateur.",
+          message: this.translateRejectionCode(rejectionCode, rejectionMessage),
         };
       }
 
@@ -331,6 +344,38 @@ export class PawaPayProvider implements PaymentProviderInterface {
     return currencyMap[correspondent || this.correspondent || ""] || "XAF";
   }
 
+  private convertToLocalCurrency(
+    amount: number,
+    sourceCurrency: string,
+    countryCode?: string,
+    correspondent?: string
+  ): number {
+    let country = countryCode ? getCountryByCode(countryCode) : null;
+    
+    if (!country && correspondent) {
+      const operatorInfo = getOperatorByCode(correspondent);
+      if (operatorInfo) {
+        country = operatorInfo.country;
+      }
+    }
+
+    if (!country) {
+      console.warn("[PawaPay] No country found for conversion, using default EUR rate");
+      return Math.round(amount * 656);
+    }
+
+    let localAmount: number;
+    if (sourceCurrency === "EUR") {
+      localAmount = amount * country.eurRate;
+    } else if (sourceCurrency === "USD") {
+      localAmount = amount * country.usdRate;
+    } else {
+      localAmount = amount;
+    }
+
+    return Math.round(localAmount);
+  }
+
   private mapStatus(externalStatus: string): "pending" | "processing" | "success" | "failed" | "cancelled" {
     const statusMap: Record<string, "pending" | "processing" | "success" | "failed" | "cancelled"> = {
       "ACCEPTED": "pending",
@@ -348,19 +393,51 @@ export class PawaPayProvider implements PaymentProviderInterface {
   private parseErrorMessage(responseText: string): string | null {
     try {
       const error = JSON.parse(responseText);
-      if (error.rejectionReason?.rejectionMessage) {
-        return error.rejectionReason.rejectionMessage;
+      let rejectionCode = error.rejectionReason?.rejectionCode;
+      let rejectionMessage = error.rejectionReason?.rejectionMessage;
+      
+      if (rejectionCode) {
+        return this.translateRejectionCode(rejectionCode, rejectionMessage);
       }
       if (error.message) {
-        return error.message;
+        return this.translateRejectionCode(null, error.message);
       }
       if (error.error) {
-        return error.error;
+        return this.translateRejectionCode(null, error.error);
       }
     } catch {
       return null;
     }
     return null;
+  }
+
+  private translateRejectionCode(code: string | null, originalMessage?: string): string {
+    const translations: Record<string, string> = {
+      "AMOUNT_TOO_LARGE": "Le montant dépasse la limite autorisée par l'opérateur. Veuillez réduire le montant ou payer en plusieurs fois.",
+      "AMOUNT_TOO_SMALL": "Le montant est trop faible pour un paiement Mobile Money.",
+      "INVALID_RECIPIENT": "Le numéro de téléphone n'est pas valide pour ce service Mobile Money.",
+      "INSUFFICIENT_BALANCE": "Solde insuffisant sur le compte Mobile Money.",
+      "RECIPIENT_NOT_FOUND": "Le numéro de téléphone n'est pas associé à un compte Mobile Money.",
+      "TRANSACTION_LIMIT_EXCEEDED": "Limite de transactions atteinte. Veuillez réessayer plus tard.",
+      "SERVICE_UNAVAILABLE": "Le service Mobile Money est temporairement indisponible.",
+      "TIMEOUT": "La transaction a expiré. Veuillez réessayer.",
+      "DUPLICATE_TRANSACTION": "Cette transaction a déjà été effectuée.",
+    };
+
+    if (code && translations[code]) {
+      return translations[code];
+    }
+
+    if (originalMessage) {
+      if (originalMessage.toLowerCase().includes("amount") && originalMessage.toLowerCase().includes("greater")) {
+        return translations["AMOUNT_TOO_LARGE"];
+      }
+      if (originalMessage.toLowerCase().includes("insufficient")) {
+        return translations["INSUFFICIENT_BALANCE"];
+      }
+    }
+
+    return originalMessage || "Erreur lors du paiement Mobile Money.";
   }
 }
 

@@ -9,7 +9,7 @@ import { SiPaypal } from "react-icons/si";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { PAWAPAY_COUNTRIES, type PawaPayCountry, type MobileOperator } from "@shared/pawapay-countries";
+import { PAWAPAY_COUNTRIES, EUR_TO_USD_RATE, type PawaPayCountry, type MobileOperator } from "@shared/pawapay-countries";
 
 type PaymentProvider = "pawapay" | "lemonsqueezy" | "paypal";
 
@@ -88,31 +88,24 @@ export function PaymentMethodSelector({
     setCustomerPhone("");
   };
 
-  const getAmountAndCurrency = (provider: PaymentProvider) => {
-    if (provider === "pawapay" && currentCountry) {
-      return {
-        amount: Math.round(amount * currentCountry.eurRate),
-        currency: currentCountry.currency
-      };
-    }
-    return { amount, currency };
+  const getUsdAmount = () => {
+    return Math.round(amount * EUR_TO_USD_RATE * 100) / 100;
   };
 
   const getDisplayAmount = () => {
-    if (selectedMethod === "pawapay" && currentCountry) {
-      const localAmount = Math.round(amount * currentCountry.eurRate);
-      return `${localAmount.toLocaleString()} ${currentCountry.currency}`;
+    if (selectedMethod === "pawapay") {
+      const usdAmount = getUsdAmount();
+      return `${usdAmount.toFixed(2)} USD`;
     }
     return `${amount} ${currency}`;
   };
 
   const initPaymentMutation = useMutation({
     mutationFn: async (provider: PaymentProvider) => {
-      const { amount: paymentAmount, currency: paymentCurrency } = getAmountAndCurrency(provider);
       const response = await apiRequest("POST", "/api/payments/init", {
         provider,
-        amount: paymentAmount,
-        currency: paymentCurrency,
+        amount,
+        currency,
         serviceId,
         serviceName,
         customerEmail,
@@ -143,10 +136,27 @@ export function PaymentMethodSelector({
         onError?.(data.message || "Erreur de paiement");
       }
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      let errorMessage = "Une erreur est survenue. Veuillez réessayer.";
+      if (error?.response) {
+        try {
+          error.response.json().then((data: any) => {
+            if (data?.message) {
+              toast({
+                title: "Erreur de paiement",
+                description: data.message,
+                variant: "destructive",
+              });
+            }
+          });
+          onError?.(error.message);
+          return;
+        } catch {
+        }
+      }
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue. Veuillez réessayer.",
+        description: errorMessage,
         variant: "destructive",
       });
       onError?.(error.message);
@@ -355,9 +365,9 @@ export function PaymentMethodSelector({
             {getDisplayAmount()}
           </span>
         </div>
-        {selectedMethod === "pawapay" && currentCountry && (
+        {selectedMethod === "pawapay" && (
           <p className="text-xs text-muted-foreground text-center mb-2">
-            Équivalent de {amount} EUR (taux: 1 EUR = {currentCountry.eurRate} {currentCountry.currency})
+            Équivalent de {amount} EUR
           </p>
         )}
         
