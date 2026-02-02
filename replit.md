@@ -43,12 +43,17 @@ Structured around `content` (API for trips, testimonials, portfolio), `transacti
 **Technical Implementations & Feature Specifications:**
 - **Modular Payment System:** Supports PawaPay (Mobile Money), LemonSqueezy (Card), and PayPal. All payment logic resides on the server. Designed for extensibility to add more providers.
 - **Calendly Integration:** Uses Calendly API v2 for event types and real-time slot availability, redirecting users to Calendly for final booking.
-- **Hybrid Chatbot:** A floating `ChatWidget` with a rule-based system by default, optionally switching to an AI mode. Includes 15+ predefined response categories.
+- **Hybrid Chatbot (Refactored):** A floating `ChatWidget` with persistent conversations stored in PostgreSQL. Features:
+  - **Versioned System Prompts:** Admin-managed prompts stored in `chatbot_system_prompts` table with version control and active flag.
+  - **Session Persistence:** Conversations saved in `chatbot_conversations` table with session IDs stored in localStorage.
+  - **Security Isolation:** Chatbot only accesses public data (services, trips, FAQs). No access to payment APIs, admin functions, or secrets.
+  - **Mode Hybride:** Defaults to rule-based responses (15+ categories), switches to OpenAI GPT-4o-mini when OPENAI_API_KEY is configured.
+  - **Admin Routes:** Full CRUD for system prompts at `/api/admin/chatbot/prompts/*`.
 - **Dynamic Content:** Trips, testimonials, and portfolio items are dynamically managed via the admin panel. Portfolio includes filtering by service type and a draft/published status.
 - **Admin Module:** Token-based authentication, comprehensive dashboard with statistics, full CRUD capabilities for content, and activity logging.
 - **"Voyage à Crédit" Service:** A multi-step form for travel financing applications, including secure document uploads to object storage. Features an admin approval workflow (pending, approved, refused).
 - **Featured Trips:** A boolean flag `isFeatured` for trips allows highlighting up to 4 trips in a carousel on the homepage.
-- **Database:** PostgreSQL with Drizzle ORM, structured with tables for `trips`, `testimonials`, `portfolio`, `faqs`, `admins`, `activity_logs`, and `credit_travel_requests`. Includes a seed script for initial data.
+- **Database:** PostgreSQL with Drizzle ORM, structured with tables for `trips`, `testimonials`, `portfolio`, `faqs`, `admins`, `activity_logs`, `credit_travel_requests`, `chatbot_conversations`, and `chatbot_system_prompts`. Includes a seed script for initial data.
 
 **Architectural Rules:**
 - Strict separation of frontend and backend: no business logic or API keys exposed client-side, server-side validation is mandatory.
