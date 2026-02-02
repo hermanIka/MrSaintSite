@@ -1,37 +1,33 @@
 /**
  * TRANSACTION MODULE - BACKEND CONTEXT
  * 
- * Domaine: Gestion des paiements et réservations côté serveur
+ * Domaine: Gestion des réservations côté serveur
  * 
  * Responsabilités:
- * - Webhooks Stripe/Lemon Squeezy
- * - Validation des paiements
  * - Intégration Calendly API
- * - Confirmation des transactions
+ * - Gestion des réservations
+ * - Coordination avec le module de paiement
+ * 
+ * NOTE: Les paiements sont gérés par le module /server/modules/payment/
+ * qui supporte 3 providers : PowerPay, LemonSqueezy, PayPal
  * 
  * RÈGLES DE SÉCURITÉ:
  * - Toutes les clés API sont stockées en secrets
- * - Validation stricte des webhooks
- * - Logs de toutes les transactions
  * - Aucune logique de paiement côté frontend
  * 
- * STATUT: En préparation - structure prête pour l'implémentation
+ * STATUT: Actif - Réservations en préparation
  */
 
 export const TRANSACTION_BACKEND_MODULE = {
   name: 'transaction-backend',
-  description: 'Backend pour paiements et réservations',
-  status: 'preparation',
-  futureRoutes: [
-    'POST /api/payments/create-session',
-    'POST /api/webhooks/stripe',
-    'POST /api/bookings/create',
-    'GET /api/bookings/:id'
+  description: 'Backend pour réservations (paiements dans module payment)',
+  status: 'active',
+  routes: [
+    'GET /api/transaction/status',
+    'POST /api/bookings/create (futur)',
+    'GET /api/bookings/:id (futur)'
   ],
   requiredSecrets: [
-    'STRIPE_SECRET_KEY',
-    'STRIPE_WEBHOOK_SECRET',
-    'CALENDLY_API_KEY',
-    'LEMON_SQUEEZY_API_KEY'
+    'CALENDLY_API_KEY'
   ]
 } as const;

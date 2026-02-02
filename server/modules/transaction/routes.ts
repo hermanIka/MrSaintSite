@@ -1,31 +1,29 @@
 /**
  * TRANSACTION MODULE - Routes
  * 
- * Routes API pour les paiements et réservations.
+ * Routes API pour les réservations et le statut du module.
  * 
- * STATUT: En préparation
+ * NOTE: Les paiements sont gérés par le module /server/modules/payment/
  * 
- * ROUTES FUTURES:
- * - POST /api/payments/create-session
- * - POST /api/webhooks/stripe
- * - POST /api/bookings/create
- * - GET /api/bookings/:id
- * 
- * INTÉGRATIONS PRÉVUES:
- * - Stripe / Lemon Squeezy pour les paiements
- * - Calendly pour les réservations
+ * ROUTES:
+ * - GET /api/transaction/status - Statut du module
+ * - POST /api/bookings/create - Créer une réservation (futur)
+ * - GET /api/bookings/:id - Détails d'une réservation (futur)
  */
 
 import type { Express } from "express";
 
 export function registerTransactionRoutes(app: Express): void {
-  // Placeholder route pour vérifier que le module est chargé
   app.get("/api/transaction/status", (_req, res) => {
     res.json({
-      status: "preparation",
-      message: "Module de transaction en préparation",
-      plannedIntegrations: ["calendly", "stripe", "lemon_squeezy"],
-      futureIntegrations: ["mobile_money"]
+      status: "active",
+      message: "Module de transaction actif",
+      paymentProviders: ["powerpay", "lemonsqueezy", "paypal"],
+      features: {
+        payments: true,
+        bookings: false,
+        calendly: !!process.env.CALENDLY_URL,
+      },
     });
   });
 }

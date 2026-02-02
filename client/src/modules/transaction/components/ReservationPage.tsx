@@ -1,19 +1,35 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Layout } from "@/modules/foundation";
 import { SEO } from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
-import { FileText, Briefcase, Plane, CheckCircle, Calendar, CreditCard, Lock, ArrowLeft } from "lucide-react";
+import { Link, useSearch } from "wouter";
+import { FileText, Briefcase, Plane, CheckCircle, Calendar, CreditCard, Lock, ArrowLeft, PartyPopper } from "lucide-react";
 import CalendlyEmbed from "./CalendlyEmbed";
+import { PaymentMethodSelector } from "./PaymentMethodSelector";
 import reservationHero from "@/assets/images/reservation-hero.png";
 
 type ServiceType = "visa" | "agence" | "voyage" | null;
-type Step = "select" | "calendar";
+type Step = "select" | "payment" | "calendar" | "success";
 
 export default function ReservationPage() {
   const [selectedService, setSelectedService] = useState<ServiceType>(null);
   const [currentStep, setCurrentStep] = useState<Step>("select");
+  const [paymentId, setPaymentId] = useState<string | null>(null);
+  const searchString = useSearch();
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchString);
+    const paymentStatus = params.get("payment");
+    const id = params.get("id");
+    
+    if (paymentStatus === "success" && id) {
+      setPaymentId(id);
+      setCurrentStep("success");
+    } else if (paymentStatus === "cancelled" || paymentStatus === "failed") {
+      setCurrentStep("select");
+    }
+  }, [searchString]);
 
   const services = [
     {
@@ -21,7 +37,8 @@ export default function ReservationPage() {
       icon: FileText,
       title: "Facilitation Visa",
       description: "Demande de visa pour votre destination",
-      price: "À partir de 75€",
+      price: 75,
+      priceLabel: "À partir de 75€",
       features: ["Analyse du dossier", "Constitution des documents", "Suivi de la demande"],
     },
     {
@@ -29,7 +46,8 @@ export default function ReservationPage() {
       icon: Briefcase,
       title: "Création d'Agence",
       description: "Formation et accompagnement complet",
-      price: "750€",
+      price: 750,
+      priceLabel: "750€",
       features: ["Formation 4 semaines", "Coaching 6 mois", "Accès au réseau"],
     },
     {
@@ -37,7 +55,8 @@ export default function ReservationPage() {
       icon: Plane,
       title: "Voyage Organisé",
       description: "Voyage business clé en main",
-      price: "À partir de 1 200€",
+      price: 1200,
+      priceLabel: "À partir de 1 200€",
       features: ["Vol + Hébergement", "Transferts inclus", "Guide francophone"],
     },
   ];
@@ -48,26 +67,36 @@ export default function ReservationPage() {
       title: "Choisir un service",
       description: "Sélectionnez le service qui correspond à vos besoins",
       icon: CheckCircle,
+      active: currentStep === "select",
     },
     {
       number: 2,
       title: "Paiement sécurisé",
-      description: "Effectuez le paiement via notre plateforme sécurisée",
+      description: "Carte, Mobile Money ou PayPal",
       icon: CreditCard,
+      active: currentStep === "payment",
     },
     {
       number: 3,
       title: "Réservation confirmée",
       description: "Choisissez votre créneau et recevez votre confirmation",
       icon: Calendar,
+      active: currentStep === "calendar" || currentStep === "success",
     },
   ];
+
+  const selectedServiceData = services.find((s) => s.id === selectedService);
+
+  const handlePaymentSuccess = (id: string) => {
+    setPaymentId(id);
+    setCurrentStep("calendar");
+  };
 
   return (
     <Layout>
       <SEO 
         title="Réservation"
-        description="Réservez votre consultation avec Mr Saint. Paiement sécurisé, choix du créneau et confirmation instantanée. Démarrez votre projet dès maintenant."
+        description="Réservez votre consultation avec Mr Saint. Paiement sécurisé par carte, Mobile Money ou PayPal. Confirmation instantanée."
         keywords="réservation, consultation, paiement, rendez-vous, Mr Saint"
       />
       <section className="relative py-32 bg-black text-white overflow-hidden">
@@ -104,13 +133,19 @@ export default function ReservationPage() {
               const Icon = step.icon;
               return (
                 <div key={step.number} data-testid={`step-${step.number}`} className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-primary flex items-center justify-center">
-                    <span className="text-lg font-bold text-primary-foreground">
+                  <div className={`flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center ${
+                    step.active ? "bg-primary" : "bg-muted"
+                  }`}>
+                    <span className={`text-lg font-bold ${
+                      step.active ? "text-primary-foreground" : "text-muted-foreground"
+                    }`}>
                       {step.number}
                     </span>
                   </div>
                   <div>
-                    <h3 data-testid={`text-step-title-${step.number}`} className="text-lg font-heading font-semibold text-foreground mb-1">
+                    <h3 data-testid={`text-step-title-${step.number}`} className={`text-lg font-heading font-semibold mb-1 ${
+                      step.active ? "text-foreground" : "text-muted-foreground"
+                    }`}>
                       {step.title}
                     </h3>
                     <p data-testid={`text-step-desc-${step.number}`} className="text-sm text-muted-foreground">{step.description}</p>
@@ -124,110 +159,161 @@ export default function ReservationPage() {
 
       <section className="py-24 bg-muted/30">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 data-testid="text-choose-service-title" className="text-3xl font-heading font-bold text-foreground mb-4">
-              Choisissez votre service
-            </h2>
-            <p data-testid="text-choose-service-subtitle" className="text-muted-foreground">
-              Sélectionnez le service pour lequel vous souhaitez effectuer une réservation
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            {services.map((service) => {
-              const Icon = service.icon;
-              const isSelected = selectedService === service.id;
-              
-              return (
-                <Card
-                  key={service.id}
-                  data-testid={`card-service-${service.id}`}
-                  className={`cursor-pointer transition-all duration-300 overflow-visible hover-elevate ${
-                    isSelected
-                      ? "border-primary ring-2 ring-primary/20"
-                      : "border-primary/20"
-                  }`}
-                  onClick={() => setSelectedService(service.id)}
-                >
-                  <CardHeader className="pb-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <Icon className="w-6 h-6 text-primary" />
-                      </div>
-                      {isSelected && (
-                        <CheckCircle className="w-6 h-6 text-primary" />
-                      )}
-                    </div>
-                    <CardTitle data-testid={`text-title-${service.id}`} className="text-xl font-heading">{service.title}</CardTitle>
-                    <p data-testid={`text-desc-${service.id}`} className="text-sm text-muted-foreground">{service.description}</p>
-                  </CardHeader>
-                  <CardContent>
-                    <div data-testid={`text-price-${service.id}`} className="text-lg font-semibold text-primary mb-4">
-                      {service.price}
-                    </div>
-                    <ul className="space-y-2">
-                      {service.features.map((feature, i) => (
-                        <li key={i} data-testid={`text-feature-${service.id}-${i}`} className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-
-          {selectedService && currentStep === "select" && (
-            <Card className="border-primary/20 bg-card">
-              <CardContent className="p-8">
-                <div className="text-center mb-8">
-                  <h3 data-testid="text-payment-title" className="text-2xl font-heading font-bold text-foreground mb-2">
-                    Prochaine étape : Réserver un créneau
-                  </h3>
-                  <p className="text-muted-foreground">
-                    Vous avez sélectionné :{" "}
-                    <span data-testid="text-selected-service" className="font-medium text-primary">
-                      {services.find((s) => s.id === selectedService)?.title}
-                    </span>
-                  </p>
+          {currentStep === "success" && (
+            <Card className="border-primary/20 bg-card mb-8">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
+                  <PartyPopper className="w-8 h-8 text-green-600 dark:text-green-400" />
                 </div>
-
-                <div className="bg-muted/50 rounded-lg p-6 mb-8">
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                    <Calendar className="w-5 h-5 text-primary" />
-                    <span data-testid="text-calendar-notice">
-                      Choisissez un créneau disponible pour votre consultation avec Mr Saint.
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-4 justify-center flex-wrap">
-                  <Button
-                    data-testid="button-choose-slot"
-                    size="lg"
-                    className="gap-2"
-                    onClick={() => setCurrentStep("calendar")}
-                  >
-                    <Calendar className="w-5 h-5" />
-                    Choisir un créneau
-                  </Button>
-                  <Link href="/contact">
-                    <Button
-                      data-testid="button-contact-first"
-                      variant="outline"
-                      size="lg"
-                    >
-                      Me contacter d'abord
-                    </Button>
-                  </Link>
-                </div>
+                <h2 data-testid="text-success-title" className="text-2xl font-heading font-bold text-foreground mb-4">
+                  Paiement réussi !
+                </h2>
+                <p className="text-muted-foreground mb-6">
+                  Votre paiement a été confirmé. Vous pouvez maintenant réserver votre créneau.
+                </p>
+                <Button onClick={() => setCurrentStep("calendar")} data-testid="button-book-slot">
+                  <Calendar className="w-5 h-5 mr-2" />
+                  Réserver mon créneau
+                </Button>
               </CardContent>
             </Card>
           )}
 
-          {selectedService && currentStep === "calendar" && (
+          {(currentStep === "select" || currentStep === "payment") && (
+            <>
+              <div className="text-center mb-12">
+                <h2 data-testid="text-choose-service-title" className="text-3xl font-heading font-bold text-foreground mb-4">
+                  {currentStep === "select" ? "Choisissez votre service" : "Finalisez votre paiement"}
+                </h2>
+                <p data-testid="text-choose-service-subtitle" className="text-muted-foreground">
+                  {currentStep === "select" 
+                    ? "Sélectionnez le service pour lequel vous souhaitez effectuer une réservation"
+                    : `Service sélectionné : ${selectedServiceData?.title}`
+                  }
+                </p>
+              </div>
+
+              {currentStep === "select" && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                  {services.map((service) => {
+                    const Icon = service.icon;
+                    const isSelected = selectedService === service.id;
+                    
+                    return (
+                      <Card
+                        key={service.id}
+                        data-testid={`card-service-${service.id}`}
+                        className={`cursor-pointer transition-all duration-300 overflow-visible hover-elevate ${
+                          isSelected
+                            ? "border-primary ring-2 ring-primary/20"
+                            : "border-primary/20"
+                        }`}
+                        onClick={() => setSelectedService(service.id)}
+                      >
+                        <CardHeader className="pb-4">
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                              <Icon className="w-6 h-6 text-primary" />
+                            </div>
+                            {isSelected && (
+                              <CheckCircle className="w-6 h-6 text-primary" />
+                            )}
+                          </div>
+                          <CardTitle data-testid={`text-title-${service.id}`} className="text-xl font-heading">{service.title}</CardTitle>
+                          <p data-testid={`text-desc-${service.id}`} className="text-sm text-muted-foreground">{service.description}</p>
+                        </CardHeader>
+                        <CardContent>
+                          <div data-testid={`text-price-${service.id}`} className="text-lg font-semibold text-primary mb-4">
+                            {service.priceLabel}
+                          </div>
+                          <ul className="space-y-2">
+                            {service.features.map((feature, i) => (
+                              <li key={i} data-testid={`text-feature-${service.id}-${i}`} className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                                {feature}
+                              </li>
+                            ))}
+                          </ul>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+
+              {selectedService && currentStep === "select" && (
+                <Card className="border-primary/20 bg-card">
+                  <CardContent className="p-8">
+                    <div className="text-center mb-8">
+                      <h3 data-testid="text-payment-title" className="text-2xl font-heading font-bold text-foreground mb-2">
+                        Prochaine étape : Paiement
+                      </h3>
+                      <p className="text-muted-foreground">
+                        Vous avez sélectionné :{" "}
+                        <span data-testid="text-selected-service" className="font-medium text-primary">
+                          {selectedServiceData?.title}
+                        </span>
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center flex-wrap">
+                      <Button
+                        data-testid="button-proceed-payment"
+                        size="lg"
+                        className="gap-2"
+                        onClick={() => setCurrentStep("payment")}
+                      >
+                        <CreditCard className="w-5 h-5" />
+                        Procéder au paiement
+                      </Button>
+                      <Link href="/contact">
+                        <Button
+                          data-testid="button-contact-first"
+                          variant="outline"
+                          size="lg"
+                        >
+                          Me contacter d'abord
+                        </Button>
+                      </Link>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {selectedService && currentStep === "payment" && (
+                <div className="space-y-6">
+                  <Button
+                    variant="ghost"
+                    onClick={() => setCurrentStep("select")}
+                    className="gap-2"
+                    data-testid="button-back-to-services"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Retour aux services
+                  </Button>
+                  
+                  <Card className="border-primary/20 bg-card">
+                    <CardHeader>
+                      <CardTitle className="text-xl font-heading">
+                        Paiement pour : {selectedServiceData?.title}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <PaymentMethodSelector
+                        serviceId={selectedService}
+                        serviceName={selectedServiceData?.title || ""}
+                        amount={selectedServiceData?.price || 0}
+                        currency="EUR"
+                        onSuccess={handlePaymentSuccess}
+                      />
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+            </>
+          )}
+
+          {(currentStep === "calendar" || (currentStep === "success" && paymentId)) && selectedService && (
             <div className="space-y-6">
               <Button
                 variant="ghost"
@@ -241,7 +327,7 @@ export default function ReservationPage() {
               
               <CalendlyEmbed
                 serviceType={selectedService}
-                serviceName={services.find((s) => s.id === selectedService)?.title || ""}
+                serviceName={selectedServiceData?.title || ""}
               />
             </div>
           )}
@@ -259,7 +345,7 @@ export default function ReservationPage() {
                 Paiement sécurisé
               </h3>
               <p data-testid="text-feature-secure-desc" className="text-sm text-muted-foreground">
-                Transactions cryptées et protégées
+                Carte, Mobile Money ou PayPal
               </p>
             </div>
             <div data-testid="feature-confirmation">

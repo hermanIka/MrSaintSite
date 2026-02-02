@@ -95,9 +95,10 @@ modules/
    - Chaque module contient un fichier de contexte documentant sa responsabilité
    - Les contextes sont mis à jour à chaque modification majeure
 
-4. **Extensions futures**
-   - L'architecture permet l'ajout de Mobile Money sans refactoring massif
-   - Le module transaction est préparé pour Calendly + Stripe/Lemon Squeezy
+4. **Système de paiement modulaire**
+   - 3 providers supportés : PowerPay (Mobile Money), LemonSqueezy (Carte), PayPal
+   - Architecture extensible pour ajouter d'autres providers
+   - Toute la logique de paiement est côté serveur
 
 ## API Endpoints
 
@@ -107,11 +108,17 @@ modules/
 - `GET /api/testimonials` - Liste les témoignages
 - `GET /api/portfolio` - Liste le portfolio
 
-### Module Transaction (Futur)
+### Module Payment (Actif)
+- `GET /api/payments/providers` - Liste des providers disponibles
+- `POST /api/payments/init` - Initialiser un paiement
+- `GET /api/payments/verify/:paymentId` - Vérifier un paiement
+- `GET /api/payments/paypal/capture` - Callback PayPal
+- `POST /api/webhooks/powerpay` - Webhook PowerPay
+- `POST /api/webhooks/lemonsqueezy` - Webhook LemonSqueezy
+- `POST /api/webhooks/paypal` - Webhook PayPal
+
+### Module Transaction
 - `GET /api/transaction/status` - Statut du module
-- `POST /api/payments/create-session` (prévu)
-- `POST /api/webhooks/stripe` (prévu)
-- `POST /api/bookings/create` (prévu)
 
 ### Module Admin (Protégé)
 - `POST /api/admin/login` - Connexion admin
@@ -127,21 +134,40 @@ modules/
 ### Module FAQ (Public)
 - `GET /api/faqs` - Liste toutes les FAQ
 
-## Intégrations Prévues
+## Système de Paiement
 
-### Actuelles (Non implémentées)
-- **Calendly** - Réservation de créneaux
-- **Stripe / Lemon Squeezy** - Paiement en ligne
+### Providers Actifs
+- **PowerPay** - Mobile Money (Orange Money, MTN, etc.)
+- **LemonSqueezy** - Carte bancaire (Visa, Mastercard)
+- **PayPal** - Paiement PayPal
 
-### Futures
-- **Mobile Money** - Extension pour paiements africains
+### Variables d'Environnement Requises
+```
+# PowerPay (Mobile Money)
+POWERPAY_API_KEY=
+POWERPAY_BASE_URL=
 
-### Flux de Paiement Prévu
+# LemonSqueezy (Carte bancaire)
+LEMONSQUEEZY_API_KEY=
+LEMONSQUEEZY_STORE_ID=
+LEMONSQUEEZY_WEBHOOK_SECRET=
+
+# PayPal
+PAYPAL_CLIENT_ID=
+PAYPAL_CLIENT_SECRET=
+PAYPAL_ENV=sandbox  # ou production
+```
+
+### Flux de Paiement
 1. Sélection du service par l'utilisateur
-2. Paiement obligatoire (Stripe/Lemon Squeezy)
-3. Confirmation du paiement (backend uniquement)
-4. Accès à la réservation (Calendly)
-5. Confirmation finale
+2. Choix du mode de paiement (Carte, Mobile Money, PayPal)
+3. Paiement via le provider sélectionné
+4. Confirmation du paiement (backend uniquement)
+5. Accès à la réservation (Calendly)
+6. Confirmation finale
+
+### Intégration Calendly
+- **Calendly** - Réservation de créneaux (intégré via CALENDLY_URL)
 
 ## Stack Technique
 
@@ -229,9 +255,9 @@ npm run db:push  # Synchronisation schema DB
 - Composant CalendarBooking avec sélection de date et créneau horaire
 - Gestion des créneaux disponibles/réservés
 - Fuseau horaire affiché (Paris GMT+1)
-- Flow complet : sélection service → calendrier → créneau → confirmation
+- Flow complet : sélection service → paiement → calendrier → créneau → confirmation
 - Préparé pour intégration Calendly API (créneaux actuellement mockés)
-- Intégration paiement Stripe prévue (20€ avant accès calendrier)
+- Système de paiement multi-providers intégré (PowerPay, LemonSqueezy, PayPal)
 
 ### Module 3 (Chatbot Hybride - Complété)
 - ChatWidget flottant intégré au Layout
@@ -255,5 +281,5 @@ npm run db:push  # Synchronisation schema DB
 - Pour configurer: Modifier CALENDLY_URL avec le lien Calendly du client
 
 ### Prochaines Étapes
-1. Intégration Stripe/Lemon Squeezy pour les paiements (en attente des clés API du client)
+1. Configuration des clés API des providers de paiement (PowerPay, LemonSqueezy, PayPal)
 2. Amélioration chatbot avec OpenAI (optionnel)

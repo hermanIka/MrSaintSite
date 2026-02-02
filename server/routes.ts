@@ -13,6 +13,7 @@ import { registerAdminRoutes } from "./modules/admin";
 import { chatbotRoutes } from "./modules/chatbot";
 import { registerInteractionRoutes } from "./modules/interaction";
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
+import { registerPaymentRoutes } from "./modules/payment";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Enregistrement des routes par module
@@ -20,6 +21,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerTransactionRoutes(app);
   registerAdminRoutes(app);
   registerInteractionRoutes(app);
+  
+  // Module de paiement (PowerPay, LemonSqueezy, PayPal)
+  registerPaymentRoutes(app);
   
   // Object Storage routes
   registerObjectStorageRoutes(app);
