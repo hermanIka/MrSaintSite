@@ -5,13 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CreditCard, Smartphone, Loader2, Globe, Radio } from "lucide-react";
-import { SiPaypal } from "react-icons/si";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { PAWAPAY_COUNTRIES, EUR_TO_USD_RATE, type PawaPayCountry, type MobileOperator } from "@shared/pawapay-countries";
 
-type PaymentProvider = "pawapay" | "lemonsqueezy" | "paypal";
+type PaymentProvider = "pawapay" | "lemonsqueezy";
 
 interface PaymentMethodSelectorProps {
   serviceId: string;
@@ -35,21 +34,15 @@ interface PaymentInitResponse {
 const paymentMethods = [
   {
     id: "lemonsqueezy" as PaymentProvider,
-    label: "Carte bancaire",
-    description: "Visa, Mastercard, etc.",
+    label: "Carte bancaire / PayPal",
+    description: "Visa, Mastercard, PayPal",
     icon: CreditCard,
   },
   {
     id: "pawapay" as PaymentProvider,
     label: "Mobile Money",
-    description: "Orange Money, MTN, Airtel, etc.",
+    description: "Orange Money, MTN, Airtel, M-Pesa",
     icon: Smartphone,
-  },
-  {
-    id: "paypal" as PaymentProvider,
-    label: "PayPal",
-    description: "Payer avec votre compte PayPal",
-    icon: SiPaypal,
   },
 ];
 
@@ -221,7 +214,7 @@ export function PaymentMethodSelector({
         <h3 data-testid="text-payment-method-title" className="text-lg font-heading font-semibold mb-4">
           Choisissez votre mode de paiement
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {paymentMethods.map((method) => {
             const Icon = method.icon;
             const isSelected = selectedMethod === method.id;

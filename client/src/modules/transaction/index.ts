@@ -4,9 +4,8 @@
  * Ce module gère les paiements et réservations.
  * 
  * PROVIDERS DE PAIEMENT:
+ * - LemonSqueezy (Carte bancaire + PayPal intégré)
  * - PawaPay (Mobile Money - Afrique)
- * - LemonSqueezy (Carte bancaire)
- * - PayPal
  * 
  * INTÉGRATIONS:
  * - Calendly (réservation) - INTÉGRÉ via API Calendly v2
@@ -30,5 +29,5 @@ export { PaymentMethodSelector } from "./components/PaymentMethodSelector";
 
 export const TRANSACTION_STATUS = {
   calendly: true,
-  paymentProviders: ['pawapay', 'lemonsqueezy', 'paypal'],
+  paymentProviders: ['lemonsqueezy', 'pawapay'],
 } as const;

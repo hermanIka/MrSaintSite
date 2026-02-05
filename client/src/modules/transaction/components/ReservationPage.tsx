@@ -92,7 +92,7 @@ export default function ReservationPage() {
     {
       number: 2,
       title: "Paiement sécurisé",
-      description: "Carte, Mobile Money ou PayPal",
+      description: "Carte bancaire, PayPal ou Mobile Money",
       icon: CreditCard,
       active: currentStep === "payment",
     },
@@ -140,7 +140,7 @@ export default function ReservationPage() {
     <Layout>
       <SEO 
         title="Réservation"
-        description="Réservez votre consultation avec Mr Saint. Paiement sécurisé par carte, Mobile Money ou PayPal. Confirmation instantanée."
+        description="Réservez votre consultation avec Mr Saint. Paiement sécurisé par carte bancaire, PayPal ou Mobile Money. Confirmation instantanée."
         keywords="réservation, consultation, paiement, rendez-vous, Mr Saint"
       />
       <section className="relative py-32 bg-black text-white overflow-hidden">
@@ -470,7 +470,7 @@ export default function ReservationPage() {
                 Paiement sécurisé
               </h3>
               <p data-testid="text-feature-secure-desc" className="text-sm text-muted-foreground">
-                Carte, Mobile Money ou PayPal
+                Carte bancaire, PayPal ou Mobile Money
               </p>
             </div>
             <div data-testid="feature-confirmation">
