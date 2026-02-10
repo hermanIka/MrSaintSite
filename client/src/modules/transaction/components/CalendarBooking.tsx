@@ -11,7 +11,6 @@ import {
   CheckCircle,
   Globe,
   Loader2,
-  ExternalLink,
   CreditCard
 } from "lucide-react";
 
@@ -158,7 +157,6 @@ export default function CalendarBooking({
       if (onSlotSelected) {
         onSlotSelected(selectedDate, selectedTime, selectedSlotUrl);
       } else {
-        window.open(selectedSlotUrl, '_blank');
         setBookingConfirmed(true);
       }
     }
@@ -260,42 +258,54 @@ export default function CalendarBooking({
 
   if (bookingConfirmed) {
     return (
-      <Card className="w-full max-w-2xl mx-auto" data-testid="card-booking-confirmed">
-        <CardContent className="p-8 text-center">
-          <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
-          </div>
-          <h2 className="text-2xl font-heading font-bold mb-2">
-            Réservation en cours !
-          </h2>
-          <p className="text-muted-foreground mb-6">
-            Finalisez votre réservation sur Calendly dans la nouvelle fenêtre.
-          </p>
-          <div className="bg-muted/50 rounded-lg p-4 mb-6 text-left space-y-2">
-            <div className="flex items-center gap-2">
-              <CalendarIcon className="w-4 h-4 text-primary" />
-              <span className="font-medium">{formatSelectedDate()}</span>
+      <div className="w-full max-w-4xl mx-auto space-y-6">
+        <Card data-testid="card-booking-confirmed">
+          <CardContent className="p-8 text-center">
+            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
             </div>
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-primary" />
-              <span className="font-medium">{selectedTime}</span>
+            <h2 className="text-2xl font-heading font-bold mb-2">
+              Finalisez votre réservation
+            </h2>
+            <p className="text-muted-foreground mb-4">
+              Remplissez vos informations ci-dessous pour confirmer votre créneau.
+            </p>
+            <div className="bg-muted/50 rounded-lg p-4 mb-4 inline-block text-left space-y-2">
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="w-4 h-4 text-primary" />
+                <span className="font-medium">{formatSelectedDate()}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-primary" />
+                <span className="font-medium">{selectedTime}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary">{serviceName}</Badge>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary">{serviceName}</Badge>
-            </div>
-          </div>
-          {selectedSlotUrl && (
-            <Button 
-              variant="outline" 
-              onClick={() => window.open(selectedSlotUrl, '_blank')}
-              className="gap-2"
-            >
-              <ExternalLink className="w-4 h-4" />
-              Ouvrir Calendly
-            </Button>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+
+        {selectedSlotUrl && (
+          <Card data-testid="card-calendly-inline">
+            <CardContent className="p-4">
+              <div 
+                className="rounded-lg overflow-hidden border border-border"
+                style={{ minHeight: "700px" }}
+              >
+                <iframe
+                  src={`${selectedSlotUrl}?hide_gdpr_banner=1&primary_color=f2c94c&text_color=ffffff&background_color=1a1a1a`}
+                  width="100%"
+                  height="700"
+                  frameBorder="0"
+                  title="Calendly - Finaliser la réservation"
+                  data-testid="iframe-calendly-booking"
+                />
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     );
   }
 
@@ -434,8 +444,8 @@ export default function CalendarBooking({
                             </>
                           ) : (
                             <>
-                              <ExternalLink className="w-4 h-4" />
-                              Réserver sur Calendly
+                              <CalendarIcon className="w-4 h-4" />
+                              Confirmer et réserver
                             </>
                           )}
                         </Button>

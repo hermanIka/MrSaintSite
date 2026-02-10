@@ -4,7 +4,7 @@ import { SEO } from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link, useSearch } from "wouter";
-import { FileText, Briefcase, Plane, CheckCircle, Calendar as CalendarIcon, CreditCard, Lock, ArrowLeft, PartyPopper, Clock } from "lucide-react";
+import { FileText, Briefcase, Plane, CheckCircle, Calendar as CalendarIcon, CreditCard, Lock, ArrowLeft, Clock } from "lucide-react";
 import CalendarBooking from "./CalendarBooking";
 import { PaymentMethodSelector } from "./PaymentMethodSelector";
 import reservationHero from "@/assets/images/reservation-hero.png";
@@ -203,26 +203,6 @@ export default function ReservationPage() {
 
       <section className="py-24 bg-muted/30">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          {currentStep === "success" && (
-            <Card className="border-primary/20 bg-card mb-8">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
-                  <PartyPopper className="w-8 h-8 text-green-600 dark:text-green-400" />
-                </div>
-                <h2 data-testid="text-success-title" className="text-2xl font-heading font-bold text-foreground mb-4">
-                  Paiement réussi !
-                </h2>
-                <p className="text-muted-foreground mb-6">
-                  Votre paiement a été confirmé. Vous pouvez maintenant réserver votre créneau.
-                </p>
-                <Button onClick={() => setCurrentStep("calendar")} data-testid="button-book-slot">
-                  <CalendarIcon className="w-5 h-5 mr-2" />
-                  Réserver mon créneau
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-
           {(currentStep === "select" || currentStep === "payment") && (
             <>
               <div className="text-center mb-12">
@@ -405,56 +385,81 @@ export default function ReservationPage() {
           )}
 
           {currentStep === "success" && (
-            <Card className="border-green-500/20 bg-card">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
-                  <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
-                </div>
-                <h2 data-testid="text-final-success-title" className="text-2xl font-heading font-bold text-foreground mb-4">
-                  Réservation confirmée !
-                </h2>
-                <p className="text-muted-foreground mb-6">
-                  Votre paiement a été effectué et votre créneau est réservé. Finalisez votre réservation sur Calendly dans la nouvelle fenêtre.
-                </p>
-                {selectedSlot && (
-                  <div className="bg-muted/50 rounded-lg p-4 mb-6 inline-block text-left">
-                    <div className="flex items-center gap-2 mb-2">
-                      <CalendarIcon className="w-4 h-4 text-primary" />
-                      <span className="font-medium">
-                        {selectedSlot.date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-primary" />
-                      <span className="font-medium">{selectedSlot.time}</span>
-                    </div>
+            <div className="space-y-6">
+              <Card className="border-green-500/20 bg-card">
+                <CardContent className="p-8 text-center">
+                  <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
+                    <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
                   </div>
-                )}
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <h2 data-testid="text-final-success-title" className="text-2xl font-heading font-bold text-foreground mb-4">
+                    Paiement confirmé !
+                  </h2>
+                  <p className="text-muted-foreground mb-6">
+                    Votre paiement a été effectué avec succès. Finalisez votre réservation en remplissant le formulaire ci-dessous.
+                  </p>
                   {selectedSlot && (
-                    <Button 
-                      onClick={() => window.open(selectedSlot.schedulingUrl, '_blank')}
-                      className="gap-2"
-                    >
-                      <CalendarIcon className="w-5 h-5" />
-                      Ouvrir Calendly
-                    </Button>
+                    <div className="bg-muted/50 rounded-lg p-4 mb-4 inline-block text-left">
+                      <div className="flex items-center gap-2 mb-2">
+                        <CalendarIcon className="w-4 h-4 text-primary" />
+                        <span className="font-medium">
+                          {selectedSlot.date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-primary" />
+                        <span className="font-medium">{selectedSlot.time}</span>
+                      </div>
+                    </div>
                   )}
-                  <Button 
-                    variant="outline"
-                    onClick={() => {
-                      localStorage.removeItem('mr-saint-selected-slot');
-                      setCurrentStep("select");
-                      setSelectedService(null);
-                      setSelectedSlot(null);
-                      setPaymentId(null);
-                    }}
-                  >
-                    Nouvelle réservation
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+
+              {selectedSlot && (
+                <Card data-testid="card-calendly-inline-booking">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3 mb-4">
+                      <CalendarIcon className="w-5 h-5 text-primary" />
+                      <div>
+                        <p className="font-medium">Finalisez votre réservation</p>
+                        <p className="text-sm text-muted-foreground">
+                          Remplissez vos informations pour confirmer le créneau sélectionné
+                        </p>
+                      </div>
+                    </div>
+                    <div 
+                      className="rounded-lg overflow-hidden border border-border"
+                      style={{ minHeight: "700px" }}
+                      data-testid="calendly-inline-widget"
+                    >
+                      <iframe
+                        src={`${selectedSlot.schedulingUrl}?hide_gdpr_banner=1&primary_color=f2c94c&text_color=ffffff&background_color=1a1a1a`}
+                        width="100%"
+                        height="700"
+                        frameBorder="0"
+                        title="Calendly - Finaliser la réservation"
+                        data-testid="iframe-calendly"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              <div className="flex justify-center">
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    localStorage.removeItem('mr-saint-selected-slot');
+                    setCurrentStep("select");
+                    setSelectedService(null);
+                    setSelectedSlot(null);
+                    setPaymentId(null);
+                  }}
+                  data-testid="button-new-reservation"
+                >
+                  Nouvelle réservation
+                </Button>
+              </div>
+            </div>
           )}
         </div>
       </section>
