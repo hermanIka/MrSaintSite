@@ -2,10 +2,12 @@
  * AUTO-SEED MODULE
  * 
  * Vérifie si la base de données est vide au démarrage et insère les données initiales si nécessaire.
- * Cela permet à la version production d'avoir automatiquement les données de démonstration.
+ * Inclut aussi une logique de "mise à jour" pour s'assurer que les tables critiques
+ * (services, trips featured) sont correctement remplies même si d'autres données existent déjà.
  */
 
 import { db } from "./db";
+import { eq } from "drizzle-orm";
 import {
   trips,
   testimonials,
@@ -27,8 +29,130 @@ function hashPassword(password: string): string {
   return crypto.createHash("sha256").update(password).digest("hex");
 }
 
+const servicesData: InsertService[] = [
+  {
+    name: "Facilitation Visa",
+    slug: "visa",
+    shortDescription: "Obtenez votre visa sans stress",
+    fullDescription: "Nous prenons en charge toutes vos démarches administratives pour l'obtention de votre visa. Tourisme, affaires, études ou travail, notre expertise garantit un traitement rapide et efficace.",
+    price: 75,
+    priceLabel: "À partir de",
+    priceUnit: null,
+    category: "visa",
+    features: [
+      "Analyse de votre dossier personnalisé",
+      "Constitution des documents requis",
+      "Suivi de votre demande en temps réel",
+      "Accompagnement jusqu'à l'obtention",
+      "Conseils pour maximiser vos chances",
+    ],
+    imageUrl: null,
+    iconName: "FileText",
+    ctaText: "Demander mon visa",
+    ctaLink: "/facilitation-visa",
+    order: 1,
+    status: "published",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    name: "Création d'Agence de Voyage",
+    slug: "agence",
+    shortDescription: "Lancez votre agence avec un accompagnement expert",
+    fullDescription: "Programme complet de formation et coaching pour créer votre propre agence de voyage. De la conception à la première vente, nous vous accompagnons à chaque étape.",
+    price: 750,
+    priceLabel: "Programme complet :",
+    priceUnit: null,
+    category: "formation",
+    features: [
+      "Formation complète sur 4 semaines",
+      "Outils et templates professionnels",
+      "Accès à notre réseau de partenaires",
+      "Coaching personnalisé pendant 3 mois",
+      "Support technique et commercial",
+    ],
+    imageUrl: null,
+    iconName: "Briefcase",
+    ctaText: "Découvrir le programme",
+    ctaLink: "/creation-agence",
+    order: 2,
+    status: "published",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    name: "Consultation Stratégique",
+    slug: "consultation",
+    shortDescription: "Conseil personnalisé pour votre projet voyage",
+    fullDescription: "Session de consultation individuelle pour répondre à toutes vos questions sur le secteur du voyage, l'import-export ou le développement de votre activité.",
+    price: 95,
+    priceLabel: "",
+    priceUnit: "/ session",
+    category: "consultation",
+    features: [
+      "Session d'1 heure en visioconférence",
+      "Analyse personnalisée de votre situation",
+      "Conseils stratégiques adaptés",
+      "Plan d'action concret",
+      "Suivi par email pendant 7 jours",
+    ],
+    imageUrl: null,
+    iconName: "MessageCircle",
+    ctaText: "Réserver ma consultation",
+    ctaLink: "/reservation",
+    order: 3,
+    status: "published",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    name: "Voyages Organisés",
+    slug: "voyage",
+    shortDescription: "Voyages d'affaires et découverte en groupe",
+    fullDescription: "Participez à nos voyages organisés : business trips pour développer votre réseau et explorer de nouvelles opportunités commerciales à l'international.",
+    price: 1200,
+    priceLabel: "À partir de",
+    priceUnit: "/ personne",
+    category: "voyage",
+    features: [
+      "Vols et hébergement inclus",
+      "Accompagnement francophone",
+      "Networking avec entrepreneurs",
+      "Visites de fournisseurs et marchés",
+      "Formation import-export sur place",
+    ],
+    imageUrl: null,
+    iconName: "Plane",
+    ctaText: "Voir les voyages",
+    ctaLink: "/voyages",
+    order: 4,
+    status: "published",
+    createdAt: new Date().toISOString(),
+  },
+  {
+    name: "Voyage à Crédit",
+    slug: "voyage-credit",
+    shortDescription: "Réalisez votre rêve de voyage avec un financement flexible",
+    fullDescription: "Notre solution de financement vous permet d'étaler le coût de votre voyage sur plusieurs mois. Votre demande est étudiée personnellement et une réponse vous est donnée sous 48 à 72 heures.",
+    price: 0,
+    priceLabel: "Financement sur mesure",
+    priceUnit: null,
+    category: "financement",
+    features: [
+      "Paiement échelonné sur plusieurs mois",
+      "Étude personnalisée de votre dossier",
+      "Réponse sous 48 à 72 heures",
+      "Accompagnement dédié",
+      "Destinations accessibles",
+    ],
+    imageUrl: null,
+    iconName: "CreditCard",
+    ctaText: "Faire une demande",
+    ctaLink: "/voyage-credit",
+    order: 5,
+    status: "published",
+    createdAt: new Date().toISOString(),
+  },
+];
+
 export async function autoSeed(): Promise<void> {
-  // Always ensure chatbot prompt exists (before any early return)
   try {
     const existingPrompts = await db.select().from(chatbotSystemPrompts).limit(1);
     if (existingPrompts.length === 0) {
@@ -44,7 +168,8 @@ export async function autoSeed(): Promise<void> {
   try {
     const existingTrips = await db.select().from(trips).limit(1);
     if (existingTrips.length > 0) {
-      console.log("✓ Database already contains data - skipping auto-seed");
+      console.log("✓ Database already contains data - checking for missing data...");
+      await ensureDataIntegrity();
       return;
     }
 
@@ -67,6 +192,7 @@ export async function autoSeed(): Promise<void> {
         destination: "Shanghai & Beijing",
         date: "15-25 Mars 2025",
         price: 2800,
+        isFeatured: true,
         description:
           "Voyage business exclusif en Chine. Découvrez les opportunités d'import-export, visitez les plus grands marchés et développez votre réseau avec des entrepreneurs chinois. Programme intensif de 10 jours avec interprète professionnel.",
         imageUrl: "/images/trips/china-shanghai-tourism.png",
@@ -103,6 +229,7 @@ export async function autoSeed(): Promise<void> {
         destination: "Dubaï, UAE",
         date: "10-17 Avril 2025",
         price: 3200,
+        isFeatured: true,
         description:
           "Séjour business premium à Dubaï. Explorez le hub entrepreneurial du Moyen-Orient, participez à des conférences exclusives, rencontrez des investisseurs et découvrez les opportunités d'affaires dans l'une des villes les plus dynamiques du monde.",
         imageUrl: "/images/trips/dubai-tourism.png",
@@ -137,6 +264,7 @@ export async function autoSeed(): Promise<void> {
         destination: "Istanbul, Turquie",
         date: "5-12 Mai 2025",
         price: 1900,
+        isFeatured: true,
         description:
           "Voyage d'affaires à Istanbul pour découvrir les opportunités d'import textile, maroquinerie et décoration. Visitez les plus grands grossistes, négociez directement avec les fabricants et repartez avec vos premiers contrats.",
         imageUrl: "/images/trips/istanbul-tourism.png",
@@ -326,136 +454,50 @@ export async function autoSeed(): Promise<void> {
     await db.insert(faqs).values(faqsData);
 
     console.log("  → Inserting services...");
-    const servicesData: InsertService[] = [
-      {
-        name: "Facilitation Visa",
-        slug: "visa",
-        shortDescription: "Obtenez votre visa sans stress",
-        fullDescription: "Nous prenons en charge toutes vos démarches administratives pour l'obtention de votre visa. Tourisme, affaires, études ou travail, notre expertise garantit un traitement rapide et efficace.",
-        price: 75,
-        priceLabel: "À partir de",
-        priceUnit: null,
-        category: "visa",
-        features: [
-          "Analyse de votre dossier personnalisé",
-          "Constitution des documents requis",
-          "Suivi de votre demande en temps réel",
-          "Accompagnement jusqu'à l'obtention",
-          "Conseils pour maximiser vos chances",
-        ],
-        imageUrl: null,
-        iconName: "FileText",
-        ctaText: "Demander mon visa",
-        ctaLink: "/facilitation-visa",
-        order: 1,
-        status: "published",
-        createdAt: new Date().toISOString(),
-      },
-      {
-        name: "Création d'Agence de Voyage",
-        slug: "agence",
-        shortDescription: "Lancez votre agence avec un accompagnement expert",
-        fullDescription: "Programme complet de formation et coaching pour créer votre propre agence de voyage. De la conception à la première vente, nous vous accompagnons à chaque étape.",
-        price: 750,
-        priceLabel: "Programme complet :",
-        priceUnit: null,
-        category: "formation",
-        features: [
-          "Formation complète sur 4 semaines",
-          "Outils et templates professionnels",
-          "Accès à notre réseau de partenaires",
-          "Coaching personnalisé pendant 3 mois",
-          "Support technique et commercial",
-        ],
-        imageUrl: null,
-        iconName: "Briefcase",
-        ctaText: "Découvrir le programme",
-        ctaLink: "/creation-agence",
-        order: 2,
-        status: "published",
-        createdAt: new Date().toISOString(),
-      },
-      {
-        name: "Consultation Stratégique",
-        slug: "consultation",
-        shortDescription: "Conseil personnalisé pour votre projet voyage",
-        fullDescription: "Session de consultation individuelle pour répondre à toutes vos questions sur le secteur du voyage, l'import-export ou le développement de votre activité.",
-        price: 95,
-        priceLabel: "",
-        priceUnit: "/ session",
-        category: "consultation",
-        features: [
-          "Session d'1 heure en visioconférence",
-          "Analyse personnalisée de votre situation",
-          "Conseils stratégiques adaptés",
-          "Plan d'action concret",
-          "Suivi par email pendant 7 jours",
-        ],
-        imageUrl: null,
-        iconName: "MessageCircle",
-        ctaText: "Réserver ma consultation",
-        ctaLink: "/reservation",
-        order: 3,
-        status: "published",
-        createdAt: new Date().toISOString(),
-      },
-      {
-        name: "Voyages Organisés",
-        slug: "voyage",
-        shortDescription: "Voyages d'affaires et découverte en groupe",
-        fullDescription: "Participez à nos voyages organisés : business trips pour développer votre réseau et explorer de nouvelles opportunités commerciales à l'international.",
-        price: 1200,
-        priceLabel: "À partir de",
-        priceUnit: "/ personne",
-        category: "voyage",
-        features: [
-          "Vols et hébergement inclus",
-          "Accompagnement francophone",
-          "Networking avec entrepreneurs",
-          "Visites de fournisseurs et marchés",
-          "Formation import-export sur place",
-        ],
-        imageUrl: null,
-        iconName: "Plane",
-        ctaText: "Voir les voyages",
-        ctaLink: "/voyages",
-        order: 4,
-        status: "published",
-        createdAt: new Date().toISOString(),
-      },
-      {
-        name: "Voyage à Crédit",
-        slug: "voyage-credit",
-        shortDescription: "Réalisez votre rêve de voyage avec un financement flexible",
-        fullDescription: "Notre solution de financement vous permet d'étaler le coût de votre voyage sur plusieurs mois. Votre demande est étudiée personnellement et une réponse vous est donnée sous 48 à 72 heures.",
-        price: 0,
-        priceLabel: "Financement sur mesure",
-        priceUnit: null,
-        category: "financement",
-        features: [
-          "Paiement échelonné sur plusieurs mois",
-          "Étude personnalisée de votre dossier",
-          "Réponse sous 48 à 72 heures",
-          "Accompagnement dédié",
-          "Destinations accessibles",
-        ],
-        imageUrl: null,
-        iconName: "CreditCard",
-        ctaText: "Faire une demande",
-        ctaLink: "/voyage-credit",
-        order: 5,
-        status: "published",
-        createdAt: new Date().toISOString(),
-      },
-    ];
     await db.insert(services).values(servicesData);
 
-    // Seed initial chatbot system prompt
     console.log("  → Inserting chatbot system prompt...");
     await seedInitialPrompt();
 
     console.log("✅ Auto-seed completed successfully!");
   } catch (error) {
     console.error("⚠️ Auto-seed error (non-fatal):", error);
+  }
+}
+
+async function ensureDataIntegrity(): Promise<void> {
+  try {
+    const existingServices = await db.select().from(services).limit(1);
+    if (existingServices.length === 0) {
+      console.log("  → Services table is empty - inserting services...");
+      await db.insert(services).values(servicesData);
+      console.log("  ✓ Services inserted successfully");
+    } else {
+      console.log("  ✓ Services already exist");
+    }
+
+    const featuredTrips = await db.select().from(trips).where(eq(trips.isFeatured, true));
+    if (featuredTrips.length === 0) {
+      console.log("  → No featured trips found - marking all trips as featured...");
+      const result = await db.update(trips).set({ isFeatured: true }).where(eq(trips.isFeatured, false));
+      console.log("  ✓ All trips marked as featured");
+    } else {
+      console.log(`  ✓ ${featuredTrips.length} featured trips found`);
+    }
+
+    const existingAdmin = await db.select().from(admins).limit(1);
+    if (existingAdmin.length === 0) {
+      console.log("  → No admin found - inserting default admin...");
+      await db.insert(admins).values({
+        username: "admin",
+        passwordHash: hashPassword("admin123"),
+        createdAt: new Date().toISOString(),
+      });
+      console.log("  ✓ Admin created");
+    }
+
+    console.log("✓ Data integrity check completed");
+  } catch (error) {
+    console.error("⚠️ Data integrity check error (non-fatal):", error);
   }
 }
