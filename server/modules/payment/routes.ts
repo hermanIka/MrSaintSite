@@ -146,6 +146,29 @@ export function registerPaymentRoutes(app: Express): void {
     }
   });
 
+  app.get("/api/payments/maishapay/callback/:paymentId", (req: Request, res: Response) => {
+    try {
+      const { paymentId } = req.params;
+      const { status, description, transactionRefId, operatorRefId } = req.query;
+
+      console.log("[MaishaPay] Callback received for:", paymentId, "status:", status, "desc:", description, "ref:", transactionRefId);
+
+      const isSuccess = status === "202" || status === "200";
+      
+      if (isSuccess) {
+        paymentService.updatePaymentStatus(paymentId, "success", (transactionRefId as string) || paymentId);
+      }
+
+      const paymentResult = isSuccess ? "success" : "failed";
+      const message = description ? encodeURIComponent(description as string) : "";
+      
+      res.redirect(`/reservation?payment=${paymentResult}&id=${paymentId}&provider=maishapay${message ? `&message=${message}` : ""}`);
+    } catch (error) {
+      console.error("[MaishaPay] Callback error:", error);
+      res.redirect("/reservation?payment=error&message=callback_error");
+    }
+  });
+
   app.get("/api/payments/maishapay/redirect", (req: Request, res: Response) => {
     try {
       const { paymentId, amount, currency } = req.query;
@@ -166,8 +189,8 @@ export function registerPaymentRoutes(app: Express): void {
             ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
             : "http://localhost:5000";
 
-      const callbackUrl = `${appUrl}/reservation?payment=success&id=${paymentId}&provider=maishapay`;
-      const formData = maishaPayProvider.getFormData(
+      const callbackUrl = `${appUrl}/api/payments/maishapay/callback/${paymentId}`;
+      const formData = maishaPayProvider.getCheckoutFormData(
         paymentId as string,
         parseFloat(amount as string),
         (currency as string) || "USD",

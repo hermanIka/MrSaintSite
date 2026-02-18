@@ -1,14 +1,14 @@
 /**
- * MAISHAPAY PROVIDER - Carte Bancaire
+ * MAISHAPAY PROVIDER - Carte Bancaire (REST API)
  * 
- * Intégration MaishaPay pour les paiements par carte bancaire.
- * Supporte Visa, Mastercard, American Express, UnionPay.
+ * Intégration MaishaPay REST API pour les paiements par carte bancaire.
+ * Supporte Visa, Mastercard, American Express, UnionPay avec 3D Secure.
  * 
- * MaishaPay utilise un système de formulaire POST avec redirection.
- * URL Checkout : https://marchand.maishapay.online/payment/vers1.0/merchant/checkout
+ * API Base URL : https://marchand.maishapay.online/api
+ * Endpoint Card Collection : POST /collect/v2/store/card (JSON)
  * 
- * Paramètres requis : gatewayMode, publicApiKey, secretApiKey, montant, devise
- * Paramètre optionnel : callbackUrl (retour après paiement)
+ * L'API retourne une paymentPage URL hébergée par MaishaPay
+ * où le client entre ses informations de carte en toute sécurité.
  * 
  * Configuration via variables d'environnement :
  * - MAISHAPAY_PUBLIC_KEY (format: MP-LIVEPK-xxx)
@@ -25,13 +25,23 @@ import type {
   WebhookPayload,
 } from "../types";
 
+function getAppUrl(): string {
+  return process.env.APP_URL 
+    ? process.env.APP_URL 
+    : process.env.REPLIT_DEPLOYMENTS_URL
+      ? `https://${process.env.REPLIT_DEPLOYMENTS_URL}`
+      : process.env.REPLIT_DEV_DOMAIN 
+        ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
+        : "http://localhost:5000";
+}
+
 export class MaishaPayProvider implements PaymentProviderInterface {
   name = "maishapay" as const;
   
   private publicKey: string | undefined;
   private secretKey: string | undefined;
   private gatewayMode: string;
-  private checkoutUrl = "https://marchand.maishapay.online/payment/vers1.0/merchant/checkout";
+  private apiBaseUrl = "https://marchand.maishapay.online/api";
 
   constructor() {
     this.publicKey = process.env.MAISHAPAY_PUBLIC_KEY;
@@ -43,11 +53,7 @@ export class MaishaPayProvider implements PaymentProviderInterface {
     return !!this.publicKey && !!this.secretKey;
   }
 
-  getCheckoutUrl(): string {
-    return this.checkoutUrl;
-  }
-
-  getFormData(paymentId: string, amount: number, currency: string, callbackUrl: string): Record<string, string> {
+  getCheckoutFormData(paymentId: string, amount: number, currency: string, callbackUrl: string): Record<string, string> {
     const deviseMap: Record<string, string> = {
       "EUR": "EURO",
       "USD": "USD",
@@ -67,6 +73,10 @@ export class MaishaPayProvider implements PaymentProviderInterface {
     };
   }
 
+  getCheckoutUrl(): string {
+    return "https://marchand.maishapay.online/payment/vers1.0/merchant/checkout";
+  }
+
   async initPayment(request: PaymentInitRequest): Promise<PaymentInitResponse> {
     if (!this.isConfigured()) {
       return {
@@ -80,40 +90,113 @@ export class MaishaPayProvider implements PaymentProviderInterface {
 
     try {
       const paymentId = `mp_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-      const appUrl = process.env.APP_URL 
-        ? process.env.APP_URL 
-        : process.env.REPLIT_DEPLOYMENTS_URL
-          ? `https://${process.env.REPLIT_DEPLOYMENTS_URL}`
-          : process.env.REPLIT_DEV_DOMAIN 
-            ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
-            : "http://localhost:5000";
+      const appUrl = getAppUrl();
 
-      const callbackUrl = `${appUrl}/reservation?payment=success&id=${paymentId}&provider=maishapay`;
+      const callbackUrl = `${appUrl}/api/payments/maishapay/callback/${paymentId}`;
 
-      console.log("[MaishaPay] Creating checkout for:", paymentId, "amount:", request.amount, request.currency);
-
-      const redirectUrl = `${appUrl}/api/payments/maishapay/redirect?paymentId=${encodeURIComponent(paymentId)}&amount=${request.amount}&currency=${encodeURIComponent(request.currency || "USD")}`;
-
-      return {
-        success: true,
-        paymentId,
-        provider: this.name,
-        status: "pending",
-        checkoutUrl: redirectUrl,
-        externalId: paymentId,
-        redirectUrl: redirectUrl,
-        message: "Redirection vers la page de paiement sécurisée MaishaPay...",
+      const currencyMap: Record<string, string> = {
+        "EUR": "EURO",
+        "USD": "USD",
+        "CDF": "CDF",
+        "XAF": "FCFA",
+        "FCFA": "FCFA",
       };
+      const currency = currencyMap[(request.currency || "USD").toUpperCase()] || "USD";
+
+      console.log("[MaishaPay] Initiating card payment:", paymentId, "amount:", request.amount, currency);
+
+      const payload = {
+        transactionReference: paymentId,
+        gatewayMode: this.gatewayMode,
+        publicApiKey: this.publicKey,
+        secretApiKey: this.secretKey,
+        order: {
+          amount: request.amount.toString(),
+          currency: currency,
+          customerFullName: request.customerName || "Client",
+          customerEmailAdress: request.customerEmail || "",
+        },
+        paymentChannel: {
+          channel: "CARD",
+          provider: "VISA",
+          walletID: request.customerPhone || request.customerEmail || "",
+          callbackUrl: callbackUrl,
+        },
+      };
+
+      console.log("[MaishaPay] Calling REST API:", `${this.apiBaseUrl}/collect/v2/store/card`);
+
+      const response = await fetch(`${this.apiBaseUrl}/collect/v2/store/card`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const responseText = await response.text();
+      console.log("[MaishaPay] API Response status:", response.status, "body:", responseText.substring(0, 500));
+
+      let data: any;
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        console.error("[MaishaPay] Failed to parse response as JSON");
+        return await this.fallbackToCheckout(paymentId, request, callbackUrl);
+      }
+
+      const responseData = data?.original?.data || data?.data || data;
+      const paymentPage = responseData?.paymentPage;
+      const transactionId = responseData?.transactionId || responseData?.reference;
+
+      if (paymentPage) {
+        console.log("[MaishaPay] Got payment page URL:", paymentPage);
+        return {
+          success: true,
+          paymentId,
+          provider: this.name,
+          status: "pending",
+          checkoutUrl: paymentPage,
+          externalId: transactionId || paymentId,
+          redirectUrl: paymentPage,
+          message: "Redirection vers la page de paiement sécurisée MaishaPay...",
+        };
+      }
+
+      console.log("[MaishaPay] No paymentPage in response, falling back to checkout form");
+      return await this.fallbackToCheckout(paymentId, request, callbackUrl);
+
     } catch (error) {
       console.error("[MaishaPay] Init exception:", error);
-      return {
-        success: false,
-        paymentId: "",
-        provider: this.name,
-        status: "failed",
-        message: "Erreur de connexion au service de paiement par carte.",
-      };
+      
+      const paymentId = `mp_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+      const appUrl = getAppUrl();
+      const callbackUrl = `${appUrl}/api/payments/maishapay/callback/${paymentId}`;
+      return await this.fallbackToCheckout(paymentId, request, callbackUrl);
     }
+  }
+
+  private async fallbackToCheckout(
+    paymentId: string,
+    request: PaymentInitRequest,
+    _callbackUrl: string
+  ): Promise<PaymentInitResponse> {
+    const appUrl = getAppUrl();
+    const redirectUrl = `${appUrl}/api/payments/maishapay/redirect?paymentId=${encodeURIComponent(paymentId)}&amount=${request.amount}&currency=${encodeURIComponent(request.currency || "USD")}`;
+
+    console.log("[MaishaPay] Using checkout form fallback:", redirectUrl);
+
+    return {
+      success: true,
+      paymentId,
+      provider: this.name,
+      status: "pending",
+      checkoutUrl: redirectUrl,
+      externalId: paymentId,
+      redirectUrl: redirectUrl,
+      message: "Redirection vers la page de paiement sécurisée MaishaPay...",
+    };
   }
 
   async verifyPayment(request: PaymentVerifyRequest): Promise<PaymentVerifyResponse> {
