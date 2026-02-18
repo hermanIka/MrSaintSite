@@ -44,8 +44,23 @@ export class MaishaPayProvider implements PaymentProviderInterface {
   private apiBaseUrl = "https://marchand.maishapay.online/api";
 
   constructor() {
-    this.publicKey = process.env.MAISHAPAY_PUBLIC_KEY;
-    this.secretKey = process.env.MAISHAPAY_SECRET_KEY;
+    let pubKey = process.env.MAISHAPAY_PUBLIC_KEY;
+    let secKey = process.env.MAISHAPAY_SECRET_KEY;
+
+    if (pubKey && secKey) {
+      const pubIsSK = pubKey.includes("SK") && !pubKey.includes("PK");
+      const secIsPK = secKey.includes("PK") && !secKey.includes("SK");
+      if (pubIsSK && secIsPK) {
+        console.warn("[MaishaPay] Keys appear swapped — auto-correcting");
+        [pubKey, secKey] = [secKey, pubKey];
+      }
+      if (!secKey.includes("SK")) {
+        console.error("[MaishaPay] WARNING: MAISHAPAY_SECRET_KEY does not contain a secret key (expected MP-LIVESK-xxx). Current prefix:", secKey.substring(0, 12));
+      }
+    }
+
+    this.publicKey = pubKey;
+    this.secretKey = secKey;
     this.gatewayMode = process.env.MAISHAPAY_GATEWAY_MODE || "1";
   }
 
