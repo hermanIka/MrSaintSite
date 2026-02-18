@@ -18,7 +18,7 @@ export function registerTransactionRoutes(app: Express): void {
     res.json({
       status: "active",
       message: "Module de transaction actif",
-      paymentProviders: ["pawapay", "lemonsqueezy", "paypal"],
+      paymentProviders: ["pawapay", "maishapay", "paypal"],
       features: {
         payments: true,
         bookings: false,

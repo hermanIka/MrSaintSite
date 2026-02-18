@@ -4,7 +4,7 @@
  * Ce module gère les paiements et réservations.
  * 
  * PROVIDERS DE PAIEMENT:
- * - LemonSqueezy (Carte bancaire + PayPal intégré)
+ * - MaishaPay (Carte bancaire)
  * - PawaPay (Mobile Money - Afrique)
  * 
  * INTÉGRATIONS:
@@ -29,5 +29,5 @@ export { PaymentMethodSelector } from "./components/PaymentMethodSelector";
 
 export const TRANSACTION_STATUS = {
   calendly: true,
-  paymentProviders: ['lemonsqueezy', 'pawapay'],
+  paymentProviders: ['maishapay', 'pawapay'],
 } as const;

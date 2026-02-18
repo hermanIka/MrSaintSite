@@ -2,10 +2,10 @@
  * PAYMENT MODULE - Types
  * 
  * Types partagés pour le système de paiement modulaire.
- * Supporte 3 providers : PawaPay (Mobile Money), LemonSqueezy (Carte), PayPal
+ * Supporte 3 providers : PawaPay (Mobile Money), MaishaPay (Carte), PayPal
  */
 
-export type PaymentProvider = "pawapay" | "lemonsqueezy" | "paypal";
+export type PaymentProvider = "pawapay" | "maishapay" | "paypal";
 
 export type PaymentStatus = "pending" | "processing" | "success" | "failed" | "cancelled";
 

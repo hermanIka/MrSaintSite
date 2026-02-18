@@ -3,7 +3,7 @@
  * 
  * Système de paiement modulaire avec 3 providers :
  * - PawaPay (Mobile Money - Afrique)
- * - LemonSqueezy (Carte bancaire)
+ * - MaishaPay (Carte bancaire)
  * - PayPal
  */
 

@@ -11,7 +11,7 @@
  * - Confirmation de transaction
  * 
  * PROVIDERS DE PAIEMENT:
- * - LemonSqueezy (Carte bancaire + PayPal intégré)
+ * - MaishaPay (Carte bancaire)
  * - PawaPay (Mobile Money - Afrique)
  * 
  * RÈGLES STRICTES:
@@ -28,9 +28,9 @@ export const TRANSACTION_MODULE = {
   description: 'Paiements et réservations',
   status: 'active',
   pages: ['ReservationPage'],
-  paymentProviders: ['lemonsqueezy', 'pawapay'],
+  paymentProviders: ['maishapay', 'pawapay'],
   integrations: {
-    current: ['lemonsqueezy', 'pawapay'],
+    current: ['maishapay', 'pawapay'],
     planned: ['calendly'],
   },
   flow: [

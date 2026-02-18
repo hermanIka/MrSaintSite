@@ -5,7 +5,7 @@
  * 
  * PROVIDERS SUPPORTÉS:
  * - PawaPay (Mobile Money) - Paiements africains (MTN, Orange, Airtel, M-Pesa)
- * - LemonSqueezy (Carte bancaire) - Paiements internationaux
+ * - MaishaPay (Carte bancaire) - Paiements internationaux
  * - PayPal - Paiements universels
  * 
  * ARCHITECTURE:
@@ -21,11 +21,10 @@
  * - PAWAPAY_ENV (sandbox | production)
  * - PAWAPAY_CORRESPONDENT (ex: MTN_MOMO_CMR, ORANGE_CMR)
  * 
- * LemonSqueezy:
- * - LEMONSQUEEZY_API_KEY
- * - LEMONSQUEEZY_STORE_ID
- * - LEMONSQUEEZY_VARIANT_ID
- * - LEMONSQUEEZY_WEBHOOK_SECRET (optionnel)
+ * MaishaPay:
+ * - MAISHAPAY_PUBLIC_KEY
+ * - MAISHAPAY_SECRET_KEY
+ * - MAISHAPAY_GATEWAY_MODE (0=sandbox, 1=live)
  * 
  * PayPal:
  * - PAYPAL_CLIENT_ID
@@ -38,7 +37,7 @@
  * - GET /api/payments/verify/:paymentId - Vérifier un paiement
  * - GET /api/payments/paypal/capture - Callback PayPal
  * - POST /api/webhooks/pawapay - Webhook PawaPay
- * - POST /api/webhooks/lemonsqueezy - Webhook LemonSqueezy
+ * - POST /api/webhooks/maishapay - Webhook MaishaPay
  * - POST /api/webhooks/paypal - Webhook PayPal
  * 
  * SÉCURITÉ:
@@ -51,14 +50,14 @@ export const PAYMENT_MODULE = {
   name: "payment",
   description: "Système de paiement modulaire multi-providers",
   status: "active",
-  providers: ["pawapay", "lemonsqueezy", "paypal"],
+  providers: ["pawapay", "maishapay", "paypal"],
   routes: [
     "GET /api/payments/providers",
     "POST /api/payments/init",
     "GET /api/payments/verify/:paymentId",
     "GET /api/payments/paypal/capture",
     "POST /api/webhooks/pawapay",
-    "POST /api/webhooks/lemonsqueezy",
+    "POST /api/webhooks/maishapay",
     "POST /api/webhooks/paypal",
   ],
 } as const;

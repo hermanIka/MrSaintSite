@@ -48,7 +48,7 @@ export function registerPaymentRoutes(app: Express): void {
         });
       }
 
-      const validProviders: PaymentProvider[] = ["pawapay", "lemonsqueezy", "paypal"];
+      const validProviders: PaymentProvider[] = ["pawapay", "maishapay", "paypal"];
       if (!validProviders.includes(provider)) {
         return res.status(400).json({
           success: false,
@@ -161,18 +161,17 @@ export function registerPaymentRoutes(app: Express): void {
     }
   });
 
-  app.post("/api/webhooks/lemonsqueezy", async (req: Request, res: Response) => {
+  app.post("/api/webhooks/maishapay", async (req: Request, res: Response) => {
     try {
-      const result = await paymentService.handleWebhook("lemonsqueezy", {
-        provider: "lemonsqueezy",
-        event: req.body.meta?.event_name || "unknown",
-        data: req.body.data || req.body,
-        signature: req.headers["x-signature"] as string,
+      const result = await paymentService.handleWebhook("maishapay", {
+        provider: "maishapay",
+        event: req.body.event || req.body.status || "unknown",
+        data: req.body,
+        signature: req.headers["x-maishapay-signature"] as string,
       });
-
       res.json(result);
     } catch (error) {
-      console.error("[Webhook] LemonSqueezy error:", error);
+      console.error("[Webhook] MaishaPay error:", error);
       res.status(500).json({ success: false, message: "Erreur webhook" });
     }
   });

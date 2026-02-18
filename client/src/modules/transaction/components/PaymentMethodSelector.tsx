@@ -10,7 +10,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { PAWAPAY_COUNTRIES, EUR_TO_USD_RATE, type PawaPayCountry, type MobileOperator } from "@shared/pawapay-countries";
 
-type PaymentProvider = "pawapay" | "lemonsqueezy";
+type PaymentProvider = "pawapay" | "maishapay";
 
 interface PaymentMethodSelectorProps {
   serviceId: string;
@@ -33,9 +33,9 @@ interface PaymentInitResponse {
 
 const paymentMethods = [
   {
-    id: "lemonsqueezy" as PaymentProvider,
-    label: "Carte bancaire / PayPal",
-    description: "Visa, Mastercard, PayPal",
+    id: "maishapay" as PaymentProvider,
+    label: "Carte bancaire",
+    description: "Visa, Mastercard, American Express",
     icon: CreditCard,
   },
   {

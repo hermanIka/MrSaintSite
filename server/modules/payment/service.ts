@@ -2,7 +2,7 @@
  * PAYMENT SERVICE - Service Central
  * 
  * Service centralisé pour la gestion des paiements.
- * Orchestre les 3 providers : PawaPay, LemonSqueezy, PayPal
+ * Orchestre les 3 providers : PawaPay, MaishaPay, PayPal
  */
 
 import type {
@@ -16,7 +16,7 @@ import type {
   PaymentRecord,
 } from "./types";
 import { pawaPayProvider } from "./providers/pawapay.provider";
-import { lemonSqueezyProvider } from "./providers/lemonsqueezy.provider";
+import { maishaPayProvider } from "./providers/maishapay.provider";
 import { payPalProvider } from "./providers/paypal.provider";
 
 class PaymentService {
@@ -28,7 +28,7 @@ class PaymentService {
     this.payments = new Map();
     
     this.providers.set("pawapay", pawaPayProvider);
-    this.providers.set("lemonsqueezy", lemonSqueezyProvider);
+    this.providers.set("maishapay", maishaPayProvider);
     this.providers.set("paypal", payPalProvider);
   }
 
@@ -39,8 +39,8 @@ class PaymentService {
   getAvailableProviders(): { provider: PaymentProvider; configured: boolean; label: string }[] {
     return [
       {
-        provider: "lemonsqueezy",
-        configured: lemonSqueezyProvider.isConfigured(),
+        provider: "maishapay",
+        configured: maishaPayProvider.isConfigured(),
         label: "Carte bancaire",
       },
       {
@@ -170,7 +170,7 @@ class PaymentService {
   private getProviderLabel(provider: PaymentProvider): string {
     const labels: Record<PaymentProvider, string> = {
       pawapay: "Mobile Money",
-      lemonsqueezy: "Carte bancaire",
+      maishapay: "Carte bancaire",
       paypal: "PayPal",
     };
     return labels[provider] || provider;

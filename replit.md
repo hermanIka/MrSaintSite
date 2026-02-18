@@ -41,7 +41,7 @@ Structured around `content` (API for trips, testimonials, portfolio), `transacti
 - **Core Technologies:** Express.js with TypeScript, PostgreSQL with Drizzle ORM for persistent data, @neondatabase/serverless for DB connection.
 
 **Technical Implementations & Feature Specifications:**
-- **Modular Payment System:** Supports PawaPay (Mobile Money), LemonSqueezy (Card), and PayPal. All payment logic resides on the server. Designed for extensibility to add more providers.
+- **Modular Payment System:** Supports PawaPay (Mobile Money), MaishaPay (Card), and PayPal. All payment logic resides on the server. Designed for extensibility to add more providers.
 - **Calendly Integration:** Uses Calendly API v2 for event types and real-time slot availability, redirecting users to Calendly for final booking.
 - **Hybrid Chatbot (Refactored):** A floating `ChatWidget` with persistent conversations stored in PostgreSQL. Features:
   - **Versioned System Prompts:** Admin-managed prompts stored in `chatbot_system_prompts` table with version control and active flag.
@@ -65,7 +65,7 @@ Structured around `content` (API for trips, testimonials, portfolio), `transacti
 
 - **Payment Gateways:**
     - **PawaPay:** For Mobile Money transactions in 19 African countries (e.g., MTN, Orange, M-Pesa).
-    - **LemonSqueezy:** For credit card payments (Visa, Mastercard).
+    - **MaishaPay:** For credit card payments (Visa, Mastercard, American Express, UnionPay).
     - **PayPal:** For PayPal transactions.
 - **Scheduling:**
     - **Calendly API v2:** For managing and displaying booking availability.
