@@ -47,15 +47,26 @@ export class MaishaPayProvider implements PaymentProviderInterface {
     let pubKey = process.env.MAISHAPAY_PUBLIC_KEY;
     let secKey = process.env.MAISHAPAY_SECRET_KEY;
 
-    if (pubKey && secKey) {
-      const pubIsSK = pubKey.includes("SK") && !pubKey.includes("PK");
-      const secIsPK = secKey.includes("PK") && !secKey.includes("SK");
+    if (!pubKey || !secKey) {
+      if (!pubKey) console.warn("[MaishaPay] MAISHAPAY_PUBLIC_KEY is missing or empty");
+      if (!secKey) console.warn("[MaishaPay] MAISHAPAY_SECRET_KEY is missing or empty");
+    } else {
+      const pkPrefix = /^MP-(LIVE|TEST)PK-/;
+      const skPrefix = /^MP-(LIVE|TEST)SK-/;
+
+      const pubIsSK = skPrefix.test(pubKey);
+      const secIsPK = pkPrefix.test(secKey);
+
       if (pubIsSK && secIsPK) {
-        console.warn("[MaishaPay] Keys appear swapped — auto-correcting");
+        console.warn("[MaishaPay] Keys are swapped — auto-correcting. Update MAISHAPAY_PUBLIC_KEY with your PK key and MAISHAPAY_SECRET_KEY with your SK key.");
         [pubKey, secKey] = [secKey, pubKey];
       }
-      if (!secKey.includes("SK")) {
-        console.error("[MaishaPay] WARNING: MAISHAPAY_SECRET_KEY does not contain a secret key (expected MP-LIVESK-xxx). Current prefix:", secKey.substring(0, 12));
+
+      if (!pkPrefix.test(pubKey)) {
+        console.error("[MaishaPay] WARNING: MAISHAPAY_PUBLIC_KEY has unexpected format (expected MP-LIVEPK-xxx or MP-TESTPK-xxx). Current prefix:", pubKey.substring(0, 15));
+      }
+      if (!skPrefix.test(secKey)) {
+        console.error("[MaishaPay] WARNING: MAISHAPAY_SECRET_KEY has unexpected format (expected MP-LIVESK-xxx or MP-TESTSK-xxx). Current prefix:", secKey.substring(0, 15));
       }
     }
 
