@@ -14,6 +14,7 @@
 import type { Express, Request, Response } from "express";
 import { paymentService } from "./service";
 import { payPalProvider } from "./providers/paypal.provider";
+import { maishaPayProvider } from "./providers/maishapay.provider";
 import type { PaymentProvider, PaymentInitRequest } from "./types";
 
 export function registerPaymentRoutes(app: Express): void {
@@ -142,6 +143,97 @@ export function registerPaymentRoutes(app: Express): void {
     } catch (error) {
       console.error("[Payment] PayPal capture error:", error);
       res.redirect("/reservation?payment=error&message=internal_error");
+    }
+  });
+
+  app.get("/api/payments/maishapay/redirect", (req: Request, res: Response) => {
+    try {
+      const { paymentId, amount, currency } = req.query;
+
+      if (!paymentId || !amount) {
+        return res.status(400).send("Paramètres manquants");
+      }
+
+      if (!maishaPayProvider.isConfigured()) {
+        return res.status(500).send("MaishaPay n'est pas configuré");
+      }
+
+      const appUrl = process.env.APP_URL 
+        ? process.env.APP_URL 
+        : process.env.REPLIT_DEPLOYMENTS_URL
+          ? `https://${process.env.REPLIT_DEPLOYMENTS_URL}`
+          : process.env.REPLIT_DEV_DOMAIN 
+            ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
+            : "http://localhost:5000";
+
+      const callbackUrl = `${appUrl}/reservation?payment=success&id=${paymentId}&provider=maishapay`;
+      const formData = maishaPayProvider.getFormData(
+        paymentId as string,
+        parseFloat(amount as string),
+        (currency as string) || "USD",
+        callbackUrl
+      );
+      const checkoutUrl = maishaPayProvider.getCheckoutUrl();
+
+      const formFields = Object.entries(formData)
+        .map(([key, value]) => `<input type="hidden" name="${key}" value="${value}">`)
+        .join("\n        ");
+
+      const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Redirection vers MaishaPay...</title>
+  <style>
+    body { 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      height: 100vh; 
+      margin: 0; 
+      background: #000; 
+      color: #F2C94C; 
+      font-family: 'Inter', sans-serif;
+    }
+    .loader { 
+      text-align: center; 
+    }
+    .spinner {
+      border: 4px solid rgba(242,201,76,0.3);
+      border-top: 4px solid #F2C94C;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="loader">
+    <div class="spinner"></div>
+    <p>Redirection vers MaishaPay en cours...</p>
+    <p style="font-size: 12px; opacity: 0.7;">Veuillez patienter, ne fermez pas cette page.</p>
+  </div>
+  <form id="maishapayForm" action="${checkoutUrl}" method="POST" style="display:none;">
+        ${formFields}
+  </form>
+  <script>
+    document.getElementById('maishapayForm').submit();
+  </script>
+</body>
+</html>`;
+
+      res.setHeader("Content-Type", "text/html");
+      res.send(html);
+    } catch (error) {
+      console.error("[MaishaPay] Redirect error:", error);
+      res.status(500).send("Erreur lors de la redirection vers MaishaPay");
     }
   });
 
