@@ -198,7 +198,9 @@ export class MaishaPayProvider implements PaymentProviderInterface {
     _callbackUrl: string
   ): Promise<PaymentInitResponse> {
     const appUrl = getAppUrl();
-    const redirectUrl = `${appUrl}/api/payments/maishapay/redirect?paymentId=${encodeURIComponent(paymentId)}&amount=${request.amount}&currency=${encodeURIComponent(request.currency || "USD")}`;
+    const supportedCurrencies: Record<string, string> = { "USD": "USD", "CDF": "CDF" };
+    const normalizedCurrency = supportedCurrencies[(request.currency || "USD").toUpperCase()] || "USD";
+    const redirectUrl = `${appUrl}/api/payments/maishapay/redirect?paymentId=${encodeURIComponent(paymentId)}&amount=${request.amount}&currency=${encodeURIComponent(normalizedCurrency)}`;
 
     console.log("[MaishaPay] Using checkout form fallback:", redirectUrl);
 
