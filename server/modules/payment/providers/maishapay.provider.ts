@@ -70,14 +70,11 @@ export class MaishaPayProvider implements PaymentProviderInterface {
   }
 
   getCheckoutFormData(paymentId: string, amount: number, currency: string, callbackUrl: string): Record<string, string> {
-    const deviseMap: Record<string, string> = {
-      "EUR": "EURO",
+    const supportedDevises: Record<string, string> = {
       "USD": "USD",
       "CDF": "CDF",
-      "XAF": "FCFA",
-      "FCFA": "FCFA",
     };
-    const devise = deviseMap[currency.toUpperCase()] || "USD";
+    const devise = supportedDevises[currency.toUpperCase()] || "USD";
 
     return {
       gatewayMode: this.gatewayMode,
@@ -110,14 +107,16 @@ export class MaishaPayProvider implements PaymentProviderInterface {
 
       const callbackUrl = `${appUrl}/api/payments/maishapay/callback/${paymentId}`;
 
-      const currencyMap: Record<string, string> = {
-        "EUR": "EURO",
+      const supportedCurrencies: Record<string, string> = {
         "USD": "USD",
         "CDF": "CDF",
-        "XAF": "FCFA",
-        "FCFA": "FCFA",
       };
-      const currency = currencyMap[(request.currency || "USD").toUpperCase()] || "USD";
+      const requestCurrency = (request.currency || "USD").toUpperCase();
+      const currency = supportedCurrencies[requestCurrency] || "USD";
+
+      if (!supportedCurrencies[requestCurrency]) {
+        console.log(`[MaishaPay] Currency ${requestCurrency} not supported for card payments, using USD`);
+      }
 
       console.log("[MaishaPay] Initiating card payment:", paymentId, "amount:", request.amount, currency);
 
