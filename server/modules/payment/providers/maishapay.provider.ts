@@ -51,22 +51,12 @@ export class MaishaPayProvider implements PaymentProviderInterface {
       if (!pubKey) console.warn("[MaishaPay] MAISHAPAY_PUBLIC_KEY is missing or empty");
       if (!secKey) console.warn("[MaishaPay] MAISHAPAY_SECRET_KEY is missing or empty");
     } else {
-      const pkPrefix = /^MP-(LIVE|TEST)PK-/;
-      const skPrefix = /^MP-(LIVE|TEST)SK-/;
-
-      const pubIsSK = skPrefix.test(pubKey);
-      const secIsPK = pkPrefix.test(secKey);
-
-      if (pubIsSK && secIsPK) {
-        console.warn("[MaishaPay] Keys are swapped — auto-correcting. Update MAISHAPAY_PUBLIC_KEY with your PK key and MAISHAPAY_SECRET_KEY with your SK key.");
-        [pubKey, secKey] = [secKey, pubKey];
+      const validPrefix = /^MP-(LIVE|TEST|SB)(PK|SK)-/;
+      if (!validPrefix.test(pubKey)) {
+        console.warn("[MaishaPay] MAISHAPAY_PUBLIC_KEY has unexpected format. Current prefix:", pubKey.substring(0, 15));
       }
-
-      if (!pkPrefix.test(pubKey)) {
-        console.error("[MaishaPay] WARNING: MAISHAPAY_PUBLIC_KEY has unexpected format (expected MP-LIVEPK-xxx or MP-TESTPK-xxx). Current prefix:", pubKey.substring(0, 15));
-      }
-      if (!skPrefix.test(secKey)) {
-        console.error("[MaishaPay] WARNING: MAISHAPAY_SECRET_KEY has unexpected format (expected MP-LIVESK-xxx or MP-TESTSK-xxx). Current prefix:", secKey.substring(0, 15));
+      if (!validPrefix.test(secKey)) {
+        console.warn("[MaishaPay] MAISHAPAY_SECRET_KEY has unexpected format. Current prefix:", secKey.substring(0, 15));
       }
     }
 
@@ -140,12 +130,12 @@ export class MaishaPayProvider implements PaymentProviderInterface {
           amount: request.amount.toString(),
           currency: currency,
           customerFullName: request.customerName || "Client",
+          customerPhoneNumber: request.customerPhone || "",
           customerEmailAdress: request.customerEmail || "",
         },
         paymentChannel: {
           channel: "CARD",
           provider: "VISA",
-          walletID: request.customerPhone || request.customerEmail || "",
           callbackUrl: callbackUrl,
         },
       };
