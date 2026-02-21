@@ -200,7 +200,64 @@ class PaymentService {
       };
     }
 
-    return providerInstance.handleWebhook(payload);
+    const result = await providerInstance.handleWebhook(payload);
+
+    try {
+      let paymentId: string | undefined;
+      let newStatus: "success" | "failed" | undefined;
+      let externalId: string | undefined;
+
+      if (provider === "pawapay") {
+        const depositId = payload.data.depositId as string;
+        externalId = depositId;
+        const webhookStatus = (payload.data.status as string || "").toUpperCase();
+        if (webhookStatus === "COMPLETED") newStatus = "success";
+        else if (webhookStatus === "FAILED" || webhookStatus === "REJECTED") newStatus = "failed";
+
+        if (depositId && newStatus) {
+          const metadata = payload.data.metadata as Array<{ fieldName: string; fieldValue: string }> | undefined;
+          const pidMeta = metadata?.find((m: { fieldName: string }) => m.fieldName === "payment_id");
+          paymentId = pidMeta?.fieldValue;
+          if (!paymentId) {
+            const allPayments = await db.select().from(payments).where(eq(payments.externalId, depositId));
+            if (allPayments.length > 0) paymentId = allPayments[0].id;
+          }
+        }
+      } else if (provider === "maishapay") {
+        const refId = payload.data.transactionRefId as string;
+        const status = String(payload.data.status || "");
+        if (status === "202" || status === "200") newStatus = "success";
+        else if (status) newStatus = "failed";
+        if (refId) {
+          externalId = refId;
+          const found = await db.select().from(payments).where(eq(payments.externalId, refId));
+          if (found.length > 0) paymentId = found[0].id;
+        }
+      } else if (provider === "paypal") {
+        const event = payload.event;
+        if (event === "PAYMENT.CAPTURE.COMPLETED") newStatus = "success";
+        else if (event === "PAYMENT.CAPTURE.DENIED") newStatus = "failed";
+        const resource = payload.data as Record<string, unknown>;
+        const resourceId = resource.id as string;
+        const customId = resource.custom_id as string;
+        if (resourceId) externalId = resourceId;
+        if (customId) {
+          paymentId = customId;
+        } else if (resourceId) {
+          const found = await db.select().from(payments).where(eq(payments.externalId, resourceId));
+          if (found.length > 0) paymentId = found[0].id;
+        }
+      }
+
+      if (paymentId && newStatus) {
+        await this.updatePaymentStatus(paymentId, newStatus, externalId);
+        console.log(`[Payment] DB updated: ${paymentId} -> ${newStatus}`);
+      }
+    } catch (dbError) {
+      console.error("[Payment] Failed to update DB from webhook:", dbError instanceof Error ? dbError.message : "unknown");
+    }
+
+    return result;
   }
 
   async getPayment(paymentId: string): Promise<PaymentRecord | undefined> {

@@ -79,8 +79,6 @@ export class PawaPayProvider implements PaymentProviderInterface {
         activeCorrespondent
       );
 
-      console.log("[PawaPay] Converting:", request.amount, request.currency, "->", localAmount, localCurrency);
-
       const depositPayload = {
         depositId,
         amount: localAmount.toString(),
@@ -102,7 +100,7 @@ export class PawaPayProvider implements PaymentProviderInterface {
         ],
       };
 
-      console.log("[PawaPay] Initiating deposit:", depositId, "phone:", phoneNumber, "amount:", request.amount);
+      console.log("[PawaPay] Initiating deposit:", depositId, "amount:", localAmount, localCurrency);
 
       const response = await fetch(`${this.baseUrl}/deposits`, {
         method: "POST",
@@ -114,7 +112,7 @@ export class PawaPayProvider implements PaymentProviderInterface {
       });
 
       const responseText = await response.text();
-      console.log("[PawaPay] Response status:", response.status, "body:", responseText);
+      console.log("[PawaPay] Response status:", response.status);
 
       if (!response.ok) {
         console.error("[PawaPay] Init error:", responseText);
@@ -221,8 +219,6 @@ export class PawaPayProvider implements PaymentProviderInterface {
   }
 
   async handleWebhook(payload: WebhookPayload): Promise<{ success: boolean; message: string }> {
-    console.log("[PawaPay] Webhook received:", payload.event);
-    
     const { data } = payload;
     const status = this.mapStatus(data.status as string);
     const depositId = data.depositId as string;
@@ -231,7 +227,7 @@ export class PawaPayProvider implements PaymentProviderInterface {
       console.log("[PawaPay] Payment confirmed:", depositId);
       return { success: true, message: "Paiement confirmé" };
     } else if (status === "failed") {
-      console.log("[PawaPay] Payment failed:", depositId, data.failureReason);
+      console.log("[PawaPay] Payment failed:", depositId);
       return { success: false, message: "Paiement échoué" };
     }
 

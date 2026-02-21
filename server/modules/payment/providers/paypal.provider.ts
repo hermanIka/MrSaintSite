@@ -289,23 +289,64 @@ export class PayPalProvider implements PaymentProviderInterface {
     }
   }
 
+  async verifyWebhookSignature(headers: Record<string, string | undefined>, body: string): Promise<boolean> {
+    const webhookId = process.env.PAYPAL_WEBHOOK_ID;
+    if (!webhookId) {
+      const isProduction = process.env.NODE_ENV === "production";
+      if (isProduction) {
+        console.warn("[PayPal] PAYPAL_WEBHOOK_ID not configured - rejecting webhook in production");
+        return false;
+      }
+      return true;
+    }
+
+    try {
+      const accessToken = await this.getAccessToken();
+      if (!accessToken) return false;
+
+      const verifyPayload = {
+        auth_algo: headers["paypal-auth-algo"] || "",
+        cert_url: headers["paypal-cert-url"] || "",
+        transmission_id: headers["paypal-transmission-id"] || "",
+        transmission_sig: headers["paypal-transmission-sig"] || "",
+        transmission_time: headers["paypal-transmission-time"] || "",
+        webhook_id: webhookId,
+        webhook_event: JSON.parse(body),
+      };
+
+      const response = await fetch(`${this.baseUrl}/v1/notifications/verify-webhook-signature`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(verifyPayload),
+      });
+
+      if (!response.ok) return false;
+      const result = await response.json();
+      return result.verification_status === "SUCCESS";
+    } catch (error) {
+      console.error("[PayPal] Webhook signature verification failed:", error instanceof Error ? error.message : "unknown");
+      return false;
+    }
+  }
+
   async handleWebhook(payload: WebhookPayload): Promise<{ success: boolean; message: string }> {
-    console.log("[PayPal] Webhook received:", payload.event);
-    
     const eventType = payload.event;
     
     if (eventType === "CHECKOUT.ORDER.APPROVED") {
-      console.log("[PayPal] Order approved:", payload.data);
+      console.log("[PayPal] Order approved");
       return { success: true, message: "Commande approuvée" };
     }
 
     if (eventType === "PAYMENT.CAPTURE.COMPLETED") {
-      console.log("[PayPal] Payment captured:", payload.data);
+      console.log("[PayPal] Payment captured");
       return { success: true, message: "Paiement capturé" };
     }
 
     if (eventType === "PAYMENT.CAPTURE.DENIED") {
-      console.log("[PayPal] Payment denied:", payload.data);
+      console.log("[PayPal] Payment denied");
       return { success: false, message: "Paiement refusé" };
     }
 

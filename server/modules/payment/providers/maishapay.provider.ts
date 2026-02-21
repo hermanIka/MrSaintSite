@@ -143,7 +143,7 @@ export class MaishaPayProvider implements PaymentProviderInterface {
         console.log(`[MaishaPay] Currency ${requestCurrency} not supported for card payments, using USD`);
       }
 
-      console.log("[MaishaPay] Initiating card payment:", paymentId, "amount:", request.amount, currency);
+      console.log("[MaishaPay] Initiating card payment:", paymentId);
 
       const payload = {
         transactionReference: paymentId,
@@ -176,7 +176,7 @@ export class MaishaPayProvider implements PaymentProviderInterface {
       });
 
       const responseText = await response.text();
-      console.log("[MaishaPay] API Response status:", response.status, "body:", responseText.substring(0, 500));
+      console.log("[MaishaPay] API Response status:", response.status);
 
       let data: any;
       try {
@@ -191,7 +191,7 @@ export class MaishaPayProvider implements PaymentProviderInterface {
       const transactionId = responseData?.transactionId || responseData?.reference;
 
       if (paymentPage) {
-        console.log("[MaishaPay] Got payment page URL:", paymentPage);
+        console.log("[MaishaPay] Got payment page URL");
         return {
           success: true,
           paymentId,
@@ -227,7 +227,7 @@ export class MaishaPayProvider implements PaymentProviderInterface {
     const normalizedCurrency = supportedCurrencies[(request.currency || "USD").toUpperCase()] || "USD";
     const redirectUrl = `${appUrl}/api/payments/maishapay/redirect?paymentId=${encodeURIComponent(paymentId)}&amount=${request.amount}&currency=${encodeURIComponent(normalizedCurrency)}`;
 
-    console.log("[MaishaPay] Using checkout form fallback:", redirectUrl);
+    console.log("[MaishaPay] Using checkout form fallback");
 
     return {
       success: true,
@@ -264,19 +264,16 @@ export class MaishaPayProvider implements PaymentProviderInterface {
   }
 
   async handleWebhook(payload: WebhookPayload): Promise<{ success: boolean; message: string }> {
-    console.log("[MaishaPay] Callback received:", JSON.stringify(payload.data));
-    
-    const status = (payload.data?.status as string || "").toString();
-    const description = payload.data?.description as string || "";
+    const status = String(payload.data?.status || "");
     const transactionRefId = payload.data?.transactionRefId as string || "";
 
     if (status === "202" || status === "200") {
-      console.log("[MaishaPay] Payment successful - ref:", transactionRefId, "desc:", description);
+      console.log("[MaishaPay] Payment successful - ref:", transactionRefId);
       return { success: true, message: "Paiement réussi" };
     }
 
-    console.log("[MaishaPay] Payment status:", status, "desc:", description);
-    return { success: false, message: description || "Paiement non confirmé" };
+    console.log("[MaishaPay] Payment status:", status);
+    return { success: false, message: "Paiement non confirmé" };
   }
 }
 
