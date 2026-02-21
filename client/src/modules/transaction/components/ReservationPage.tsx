@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Link, useSearch } from "wouter";
 import { FileText, Briefcase, Plane, CheckCircle, Calendar as CalendarIcon, CreditCard, Lock, ArrowLeft, Clock } from "lucide-react";
 import CalendarBooking from "./CalendarBooking";
+import CalendlyWidget from "./CalendlyWidget";
 import { PaymentMethodSelector } from "./PaymentMethodSelector";
 import reservationHero from "@/assets/images/reservation-hero.png";
 
@@ -415,33 +416,11 @@ export default function ReservationPage() {
               </Card>
 
               {selectedSlot && (
-                <Card data-testid="card-calendly-inline-booking">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3 mb-4">
-                      <CalendarIcon className="w-5 h-5 text-primary" />
-                      <div>
-                        <p className="font-medium">Finalisez votre réservation</p>
-                        <p className="text-sm text-muted-foreground">
-                          Remplissez vos informations pour confirmer le créneau sélectionné
-                        </p>
-                      </div>
-                    </div>
-                    <div 
-                      className="rounded-lg overflow-hidden border border-border"
-                      style={{ minHeight: "700px" }}
-                      data-testid="calendly-inline-widget"
-                    >
-                      <iframe
-                        src={`${selectedSlot.schedulingUrl}?hide_gdpr_banner=1&primary_color=f2c94c&text_color=ffffff&background_color=1a1a1a`}
-                        width="100%"
-                        height="700"
-                        frameBorder="0"
-                        title="Calendly - Finaliser la réservation"
-                        data-testid="iframe-calendly"
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
+                <CalendlyWidget
+                  schedulingUrl={selectedSlot.schedulingUrl}
+                  selectedDate={selectedSlot.date}
+                  selectedTime={selectedSlot.time}
+                />
               )}
 
               <div className="flex justify-center">

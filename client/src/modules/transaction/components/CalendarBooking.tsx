@@ -13,6 +13,7 @@ import {
   Loader2,
   CreditCard
 } from "lucide-react";
+import CalendlyWidget from "./CalendlyWidget";
 import {
   Select,
   SelectContent,
@@ -355,23 +356,12 @@ export default function CalendarBooking({
         </Card>
 
         {selectedSlotUrl && (
-          <Card data-testid="card-calendly-inline">
-            <CardContent className="p-4">
-              <div 
-                className="rounded-lg overflow-hidden border border-border"
-                style={{ minHeight: "700px" }}
-              >
-                <iframe
-                  src={`${selectedSlotUrl}?hide_gdpr_banner=1&primary_color=f2c94c&text_color=ffffff&background_color=1a1a1a`}
-                  width="100%"
-                  height="700"
-                  frameBorder="0"
-                  title="Calendly - Finaliser la réservation"
-                  data-testid="iframe-calendly-booking"
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <CalendlyWidget
+            schedulingUrl={selectedSlotUrl}
+            selectedDate={selectedDate || undefined}
+            selectedTime={selectedTime || undefined}
+            serviceName={serviceName}
+          />
         )}
       </div>
     );
