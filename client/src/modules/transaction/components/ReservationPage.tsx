@@ -41,20 +41,33 @@ export default function ReservationPage() {
     
     if (paymentStatus === "success" && id) {
       setPaymentId(id);
-      const savedSlot = localStorage.getItem('mr-saint-selected-slot');
-      if (savedSlot) {
-        try {
-          const parsed = JSON.parse(savedSlot);
-          setSelectedSlot({
-            date: new Date(parsed.date),
-            time: parsed.time,
-            schedulingUrl: parsed.schedulingUrl
-          });
-        } catch (e) {
-          console.error('Failed to parse saved slot:', e);
-        }
-      }
-      setCurrentStep("success");
+      fetch(`/api/payments/status/${encodeURIComponent(id)}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.success && data.status === "success") {
+            const savedSlot = localStorage.getItem('mr-saint-selected-slot');
+            if (savedSlot) {
+              try {
+                const parsed = JSON.parse(savedSlot);
+                setSelectedSlot({
+                  date: new Date(parsed.date),
+                  time: parsed.time,
+                  schedulingUrl: parsed.schedulingUrl
+                });
+              } catch (e) {
+                console.error('Failed to parse saved slot:', e);
+              }
+            }
+            setCurrentStep("success");
+          } else {
+            toast({ title: "Paiement non confirmé", description: "Le paiement n'a pas été validé.", variant: "destructive" });
+            setCurrentStep("select");
+          }
+        })
+        .catch(() => {
+          toast({ title: "Erreur", description: "Impossible de vérifier le paiement.", variant: "destructive" });
+          setCurrentStep("select");
+        });
     } else if (paymentStatus === "cancelled" || paymentStatus === "failed") {
       setCurrentStep("select");
     }
@@ -434,6 +447,7 @@ export default function ReservationPage() {
                         serviceName={paymentLabel}
                         amount={paymentAmount}
                         currency="EUR"
+                        paymentMode={paymentMode}
                         onSuccess={handlePaymentSuccess}
                         onPendingVerification={handlePendingVerification}
                       />

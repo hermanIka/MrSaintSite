@@ -3,6 +3,7 @@
  * 
  * Service centralisé pour la gestion des paiements.
  * Orchestre les 3 providers : PawaPay, MaishaPay, PayPal
+ * Persiste les paiements en base de données PostgreSQL.
  */
 
 import type {
@@ -18,15 +19,23 @@ import type {
 import { pawaPayProvider } from "./providers/pawapay.provider";
 import { maishaPayProvider } from "./providers/maishapay.provider";
 import { payPalProvider } from "./providers/paypal.provider";
+import { db } from "../../db";
+import { payments } from "@shared/schema";
+import { eq } from "drizzle-orm";
+
+const CONSULTATION_PRICE = 20;
+
+const SERVICE_PRICES: Record<string, { price: number; consultationPrice: number }> = {
+  visa: { price: 75, consultationPrice: CONSULTATION_PRICE },
+  agence: { price: 750, consultationPrice: CONSULTATION_PRICE },
+  voyage: { price: 1200, consultationPrice: CONSULTATION_PRICE },
+};
 
 class PaymentService {
   private providers: Map<PaymentProvider, PaymentProviderInterface>;
-  private payments: Map<string, PaymentRecord>;
 
   constructor() {
     this.providers = new Map();
-    this.payments = new Map();
-    
     this.providers.set("pawapay", pawaPayProvider);
     this.providers.set("maishapay", maishaPayProvider);
     this.providers.set("paypal", payPalProvider);
@@ -56,7 +65,26 @@ class PaymentService {
     ];
   }
 
-  async initPayment(request: PaymentInitRequest): Promise<PaymentInitResponse> {
+  validateAmount(serviceId: string, amount: number, paymentMode: string = "direct"): { valid: boolean; expectedAmount: number; message?: string } {
+    const serviceConfig = SERVICE_PRICES[serviceId];
+    if (!serviceConfig) {
+      return { valid: false, expectedAmount: 0, message: `Service inconnu: ${serviceId}` };
+    }
+
+    const expectedAmount = paymentMode === "consultation" ? serviceConfig.consultationPrice : serviceConfig.price;
+
+    if (amount !== expectedAmount) {
+      return {
+        valid: false,
+        expectedAmount,
+        message: `Montant invalide. Attendu: ${expectedAmount}€, reçu: ${amount}€`,
+      };
+    }
+
+    return { valid: true, expectedAmount };
+  }
+
+  async initPayment(request: PaymentInitRequest & { paymentMode?: string }): Promise<PaymentInitResponse> {
     const provider = this.getProvider(request.provider);
     
     if (!provider) {
@@ -79,26 +107,44 @@ class PaymentService {
       };
     }
 
+    const paymentMode = request.paymentMode || "direct";
+    const validation = this.validateAmount(request.serviceId, request.amount, paymentMode);
+    if (!validation.valid) {
+      console.warn("[Payment] Amount validation failed:", validation.message);
+      return {
+        success: false,
+        paymentId: "",
+        provider: request.provider,
+        status: "failed",
+        message: validation.message || "Montant invalide.",
+      };
+    }
+
     const result = await provider.initPayment(request);
 
     if (result.success && result.paymentId) {
-      const record: PaymentRecord = {
-        id: result.paymentId,
-        provider: request.provider,
-        externalId: result.externalId,
-        amount: request.amount,
-        currency: request.currency,
-        status: result.status,
-        serviceId: request.serviceId,
-        serviceName: request.serviceName,
-        customerEmail: request.customerEmail,
-        customerName: request.customerName,
-        customerPhone: request.customerPhone,
-        metadata: request.metadata,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      this.payments.set(result.paymentId, record);
+      try {
+        const now = new Date().toISOString();
+        await db.insert(payments).values({
+          id: result.paymentId,
+          provider: request.provider,
+          externalId: result.externalId || null,
+          amount: request.amount,
+          currency: request.currency,
+          status: result.status,
+          serviceId: request.serviceId,
+          serviceName: request.serviceName,
+          customerEmail: request.customerEmail,
+          customerName: request.customerName || null,
+          customerPhone: request.customerPhone || null,
+          paymentMode,
+          metadata: request.metadata ? JSON.stringify(request.metadata) : null,
+          createdAt: now,
+          updatedAt: now,
+        });
+      } catch (dbError) {
+        console.error("[Payment] Failed to persist payment to DB:", dbError);
+      }
     }
 
     return result;
@@ -116,20 +162,29 @@ class PaymentService {
       };
     }
 
-    const record = this.payments.get(request.paymentId);
+    const record = await this.getPayment(request.paymentId);
     if (record) {
-      request.externalId = record.externalId;
+      request.externalId = record.externalId || undefined;
     }
 
     const result = await provider.verifyPayment(request);
 
     if (record && result.status !== record.status) {
-      record.status = result.status;
-      record.updatedAt = new Date().toISOString();
-      if (result.paidAt) {
-        record.paidAt = result.paidAt;
+      try {
+        const updateData: Record<string, string> = {
+          status: result.status,
+          updatedAt: new Date().toISOString(),
+        };
+        if (result.paidAt) {
+          updateData.paidAt = result.paidAt;
+        }
+        if (result.status === "success" && !result.paidAt) {
+          updateData.paidAt = new Date().toISOString();
+        }
+        await db.update(payments).set(updateData).where(eq(payments.id, request.paymentId));
+      } catch (dbError) {
+        console.error("[Payment] Failed to update payment status in DB:", dbError);
       }
-      this.payments.set(request.paymentId, record);
     }
 
     return result;
@@ -148,23 +203,54 @@ class PaymentService {
     return providerInstance.handleWebhook(payload);
   }
 
-  getPayment(paymentId: string): PaymentRecord | undefined {
-    return this.payments.get(paymentId);
+  async getPayment(paymentId: string): Promise<PaymentRecord | undefined> {
+    try {
+      const [record] = await db.select().from(payments).where(eq(payments.id, paymentId));
+      if (!record) return undefined;
+
+      return {
+        id: record.id,
+        provider: record.provider as PaymentProvider,
+        externalId: record.externalId || undefined,
+        amount: record.amount,
+        currency: record.currency,
+        status: record.status as PaymentRecord["status"],
+        serviceId: record.serviceId,
+        serviceName: record.serviceName,
+        customerEmail: record.customerEmail,
+        customerName: record.customerName || undefined,
+        customerPhone: record.customerPhone || undefined,
+        metadata: record.metadata ? JSON.parse(record.metadata) : undefined,
+        createdAt: record.createdAt,
+        updatedAt: record.updatedAt,
+        paidAt: record.paidAt || undefined,
+      };
+    } catch (dbError) {
+      console.error("[Payment] Failed to get payment from DB:", dbError);
+      return undefined;
+    }
   }
 
-  updatePaymentStatus(paymentId: string, status: PaymentRecord["status"], externalId?: string): void {
-    const record = this.payments.get(paymentId);
-    if (record) {
-      record.status = status;
-      record.updatedAt = new Date().toISOString();
+  async updatePaymentStatus(paymentId: string, status: PaymentRecord["status"], externalId?: string): Promise<void> {
+    try {
+      const updateData: Record<string, string> = {
+        status,
+        updatedAt: new Date().toISOString(),
+      };
       if (externalId) {
-        record.externalId = externalId;
+        updateData.externalId = externalId;
       }
       if (status === "success") {
-        record.paidAt = new Date().toISOString();
+        updateData.paidAt = new Date().toISOString();
       }
-      this.payments.set(paymentId, record);
+      await db.update(payments).set(updateData).where(eq(payments.id, paymentId));
+    } catch (dbError) {
+      console.error("[Payment] Failed to update payment status in DB:", dbError);
     }
+  }
+
+  getServicePrices(): Record<string, { price: number; consultationPrice: number }> {
+    return { ...SERVICE_PRICES };
   }
 
   private getProviderLabel(provider: PaymentProvider): string {

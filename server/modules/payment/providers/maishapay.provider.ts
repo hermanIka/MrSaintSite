@@ -69,25 +69,50 @@ export class MaishaPayProvider implements PaymentProviderInterface {
     return !!this.publicKey && !!this.secretKey;
   }
 
-  getCheckoutFormData(paymentId: string, amount: number, currency: string, callbackUrl: string): Record<string, string> {
+  async getServerSideCheckoutUrl(paymentId: string, amount: number, currency: string, callbackUrl: string): Promise<string | null> {
     const supportedDevises: Record<string, string> = {
       "USD": "USD",
       "CDF": "CDF",
     };
     const devise = supportedDevises[currency.toUpperCase()] || "USD";
 
-    return {
-      gatewayMode: this.gatewayMode,
-      publicApiKey: this.publicKey || "",
-      secretApiKey: this.secretKey || "",
-      montant: amount.toString(),
-      devise: devise,
-      callbackUrl: callbackUrl,
-    };
-  }
+    try {
+      const payload = {
+        transactionReference: paymentId,
+        gatewayMode: this.gatewayMode,
+        publicApiKey: this.publicKey,
+        secretApiKey: this.secretKey,
+        order: {
+          amount: amount.toString(),
+          currency: devise,
+          customerFullName: "Client",
+          customerPhoneNumber: "",
+          customerEmailAdress: "",
+        },
+        paymentChannel: {
+          channel: "CARD",
+          provider: "VISA",
+          callbackUrl: callbackUrl,
+        },
+      };
 
-  getCheckoutUrl(): string {
-    return "https://marchand.maishapay.online/payment/vers1.0/merchant/checkout";
+      const response = await fetch(`${this.apiBaseUrl}/collect/v2/store/card`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const responseText = await response.text();
+      const data = JSON.parse(responseText);
+      const responseData = data?.original?.data || data?.data || data;
+      return responseData?.paymentPage || null;
+    } catch (error) {
+      console.error("[MaishaPay] Server-side checkout URL failed:", error);
+      return null;
+    }
   }
 
   async initPayment(request: PaymentInitRequest): Promise<PaymentInitResponse> {

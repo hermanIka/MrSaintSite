@@ -21,6 +21,7 @@ export interface PaymentInitRequest {
   correspondent?: string;
   countryCode?: string;
   metadata?: Record<string, string>;
+  paymentMode?: string;
 }
 
 export interface PaymentInitResponse {

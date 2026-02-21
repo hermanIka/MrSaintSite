@@ -17,6 +17,7 @@ interface PaymentMethodSelectorProps {
   serviceName: string;
   amount: number;
   currency?: string;
+  paymentMode?: string;
   onSuccess?: (paymentId: string) => void;
   onPendingVerification?: (paymentId: string, provider: PaymentProvider, externalId?: string) => void;
   onError?: (message: string) => void;
@@ -53,6 +54,7 @@ export function PaymentMethodSelector({
   serviceName,
   amount,
   currency = "EUR",
+  paymentMode = "direct",
   onSuccess,
   onPendingVerification,
   onError,
@@ -107,6 +109,7 @@ export function PaymentMethodSelector({
         customerEmail,
         customerName,
         customerPhone,
+        paymentMode,
         correspondent: provider === "pawapay" ? selectedOperator : undefined,
         countryCode: provider === "pawapay" ? selectedCountry : undefined,
       });

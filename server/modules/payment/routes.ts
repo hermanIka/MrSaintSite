@@ -11,11 +11,46 @@
  * - POST /api/webhooks/:provider - Webhooks
  */
 
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { paymentService } from "./service";
 import { payPalProvider } from "./providers/paypal.provider";
 import { maishaPayProvider } from "./providers/maishapay.provider";
 import type { PaymentProvider, PaymentInitRequest } from "./types";
+
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 5;
+
+function rateLimitMiddleware(req: Request, res: Response, next: NextFunction): void {
+  const ip = req.ip || req.socket.remoteAddress || "unknown";
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    next();
+    return;
+  }
+
+  if (entry.count >= RATE_LIMIT_MAX) {
+    res.status(429).json({
+      success: false,
+      message: "Trop de tentatives de paiement. Veuillez réessayer dans une minute.",
+    });
+    return;
+  }
+
+  entry.count++;
+  next();
+}
+
+setInterval(() => {
+  const now = Date.now();
+  rateLimitMap.forEach((_entry, ip) => {
+    const entry = rateLimitMap.get(ip);
+    if (entry && now > entry.resetAt) rateLimitMap.delete(ip);
+  });
+}, 60_000);
 
 export function registerPaymentRoutes(app: Express): void {
   app.get("/api/payments/providers", (_req: Request, res: Response) => {
@@ -26,7 +61,7 @@ export function registerPaymentRoutes(app: Express): void {
     });
   });
 
-  app.post("/api/payments/init", async (req: Request, res: Response) => {
+  app.post("/api/payments/init", rateLimitMiddleware, async (req: Request, res: Response) => {
     try {
       const {
         provider,
@@ -40,6 +75,7 @@ export function registerPaymentRoutes(app: Express): void {
         correspondent,
         countryCode,
         metadata,
+        paymentMode,
       } = req.body;
 
       if (!provider || !amount || !serviceId || !serviceName || !customerEmail) {
@@ -57,7 +93,7 @@ export function registerPaymentRoutes(app: Express): void {
         });
       }
 
-      const request: PaymentInitRequest = {
+      const request = {
         provider,
         amount: parseFloat(amount),
         currency,
@@ -69,6 +105,7 @@ export function registerPaymentRoutes(app: Express): void {
         correspondent,
         countryCode,
         metadata,
+        paymentMode: paymentMode || "direct",
       };
 
       const result = await paymentService.initPayment(request);
@@ -84,7 +121,7 @@ export function registerPaymentRoutes(app: Express): void {
     }
   });
 
-  app.get("/api/payments/verify/:paymentId", async (req: Request, res: Response) => {
+  app.get("/api/payments/verify/:paymentId", rateLimitMiddleware, async (req: Request, res: Response) => {
     try {
       const { paymentId } = req.params;
       const { provider } = req.query;
@@ -96,7 +133,7 @@ export function registerPaymentRoutes(app: Express): void {
         });
       }
 
-      const payment = paymentService.getPayment(paymentId);
+      const payment = await paymentService.getPayment(paymentId);
       const paymentProvider = (provider as PaymentProvider) || payment?.provider;
 
       if (!paymentProvider) {
@@ -112,7 +149,12 @@ export function registerPaymentRoutes(app: Express): void {
         externalId: payment?.externalId,
       });
 
-      res.json(result);
+      res.json({
+        success: result.success,
+        paymentId: result.paymentId,
+        status: result.status,
+        message: result.message,
+      });
     } catch (error) {
       console.error("[Payment] Verify error:", error);
       res.status(500).json({
@@ -134,7 +176,7 @@ export function registerPaymentRoutes(app: Express): void {
       
       if (captureResult.success) {
         if (payment_id) {
-          paymentService.updatePaymentStatus(payment_id as string, "success", token as string);
+          await paymentService.updatePaymentStatus(payment_id as string, "success", token as string);
         }
         return res.redirect(`/reservation?payment=success&id=${payment_id || token}`);
       } else {
@@ -146,7 +188,7 @@ export function registerPaymentRoutes(app: Express): void {
     }
   });
 
-  app.get("/api/payments/maishapay/callback/:paymentId", (req: Request, res: Response) => {
+  app.get("/api/payments/maishapay/callback/:paymentId", async (req: Request, res: Response) => {
     try {
       const { paymentId } = req.params;
       const { status, description, transactionRefId, operatorRefId } = req.query;
@@ -156,7 +198,7 @@ export function registerPaymentRoutes(app: Express): void {
       const isSuccess = status === "202" || status === "200";
       
       if (isSuccess) {
-        paymentService.updatePaymentStatus(paymentId, "success", (transactionRefId as string) || paymentId);
+        await paymentService.updatePaymentStatus(paymentId, "success", (transactionRefId as string) || paymentId);
       }
 
       const paymentResult = isSuccess ? "success" : "failed";
@@ -169,7 +211,7 @@ export function registerPaymentRoutes(app: Express): void {
     }
   });
 
-  app.get("/api/payments/maishapay/redirect", (req: Request, res: Response) => {
+  app.get("/api/payments/maishapay/redirect", async (req: Request, res: Response) => {
     try {
       const { paymentId, amount, currency } = req.query;
 
@@ -190,65 +232,34 @@ export function registerPaymentRoutes(app: Express): void {
             : "http://localhost:5000";
 
       const callbackUrl = `${appUrl}/api/payments/maishapay/callback/${paymentId}`;
-      const formData = maishaPayProvider.getCheckoutFormData(
+      
+      const checkoutUrl = await maishaPayProvider.getServerSideCheckoutUrl(
         paymentId as string,
         parseFloat(amount as string),
         (currency as string) || "USD",
         callbackUrl
       );
-      const checkoutUrl = maishaPayProvider.getCheckoutUrl();
 
-      const formFields = Object.entries(formData)
-        .map(([key, value]) => `<input type="hidden" name="${key}" value="${value}">`)
-        .join("\n        ");
+      if (checkoutUrl) {
+        return res.redirect(checkoutUrl);
+      }
 
       const html = `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Redirection vers MaishaPay...</title>
+  <title>Erreur de paiement</title>
   <style>
-    body { 
-      display: flex; 
-      justify-content: center; 
-      align-items: center; 
-      height: 100vh; 
-      margin: 0; 
-      background: #000; 
-      color: #F2C94C; 
-      font-family: 'Inter', sans-serif;
-    }
-    .loader { 
-      text-align: center; 
-    }
-    .spinner {
-      border: 4px solid rgba(242,201,76,0.3);
-      border-top: 4px solid #F2C94C;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 1s linear infinite;
-      margin: 0 auto 20px;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #000; color: #F2C94C; font-family: 'Inter', sans-serif; }
+    .loader { text-align: center; }
   </style>
 </head>
 <body>
   <div class="loader">
-    <div class="spinner"></div>
-    <p>Redirection vers MaishaPay en cours...</p>
-    <p style="font-size: 12px; opacity: 0.7;">Veuillez patienter, ne fermez pas cette page.</p>
+    <p>Impossible d'initialiser le paiement par carte. Veuillez réessayer.</p>
+    <p style="font-size: 12px; opacity: 0.7;"><a href="/reservation" style="color: #F2C94C;">Retour à la réservation</a></p>
   </div>
-  <form id="maishapayForm" action="${checkoutUrl}" method="POST" style="display:none;">
-        ${formFields}
-  </form>
-  <script>
-    document.getElementById('maishapayForm').submit();
-  </script>
 </body>
 </html>`;
 
@@ -257,6 +268,34 @@ export function registerPaymentRoutes(app: Express): void {
     } catch (error) {
       console.error("[MaishaPay] Redirect error:", error);
       res.status(500).send("Erreur lors de la redirection vers MaishaPay");
+    }
+  });
+
+  app.get("/api/payments/status/:paymentId", async (req: Request, res: Response) => {
+    try {
+      const { paymentId } = req.params;
+      const payment = await paymentService.getPayment(paymentId);
+
+      if (!payment) {
+        return res.status(404).json({
+          success: false,
+          message: "Paiement introuvable.",
+        });
+      }
+
+      res.json({
+        success: true,
+        status: payment.status,
+        provider: payment.provider,
+        amount: payment.amount,
+        currency: payment.currency,
+      });
+    } catch (error) {
+      console.error("[Payment] Status check error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Erreur lors de la vérification du statut.",
+      });
     }
   });
 

@@ -252,6 +252,34 @@ export const CREDIT_REQUEST_STATUS = [
 ] as const;
 
 // ==========================================
+// PAYMENTS MODULE - Persistent payment records
+// ==========================================
+
+export const payments = pgTable("payments", {
+  id: varchar("id").primaryKey(),
+  provider: text("provider").notNull(),
+  externalId: text("external_id"),
+  amount: integer("amount").notNull(),
+  currency: text("currency").notNull(),
+  status: text("status").notNull().default("pending"),
+  serviceId: text("service_id").notNull(),
+  serviceName: text("service_name").notNull(),
+  customerEmail: text("customer_email").notNull(),
+  customerName: text("customer_name"),
+  customerPhone: text("customer_phone"),
+  paymentMode: text("payment_mode").notNull().default("direct"),
+  metadata: text("metadata"),
+  paidAt: text("paid_at"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export const insertPaymentSchema = createInsertSchema(payments);
+
+export type InsertPayment = z.infer<typeof insertPaymentSchema>;
+export type Payment = typeof payments.$inferSelect;
+
+// ==========================================
 // CHATBOT MODULE - Tables sécurisées
 // ==========================================
 
