@@ -41,24 +41,6 @@ export default function CalendlyWidget({
     };
   }, [theme]);
 
-  const calendlyUrl = useMemo(() => {
-    try {
-      const url = new URL(schedulingUrl.startsWith("http") ? schedulingUrl : `https://${schedulingUrl}`);
-      if (theme === "dark") {
-        url.searchParams.set("background_color", "0d0d0d");
-        url.searchParams.set("text_color", "fafafa");
-        url.searchParams.set("primary_color", "e6a817");
-      } else {
-        url.searchParams.set("background_color", "ffffff");
-        url.searchParams.set("text_color", "0d0d0d");
-        url.searchParams.set("primary_color", "e6a817");
-      }
-      return url.toString();
-    } catch {
-      return schedulingUrl;
-    }
-  }, [schedulingUrl, theme]);
-
   const formatDate = (date: Date) =>
     date.toLocaleDateString("fr-FR", {
       weekday: "long",
@@ -147,7 +129,7 @@ export default function CalendlyWidget({
       <CardContent className="p-0" data-testid="calendly-inline-widget">
         <InlineWidget
           key={theme}
-          url={calendlyUrl}
+          url={schedulingUrl}
           pageSettings={pageSettings}
           styles={{
             height: `${height}px`,
