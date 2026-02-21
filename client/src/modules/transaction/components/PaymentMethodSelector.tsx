@@ -18,6 +18,7 @@ interface PaymentMethodSelectorProps {
   amount: number;
   currency?: string;
   onSuccess?: (paymentId: string) => void;
+  onPendingVerification?: (paymentId: string, provider: PaymentProvider, externalId?: string) => void;
   onError?: (message: string) => void;
 }
 
@@ -26,6 +27,7 @@ interface PaymentInitResponse {
   paymentId: string;
   provider: PaymentProvider;
   status: string;
+  externalId?: string;
   redirectUrl?: string;
   checkoutUrl?: string;
   message?: string;
@@ -52,6 +54,7 @@ export function PaymentMethodSelector({
   amount,
   currency = "EUR",
   onSuccess,
+  onPendingVerification,
   onError,
 }: PaymentMethodSelectorProps) {
   const [selectedMethod, setSelectedMethod] = useState<PaymentProvider | null>(null);
@@ -113,6 +116,12 @@ export function PaymentMethodSelector({
       if (data.success) {
         if (data.redirectUrl || data.checkoutUrl) {
           window.location.href = data.redirectUrl || data.checkoutUrl || "";
+        } else if (data.provider === "pawapay") {
+          toast({
+            title: "Paiement initié",
+            description: "Veuillez confirmer le paiement sur votre téléphone en entrant votre code PIN.",
+          });
+          onPendingVerification?.(data.paymentId, "pawapay", data.externalId);
         } else {
           toast({
             title: "Paiement initié",

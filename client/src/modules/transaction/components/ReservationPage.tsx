@@ -1,17 +1,19 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Layout } from "@/modules/foundation";
 import { SEO } from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link, useSearch } from "wouter";
-import { FileText, Briefcase, Plane, CheckCircle, Calendar as CalendarIcon, CreditCard, Lock, ArrowLeft, Clock } from "lucide-react";
+import { FileText, Briefcase, Plane, CheckCircle, Calendar as CalendarIcon, CreditCard, Lock, ArrowLeft, Clock, Loader2, XCircle, Smartphone } from "lucide-react";
 import CalendarBooking from "./CalendarBooking";
 import CalendlyWidget from "./CalendlyWidget";
 import { PaymentMethodSelector } from "./PaymentMethodSelector";
+import { useToast } from "@/hooks/use-toast";
 import reservationHero from "@/assets/images/reservation-hero.png";
 
 type ServiceType = "visa" | "agence" | "voyage" | null;
-type Step = "select" | "calendar" | "payment" | "success";
+type Step = "select" | "calendar" | "payment" | "verifying" | "success";
+type PaymentMode = "direct" | "consultation";
 
 interface SelectedSlotInfo {
   date: Date;
@@ -22,8 +24,14 @@ interface SelectedSlotInfo {
 export default function ReservationPage() {
   const [selectedService, setSelectedService] = useState<ServiceType>(null);
   const [currentStep, setCurrentStep] = useState<Step>("select");
+  const [paymentMode, setPaymentMode] = useState<PaymentMode>("direct");
   const [paymentId, setPaymentId] = useState<string | null>(null);
+  const [pendingProvider, setPendingProvider] = useState<string | null>(null);
+  const [verificationStatus, setVerificationStatus] = useState<"polling" | "success" | "failed" | "timeout">("polling");
   const [selectedSlot, setSelectedSlot] = useState<SelectedSlotInfo | null>(null);
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
+  const pollCountRef = useRef(0);
+  const { toast } = useToast();
   const searchString = useSearch();
 
   useEffect(() => {
@@ -102,7 +110,7 @@ export default function ReservationPage() {
       title: "Réservation confirmée",
       description: "Choisissez votre créneau et recevez votre confirmation",
       icon: CalendarIcon,
-      active: currentStep === "calendar" || currentStep === "success",
+      active: currentStep === "calendar" || currentStep === "verifying" || currentStep === "success",
     },
   ];
 
@@ -131,11 +139,82 @@ export default function ReservationPage() {
     setCurrentStep("payment");
   };
 
+  const CONSULTATION_PRICE = 20;
+
   const handleContactFirst = () => {
     if (selectedService) {
+      setPaymentMode("consultation");
       setCurrentStep("calendar");
     }
   };
+
+  const handleDirectPayment = () => {
+    setPaymentMode("direct");
+    setCurrentStep("payment");
+  };
+
+  const stopPolling = useCallback(() => {
+    if (pollingRef.current) {
+      clearInterval(pollingRef.current);
+      pollingRef.current = null;
+    }
+    pollCountRef.current = 0;
+  }, []);
+
+  const handlePendingVerification = useCallback((pId: string, provider: string, externalId?: string) => {
+    setPaymentId(pId);
+    setPendingProvider(provider);
+    setVerificationStatus("polling");
+    setCurrentStep("verifying");
+    pollCountRef.current = 0;
+
+    const MAX_POLLS = 40;
+    const POLL_INTERVAL = 5000;
+
+    pollingRef.current = setInterval(async () => {
+      pollCountRef.current += 1;
+
+      if (pollCountRef.current > MAX_POLLS) {
+        stopPolling();
+        setVerificationStatus("timeout");
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/payments/verify/${encodeURIComponent(pId)}?provider=${provider}`);
+        const data = await res.json();
+
+        if (data.status === "success") {
+          stopPolling();
+          setVerificationStatus("success");
+          setTimeout(() => {
+            if (selectedSlot) {
+              localStorage.setItem('mr-saint-selected-slot', JSON.stringify({
+                date: selectedSlot.date.toISOString(),
+                time: selectedSlot.time,
+                schedulingUrl: selectedSlot.schedulingUrl
+              }));
+            }
+            setCurrentStep("success");
+          }, 2000);
+        } else if (data.status === "failed") {
+          stopPolling();
+          setVerificationStatus("failed");
+        }
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    }, POLL_INTERVAL);
+  }, [stopPolling, selectedSlot]);
+
+  useEffect(() => {
+    return () => stopPolling();
+  }, [stopPolling]);
+
+  const paymentAmount = paymentMode === "consultation" ? CONSULTATION_PRICE : (selectedServiceData?.price || 0);
+  const paymentLabel = paymentMode === "consultation" 
+    ? "Consultation (rendez-vous)" 
+    : (selectedServiceData?.title || "");
 
   return (
     <Layout>
@@ -286,10 +365,10 @@ export default function ReservationPage() {
                         data-testid="button-proceed-payment"
                         size="lg"
                         className="gap-2"
-                        onClick={() => setCurrentStep("payment")}
+                        onClick={handleDirectPayment}
                       >
                         <CreditCard className="w-5 h-5" />
-                        Procéder au paiement
+                        Payer directement ({selectedServiceData?.priceLabel})
                       </Button>
                       <Button
                           data-testid="button-contact-first"
@@ -298,7 +377,7 @@ export default function ReservationPage() {
                           onClick={handleContactFirst}
                         >
                           <CalendarIcon className="w-5 h-5 mr-2" />
-                          Consulter d'abord
+                          Consulter d'abord (20€)
                         </Button>
                     </div>
                   </CardContent>
@@ -309,15 +388,15 @@ export default function ReservationPage() {
                 <div className="space-y-6">
                   <Button
                     variant="ghost"
-                    onClick={() => setCurrentStep("calendar")}
+                    onClick={() => paymentMode === "consultation" ? setCurrentStep("calendar") : setCurrentStep("select")}
                     className="gap-2"
                     data-testid="button-back-to-calendar"
                   >
                     <ArrowLeft className="w-4 h-4" />
-                    Retour au calendrier
+                    {paymentMode === "consultation" ? "Retour au calendrier" : "Retour aux services"}
                   </Button>
                   
-                  {selectedSlot && (
+                  {selectedSlot && paymentMode === "consultation" && (
                     <Card className="border-primary/20 bg-card mb-6">
                       <CardContent className="p-4">
                         <h3 className="font-heading font-semibold mb-3">Créneau sélectionné</h3>
@@ -338,16 +417,25 @@ export default function ReservationPage() {
                   <Card className="border-primary/20 bg-card">
                     <CardHeader>
                       <CardTitle className="text-xl font-heading">
-                        Paiement pour : {selectedServiceData?.title}
+                        {paymentMode === "consultation" 
+                          ? `Consultation pour : ${selectedServiceData?.title} — 20€`
+                          : `Paiement pour : ${selectedServiceData?.title}`
+                        }
                       </CardTitle>
+                      {paymentMode === "consultation" && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Le prix de la consultation est de 20€, quel que soit le service choisi.
+                        </p>
+                      )}
                     </CardHeader>
                     <CardContent>
                       <PaymentMethodSelector
                         serviceId={selectedService}
-                        serviceName={selectedServiceData?.title || ""}
-                        amount={selectedServiceData?.price || 0}
+                        serviceName={paymentLabel}
+                        amount={paymentAmount}
                         currency="EUR"
                         onSuccess={handlePaymentSuccess}
+                        onPendingVerification={handlePendingVerification}
                       />
                     </CardContent>
                   </Card>
@@ -382,6 +470,95 @@ export default function ReservationPage() {
                 serviceName={selectedServiceData?.title || ""}
                 onSlotSelected={handleSlotSelected}
               />
+            </div>
+          )}
+
+          {currentStep === "verifying" && (
+            <div className="space-y-6">
+              <Card className="border-primary/20 bg-card">
+                <CardContent className="p-8 text-center">
+                  {verificationStatus === "polling" && (
+                    <>
+                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                        <Smartphone className="w-8 h-8 text-primary animate-pulse" />
+                      </div>
+                      <h2 data-testid="text-verifying-title" className="text-2xl font-heading font-bold text-foreground mb-4">
+                        En attente de confirmation
+                      </h2>
+                      <p className="text-muted-foreground mb-6">
+                        Veuillez confirmer le paiement sur votre téléphone en entrant votre code PIN Mobile Money.
+                      </p>
+                      <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Vérification du paiement en cours...</span>
+                      </div>
+                    </>
+                  )}
+
+                  {verificationStatus === "success" && (
+                    <>
+                      <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
+                        <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+                      </div>
+                      <h2 data-testid="text-verified-title" className="text-2xl font-heading font-bold text-foreground mb-4">
+                        Paiement confirmé !
+                      </h2>
+                      <p className="text-muted-foreground mb-6">
+                        Votre paiement a bien été reçu. Redirection en cours...
+                      </p>
+                    </>
+                  )}
+
+                  {verificationStatus === "failed" && (
+                    <>
+                      <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-6">
+                        <XCircle className="w-8 h-8 text-destructive" />
+                      </div>
+                      <h2 data-testid="text-payment-failed-title" className="text-2xl font-heading font-bold text-foreground mb-4">
+                        Paiement échoué
+                      </h2>
+                      <p className="text-muted-foreground mb-6">
+                        Le paiement n'a pas pu être confirmé. Veuillez réessayer.
+                      </p>
+                      <Button
+                        data-testid="button-retry-payment"
+                        onClick={() => setCurrentStep("payment")}
+                      >
+                        Réessayer le paiement
+                      </Button>
+                    </>
+                  )}
+
+                  {verificationStatus === "timeout" && (
+                    <>
+                      <div className="w-16 h-16 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center mx-auto mb-6">
+                        <Clock className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
+                      </div>
+                      <h2 data-testid="text-payment-timeout-title" className="text-2xl font-heading font-bold text-foreground mb-4">
+                        Délai d'attente dépassé
+                      </h2>
+                      <p className="text-muted-foreground mb-6">
+                        Nous n'avons pas reçu la confirmation de votre paiement. Si vous avez validé sur votre téléphone, veuillez patienter ou contactez-nous.
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-4 justify-center flex-wrap">
+                        <Button
+                          data-testid="button-retry-payment-timeout"
+                          onClick={() => setCurrentStep("payment")}
+                        >
+                          Réessayer le paiement
+                        </Button>
+                        <Button
+                          data-testid="button-contact-support"
+                          variant="outline"
+                          asChild
+                        >
+                          <a href="/contact">Contacter le support</a>
+                        </Button>
+                      </div>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
             </div>
           )}
 
@@ -432,6 +609,7 @@ export default function ReservationPage() {
                     setSelectedService(null);
                     setSelectedSlot(null);
                     setPaymentId(null);
+                    setPaymentMode("direct");
                   }}
                   data-testid="button-new-reservation"
                 >
