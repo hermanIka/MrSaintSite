@@ -25,7 +25,7 @@ export default function CalendlyWidget({
   const pageSettings = useMemo(() => {
     if (theme === "dark") {
       return {
-        primaryColor: "f2c94c",
+        primaryColor: "e6a817",
         backgroundColor: "0d0d0d",
         textColor: "fafafa",
         hideGdprBanner: true,
@@ -33,9 +33,9 @@ export default function CalendlyWidget({
       };
     }
     return {
-      primaryColor: "d4a017",
-      backgroundColor: "fafafa",
-      textColor: "1a1a1a",
+      primaryColor: "e6a817",
+      backgroundColor: "ffffff",
+      textColor: "0d0d0d",
       hideGdprBanner: true,
       hideLandingPageDetails: true,
     };
