@@ -70,9 +70,7 @@ export function Navigation() {
                   data-testid="button-reserve-service"
                   className="ml-4"
                   size="default"
-                >
-                  Réserver
-                </Button>
+                >Consulter</Button>
               </Link>
             </div>
 
@@ -90,7 +88,6 @@ export function Navigation() {
           </div>
         </div>
       </nav>
-
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-40 bg-black md:hidden" style={{ top: "80px" }}>
           <div className="flex flex-col p-6 gap-2">
