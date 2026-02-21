@@ -85,20 +85,45 @@ class CalendlyService {
     return data.collection;
   }
 
-  async getAvailableTimesForNextDays(eventTypeUri: string, days: number = 7): Promise<CalendlyAvailableTime[]> {
+  async getAvailableTimesForDateRange(
+    eventTypeUri: string,
+    startDate: string,
+    endDate: string
+  ): Promise<CalendlyAvailableTime[]> {
     const now = new Date();
-    now.setMinutes(now.getMinutes() + 5);
-    const startTime = now.toISOString();
-    
-    const endDate = new Date(now);
-    endDate.setDate(endDate.getDate() + Math.min(days, 7));
-    const endTime = endDate.toISOString();
+    let start = new Date(startDate);
+    if (start < now) {
+      start = new Date(now.getTime() + 5 * 60 * 1000);
+    }
 
-    return this.getAvailableTimes({
-      eventTypeUri,
-      startTime,
-      endTime,
-    });
+    const end = new Date(endDate);
+    const maxEnd = new Date(start.getTime() + 60 * 24 * 60 * 60 * 1000);
+    if (end > maxEnd) {
+      end.setTime(maxEnd.getTime());
+    }
+
+    const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+    const allSlots: CalendlyAvailableTime[] = [];
+    let chunkStart = new Date(start);
+
+    while (chunkStart < end) {
+      const chunkEnd = new Date(Math.min(chunkStart.getTime() + SEVEN_DAYS_MS, end.getTime()));
+
+      try {
+        const slots = await this.getAvailableTimes({
+          eventTypeUri,
+          startTime: chunkStart.toISOString(),
+          endTime: chunkEnd.toISOString(),
+        });
+        allSlots.push(...slots);
+      } catch (err) {
+        console.error(`Failed to fetch slots for chunk ${chunkStart.toISOString()} - ${chunkEnd.toISOString()}:`, err);
+      }
+
+      chunkStart = new Date(chunkEnd);
+    }
+
+    return allSlots;
   }
 
   getSchedulingUrl(eventType: CalendlyEventType): string {

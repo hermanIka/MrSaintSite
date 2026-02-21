@@ -24,7 +24,6 @@
 
 export { default as ReservationPage } from "./components/ReservationPage";
 export { default as CalendarBooking } from "./components/CalendarBooking";
-export { default as CalendlyEmbed } from "./components/CalendlyEmbed";
 export { PaymentMethodSelector } from "./components/PaymentMethodSelector";
 
 export const TRANSACTION_STATUS = {

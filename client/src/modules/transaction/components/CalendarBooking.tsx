@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,6 +13,13 @@ import {
   Loader2,
   CreditCard
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface TimeSlot {
   time: string;
@@ -41,6 +48,28 @@ const MONTHS_FR = [
   "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
 ];
 
+function getUserTimezone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  } catch {
+    return "UTC";
+  }
+}
+
+function getShortTimezone(tz: string): string {
+  try {
+    const now = new Date();
+    const parts = new Intl.DateTimeFormat('fr-FR', {
+      timeZone: tz,
+      timeZoneName: 'short',
+    }).formatToParts(now);
+    const tzPart = parts.find(p => p.type === 'timeZoneName');
+    return tzPart?.value || tz;
+  } catch {
+    return tz;
+  }
+}
+
 export default function CalendarBooking({ 
   serviceType, 
   serviceName,
@@ -53,6 +82,10 @@ export default function CalendarBooking({
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [selectedSlotUrl, setSelectedSlotUrl] = useState<string | null>(null);
   const [bookingConfirmed, setBookingConfirmed] = useState(false);
+  const [selectedEventTypeUri, setSelectedEventTypeUri] = useState<string | null>(null);
+
+  const userTimezone = useMemo(() => getUserTimezone(), []);
+  const shortTz = useMemo(() => getShortTimezone(userTimezone), [userTimezone]);
 
   const { data: calendlyStatus } = useQuery<{ configured: boolean }>({
     queryKey: ['/api/calendly/status'],
@@ -66,17 +99,39 @@ export default function CalendarBooking({
     enabled: calendlyStatus?.configured === true,
   });
 
-  const eventType = eventTypesData?.eventTypes?.[0];
+  const eventTypes = eventTypesData?.eventTypes || [];
+  const eventType = selectedEventTypeUri 
+    ? eventTypes.find(et => et.uri === selectedEventTypeUri) || eventTypes[0]
+    : eventTypes[0];
   const eventTypeId = eventType?.uri?.split('/').pop();
 
-  const { data: availableTimesData, isLoading: loadingSlots, isError: slotsError, refetch: refetchSlots } = useQuery<{
+  const dateRange = useMemo(() => {
+    const start = new Date(currentYear, currentMonth, 1);
+    const end = new Date(currentYear, currentMonth + 1, 0);
+    const now = new Date();
+    if (start < now) {
+      start.setTime(now.getTime());
+    }
+    return {
+      start_date: start.toISOString().split('T')[0],
+      end_date: end.toISOString().split('T')[0],
+    };
+  }, [currentMonth, currentYear]);
+
+  const availableTimesUrl = eventTypeId
+    ? `/api/calendly/available-times/${eventTypeId}?start_date=${dateRange.start_date}&end_date=${dateRange.end_date}&timezone=${encodeURIComponent(userTimezone)}`
+    : null;
+
+  const { data: availableTimesData, isLoading: loadingSlots } = useQuery<{
     success: boolean;
     availableTimes: Record<string, TimeSlot[]>;
     totalSlots: number;
+    timezone: string;
   }>({
-    queryKey: ['/api/calendly/available-times', eventTypeId],
-    enabled: !!eventTypeId,
+    queryKey: [availableTimesUrl],
+    enabled: !!eventTypeId && !!availableTimesUrl,
     retry: 2,
+    staleTime: 2 * 60 * 1000,
   });
 
   const getDaysInMonth = (month: number, year: number) => {
@@ -88,7 +143,10 @@ export default function CalendarBooking({
   };
 
   const formatDateKey = (date: Date) => {
-    return date.toISOString().split('T')[0];
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
   };
 
   const hasAvailableSlots = (date: Date): boolean => {
@@ -98,17 +156,11 @@ export default function CalendarBooking({
     return slots && slots.length > 0;
   };
 
-  const isDateAvailable = (date: Date) => {
-    const dayOfWeek = date.getDay();
-    if (dayOfWeek === 0 || dayOfWeek === 6) return false;
-    if (date < today) return false;
-    return hasAvailableSlots(date);
-  };
-
   const isDateInFuture = (date: Date) => {
     const dayOfWeek = date.getDay();
     if (dayOfWeek === 0 || dayOfWeek === 6) return false;
-    return date >= today;
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    return date >= todayStart;
   };
 
   const isDateSelected = (day: number) => {
@@ -130,6 +182,9 @@ export default function CalendarBooking({
   };
 
   const handlePrevMonth = () => {
+    const prevDate = new Date(currentYear, currentMonth - 1, 1);
+    const todayMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    if (prevDate < todayMonth) return;
     if (currentMonth === 0) {
       setCurrentMonth(11);
       setCurrentYear(currentYear - 1);
@@ -162,6 +217,13 @@ export default function CalendarBooking({
     }
   };
 
+  const handleEventTypeChange = (uri: string) => {
+    setSelectedEventTypeUri(uri);
+    setSelectedDate(null);
+    setSelectedTime(null);
+    setSelectedSlotUrl(null);
+  };
+
   const formatSelectedDate = () => {
     if (!selectedDate) return "";
     return `${DAYS_FR[selectedDate.getDay()]} ${selectedDate.getDate()} ${MONTHS_FR[selectedDate.getMonth()]} ${selectedDate.getFullYear()}`;
@@ -171,6 +233,12 @@ export default function CalendarBooking({
     if (!selectedDate || !availableTimesData?.availableTimes) return [];
     const dateKey = formatDateKey(selectedDate);
     return availableTimesData.availableTimes[dateKey] || [];
+  };
+
+  const canGoPrev = () => {
+    const prevDate = new Date(currentYear, currentMonth - 1, 1);
+    const todayMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    return prevDate >= todayMonth;
   };
 
   const renderCalendar = () => {
@@ -311,6 +379,29 @@ export default function CalendarBooking({
 
   return (
     <div className="w-full max-w-4xl mx-auto">
+      {eventTypes.length > 1 && (
+        <Card className="mb-4">
+          <CardContent className="p-4">
+            <label className="text-sm font-medium mb-2 block">Type de rendez-vous</label>
+            <Select
+              value={eventType?.uri || ""}
+              onValueChange={handleEventTypeChange}
+            >
+              <SelectTrigger data-testid="select-event-type">
+                <SelectValue placeholder="Choisir un type de rendez-vous" />
+              </SelectTrigger>
+              <SelectContent>
+                {eventTypes.map((et) => (
+                  <SelectItem key={et.uri} value={et.uri}>
+                    {et.name} ({et.duration} min)
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="grid md:grid-cols-2 gap-6">
         <Card data-testid="card-calendar">
           <CardHeader className="pb-2">
@@ -320,7 +411,7 @@ export default function CalendarBooking({
               </CardTitle>
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Globe className="w-3 h-3" />
-                <span>Fuseau: Paris (GMT+1)</span>
+                <span data-testid="text-timezone">{shortTz}</span>
               </div>
             </div>
             {eventType && (
@@ -335,6 +426,7 @@ export default function CalendarBooking({
                 variant="ghost"
                 size="icon"
                 onClick={handlePrevMonth}
+                disabled={!canGoPrev()}
                 data-testid="button-prev-month"
               >
                 <ChevronLeft className="w-4 h-4" />
