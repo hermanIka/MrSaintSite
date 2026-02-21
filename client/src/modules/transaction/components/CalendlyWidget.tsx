@@ -3,6 +3,7 @@ import { useTheme } from "@/modules/foundation/components/ThemeProvider";
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar as CalendarIcon, Clock, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { InlineWidget } from "react-calendly";
 
 interface CalendlyWidgetProps {
   schedulingUrl: string;
@@ -21,22 +22,24 @@ export default function CalendlyWidget({
 }: CalendlyWidgetProps) {
   const { theme } = useTheme();
 
-  const iframeSrc = useMemo(() => {
-    const params = new URLSearchParams({
-      hide_gdpr_banner: "1",
-      primary_color: "f2c94c",
-    });
-
+  const pageSettings = useMemo(() => {
     if (theme === "dark") {
-      params.set("background_color", "121212");
-      params.set("text_color", "fafafa");
-    } else {
-      params.set("background_color", "fafafa");
-      params.set("text_color", "1a1a1a");
+      return {
+        primaryColor: "f2c94c",
+        backgroundColor: "0d0d0d",
+        textColor: "fafafa",
+        hideGdprBanner: true,
+        hideLandingPageDetails: true,
+      };
     }
-
-    return `${schedulingUrl}?${params.toString()}`;
-  }, [schedulingUrl, theme]);
+    return {
+      primaryColor: "d4a017",
+      backgroundColor: "fafafa",
+      textColor: "1a1a1a",
+      hideGdprBanner: true,
+      hideLandingPageDetails: true,
+    };
+  }, [theme]);
 
   const formatDate = (date: Date) =>
     date.toLocaleDateString("fr-FR", {
@@ -123,21 +126,16 @@ export default function CalendlyWidget({
         )}
       </div>
 
-      <CardContent className="p-4">
-        <div
-          className="overflow-hidden rounded-md"
-          style={{ minHeight: `${height}px` }}
-          data-testid="calendly-inline-widget"
-        >
-          <iframe
-            src={iframeSrc}
-            width="100%"
-            height={height}
-            frameBorder="0"
-            title="Calendly - Finaliser la réservation"
-            data-testid="iframe-calendly"
-          />
-        </div>
+      <CardContent className="p-0" data-testid="calendly-inline-widget">
+        <InlineWidget
+          url={schedulingUrl}
+          pageSettings={pageSettings}
+          styles={{
+            height: `${height}px`,
+            minWidth: "320px",
+          }}
+          iframeTitle="Calendly - Finaliser la réservation"
+        />
       </CardContent>
     </Card>
   );
