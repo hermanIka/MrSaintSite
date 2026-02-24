@@ -3,7 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { MessageCircle, X, Send, Bot, User, Loader2, RotateCcw } from "lucide-react";
+import { X, Send, Bot, User, Loader2, RotateCcw } from "lucide-react";
+import chatBtnImage from "@assets/Mr_saint_photo_profil_1771948755492.jfif";
 
 interface Message {
   role: "user" | "assistant";
@@ -347,18 +348,24 @@ export default function ChatWidget() {
             Posez-moi vos questions
           </Badge>
         )}
-        <Button
+        <button
           data-testid="button-toggle-chat"
           onClick={toggleChat}
-          size="icon"
-          className="rounded-full shadow-lg"
+          className={`w-14 h-14 rounded-full border-2 border-primary overflow-visible cursor-pointer transition-transform ${!isOpen ? "chat-btn-glow" : ""}`}
+          style={{ padding: 0, background: "transparent" }}
         >
           {isOpen ? (
-            <X className="w-6 h-6" />
+            <span className="flex items-center justify-center w-full h-full rounded-full bg-primary text-primary-foreground">
+              <X className="w-6 h-6" />
+            </span>
           ) : (
-            <MessageCircle className="w-6 h-6" />
+            <img
+              src={chatBtnImage}
+              alt="Mr Saint - Chat"
+              className="w-full h-full rounded-full object-cover"
+            />
           )}
-        </Button>
+        </button>
       </div>
     </>
   );
