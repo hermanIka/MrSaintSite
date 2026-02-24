@@ -44,13 +44,14 @@ const rules: Rule[] = [
   {
     keywords: ["bonjour", "salut", "hello", "bonsoir", "coucou", "hey"],
     category: "greeting",
-    response: `Bonjour et bienvenue chez Mr Saint ! Je suis l'assistant virtuel et je peux vous aider avec :
+    response: `Hey, bienvenue chez Mr Saint ! Moi c'est Saint, ton conseiller voyage.
 
-• La facilitation de visa
-• La création d'agence de voyage
-• Nos voyages organisés
+Je peux t'aider avec :
+- La facilitation de visa (toutes destinations)
+- La création de ta propre agence de voyage
+- Nos voyages organisés premium
 
-Comment puis-je vous aider aujourd'hui ?`,
+Dis-moi, qu'est-ce qui t'amène aujourd'hui ?`,
     links: ["/services"]
   },
   {
@@ -251,14 +252,14 @@ Notre mission : Vous accompagner dans tous vos projets de voyage et création d'
   {
     keywords: ["merci", "super", "genial", "parfait", "excellent"],
     category: "thanks",
-    response: `Avec plaisir !
+    response: `Avec plaisir, c'est toujours un bonheur d'aider !
 
-N'hésitez pas si vous avez d'autres questions. Je suis là pour vous aider !
+N'hésite pas si tu as d'autres questions, je suis là pour toi.
 
-Vous pouvez aussi :
-• Explorer nos services
-• Réserver directement
-• Nous contacter pour une question spécifique`,
+Tu peux aussi :
+- Explorer nos services
+- Réserver directement
+- Nous contacter pour un besoin spécifique`,
     links: ["/services", "/reservation", "/contact"]
   },
   {
@@ -295,18 +296,15 @@ Consultez notre portfolio pour plus de success stories !`,
   {
     keywords: ["aide", "aider", "question", "info", "information", "renseigner"],
     category: "help",
-    response: `Je suis là pour vous aider ! Voici ce que je peux faire :
+    response: `Bien sûr, je suis là pour toi ! Voici ce que je peux faire :
 
-🛂 Facilitation Visa - Toutes destinations
-📚 Création d'Agence - Formation complète
-✈️ Voyages Organisés - Expériences premium
+- Facilitation Visa - toutes destinations
+- Création d'Agence - formation complète avec coaching
+- Voyages Organisés - expériences premium
 
-Posez-moi vos questions sur :
-• Les documents nécessaires
-• Les délais et tarifs
-• Les conditions et modalités
+Pose-moi tes questions sur les documents nécessaires, les délais, les tarifs, les conditions... tout ce que tu veux savoir !
 
-Que souhaitez-vous savoir ?`,
+Alors, qu'est-ce qui t'intéresse ?`,
     links: ["/services", "/faq"]
   }
 ];
@@ -346,15 +344,13 @@ export function findBestMatch(query: string): MatchResult {
 
   return {
     found: false,
-    response: `Je ne suis pas sûr de comprendre votre question. Voici ce que je peux vous aider avec :
+    response: `Hmm, je suis pas sûr de bien comprendre ta question ! Mais pas de souci, je peux t'aider avec :
 
-• 🛂 Facilitation Visa
-• 📚 Création d'Agence de Voyage
-• ✈️ Voyages Organisés
+- Facilitation Visa (toutes destinations)
+- Création d'Agence de Voyage
+- Voyages Organisés premium
 
-Pouvez-vous reformuler ou choisir un de ces sujets ?
-
-Vous pouvez aussi consulter notre FAQ ou nous contacter directement.`,
+Tu peux reformuler ou me dire ce qui t'intéresse ? Sinon, jette un oeil à notre FAQ ou contacte-nous directement !`,
     confidence: 0,
     suggestedLinks: ["/faq", "/contact", "/services"]
   };
