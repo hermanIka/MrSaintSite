@@ -20,13 +20,14 @@ import {
   chatbotSystemPrompts,
 } from "@shared/schema";
 import { db } from "../../db";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, lt } from "drizzle-orm";
 
 export interface IChatbotStorage {
   getConversationBySessionId(sessionId: string): Promise<ChatbotConversation | undefined>;
   createConversation(conversation: InsertChatbotConversation): Promise<ChatbotConversation>;
   updateConversation(sessionId: string, messages: string, messageCount: number, mode: string): Promise<ChatbotConversation | undefined>;
   deleteConversation(sessionId: string): Promise<boolean>;
+  purgeOldConversations(daysOld: number): Promise<number>;
   
   getActiveSystemPrompt(): Promise<ChatbotSystemPrompt | undefined>;
   getAllSystemPrompts(): Promise<ChatbotSystemPrompt[]>;
@@ -79,6 +80,18 @@ export class ChatbotDbStorage implements IChatbotStorage {
       .where(eq(chatbotConversations.sessionId, sessionId))
       .returning();
     return result.length > 0;
+  }
+
+  async purgeOldConversations(daysOld: number): Promise<number> {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - daysOld);
+    const cutoffStr = cutoffDate.toISOString();
+
+    const result = await db
+      .delete(chatbotConversations)
+      .where(lt(chatbotConversations.updatedAt, cutoffStr))
+      .returning();
+    return result.length;
   }
 
   async getActiveSystemPrompt(): Promise<ChatbotSystemPrompt | undefined> {
