@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Layout } from "@/modules/foundation";
+import goPlusCardImage from "@assets/go-plus-card.png";
 import { SEO } from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -123,18 +124,43 @@ export default function GoPlusPage() {
         description="Obtenez votre carte virtuelle GO+ et profitez de réductions exclusives sur tous les services Mr Saint."
       />
 
-      <section className="relative min-h-[40vh] flex items-center justify-center bg-black overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black" />
-        <div className="relative z-10 text-center px-4 py-20">
-          <Badge className="mb-4 bg-primary/20 text-primary border-primary/30 text-sm px-4 py-1">
-            Programme fidélité
-          </Badge>
-          <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-4">
-            Carte <span className="text-primary">GO+</span>
-          </h1>
-          <p className="text-lg text-white/70 max-w-xl mx-auto">
-            Rejoins le club exclusif Mr Saint et profite de réductions sur tous tes achats.
-          </p>
+      <section className="relative bg-black overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-black/95 to-[#1a1200]" />
+        <div className="absolute inset-0 opacity-10"
+          style={{ backgroundImage: "radial-gradient(circle at 70% 50%, #F2C94C 0%, transparent 60%)" }}
+        />
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-16 md:py-24">
+          <div className="flex flex-col md:flex-row items-center gap-10 md:gap-16">
+            <div className="flex-1 text-center md:text-left order-2 md:order-1">
+              <Badge className="mb-5 bg-primary/20 text-primary border-primary/30 text-sm px-4 py-1">
+                Programme fidélité exclusif
+              </Badge>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-white mb-5 leading-tight">
+                Carte <span className="text-primary">GO+</span>
+              </h1>
+              <p className="text-lg text-white/70 max-w-md">
+                Rejoins le club exclusif Mr Saint et profite de réductions jusqu'à <span className="text-primary font-semibold">10%</span> sur tous tes achats.
+              </p>
+            </div>
+
+            <div className="flex-1 flex justify-center md:justify-end order-1 md:order-2">
+              <div
+                className="relative w-full max-w-sm"
+                style={{
+                  filter: "drop-shadow(0 20px 60px rgba(242, 201, 76, 0.35))",
+                  transform: "perspective(900px) rotateY(-8deg) rotateX(4deg)",
+                  transition: "transform 0.4s ease",
+                }}
+              >
+                <img
+                  src={goPlusCardImage}
+                  alt="Carte virtuelle GO+ Mr Saint"
+                  data-testid="img-goplus-card"
+                  className="w-full rounded-2xl"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
