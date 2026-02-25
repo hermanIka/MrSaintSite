@@ -52,8 +52,9 @@ Structured around `content` (API for trips, testimonials, portfolio), `transacti
 - **Dynamic Content:** Trips, testimonials, and portfolio items are dynamically managed via the admin panel. Portfolio includes filtering by service type and a draft/published status.
 - **Admin Module:** Token-based authentication, comprehensive dashboard with statistics, full CRUD capabilities for content, and activity logging.
 - **"Voyage à Crédit" Service:** A multi-step form for travel financing applications, including secure document uploads to object storage. Features an admin approval workflow (pending, approved, refused).
+- **Module GO+:** A loyalty card system allowing users to purchase virtual GO+ cards (Standard 10€/5% off, Premium 15€/10% off) via MaishaPay or PawaPay. Cards are valid for 1 year and apply discounts to all services. Includes webhook-based auto-activation, admin panel for card/transaction management, and a public card status checker.
 - **Featured Trips:** A boolean flag `isFeatured` for trips allows highlighting up to 4 trips in a carousel on the homepage.
-- **Database:** PostgreSQL with Drizzle ORM, structured with tables for `trips`, `testimonials`, `portfolio`, `faqs`, `admins`, `activity_logs`, `credit_travel_requests`, `chatbot_conversations`, and `chatbot_system_prompts`. Includes a seed script for initial data.
+- **Database:** PostgreSQL with Drizzle ORM, structured with tables for `trips`, `testimonials`, `portfolio`, `faqs`, `admins`, `activity_logs`, `credit_travel_requests`, `chatbot_conversations`, `chatbot_system_prompts`, `go_plus_plans`, `go_plus_cards`, and `go_plus_transactions`. Includes a seed script for initial data.
 
 **Architectural Rules:**
 - Strict separation of frontend and backend: no business logic or API keys exposed client-side, server-side validation is mandatory.

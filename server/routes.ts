@@ -15,6 +15,7 @@ import { registerInteractionRoutes } from "./modules/interaction";
 import { registerObjectStorageRoutes } from "./replit_integrations/object_storage";
 import { registerPaymentRoutes } from "./modules/payment";
 import { calendlyRoutes } from "./modules/calendly";
+import { registerGoPlusRoutes } from "./modules/go_plus/routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Enregistrement des routes par module
@@ -25,6 +26,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Module de paiement (PawaPay, MaishaPay, PayPal)
   registerPaymentRoutes(app);
+
+  // Module GO+ (cartes virtuelles de fidélité)
+  registerGoPlusRoutes(app);
   
   // Object Storage routes
   registerObjectStorageRoutes(app);

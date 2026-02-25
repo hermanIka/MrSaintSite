@@ -280,6 +280,70 @@ export type InsertPayment = z.infer<typeof insertPaymentSchema>;
 export type Payment = typeof payments.$inferSelect;
 
 // ==========================================
+// GO+ MODULE - Cartes virtuelles de fidélité
+// ==========================================
+
+export const goPlusPlans = pgTable("go_plus_plans", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  price: integer("price").notNull(), // En centimes (ex: 1000 = 10€)
+  currency: text("currency").notNull().default("EUR"),
+  discountPercentage: integer("discount_percentage").notNull(),
+  privileges: text("privileges").notNull(), // JSON stringifié
+  durationDays: integer("duration_days").notNull().default(365),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: text("created_at").notNull(),
+});
+
+export const insertGoPlusPlanSchema = createInsertSchema(goPlusPlans).omit({
+  id: true,
+});
+
+export type InsertGoPlusPlan = z.infer<typeof insertGoPlusPlanSchema>;
+export type GoPlusPlan = typeof goPlusPlans.$inferSelect;
+
+export const goPlusCards = pgTable("go_plus_cards", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: text("user_id").notNull(), // Email de l'acheteur
+  planId: varchar("plan_id").notNull(),
+  cardNumber: varchar("card_number").notNull().unique(),
+  status: text("status").notNull().default("pending"), // pending / active / expired / suspended
+  startDate: text("start_date"),
+  endDate: text("end_date"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export const insertGoPlusCardSchema = createInsertSchema(goPlusCards).omit({
+  id: true,
+});
+
+export type InsertGoPlusCard = z.infer<typeof insertGoPlusCardSchema>;
+export type GoPlusCard = typeof goPlusCards.$inferSelect;
+
+export const goPlusTransactions = pgTable("go_plus_transactions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: text("user_id").notNull(), // Email de l'acheteur
+  planId: varchar("plan_id").notNull(),
+  provider: text("provider").notNull(), // maishapay / pawapay
+  providerPaymentId: text("provider_payment_id"),
+  amount: integer("amount").notNull(), // En centimes
+  currency: text("currency").notNull().default("EUR"),
+  status: text("status").notNull().default("pending"), // pending / paid / failed
+  rawWebhookPayload: text("raw_webhook_payload"), // JSON stringifié
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export const insertGoPlusTransactionSchema = createInsertSchema(goPlusTransactions).omit({
+  id: true,
+});
+
+export type InsertGoPlusTransaction = z.infer<typeof insertGoPlusTransactionSchema>;
+export type GoPlusTransaction = typeof goPlusTransactions.$inferSelect;
+
+// ==========================================
 // CHATBOT MODULE - Tables sécurisées
 // ==========================================
 

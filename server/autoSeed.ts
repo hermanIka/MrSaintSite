@@ -15,6 +15,7 @@ import {
   faqs,
   admins,
   services,
+  goPlusPlans,
   chatbotSystemPrompts,
   type InsertTrip,
   type InsertTestimonial,
@@ -494,6 +495,49 @@ async function ensureDataIntegrity(): Promise<void> {
         createdAt: new Date().toISOString(),
       });
       console.log("  ✓ Admin created");
+    }
+
+    const existingGoPlusPlans = await db.select().from(goPlusPlans).limit(1);
+    if (existingGoPlusPlans.length === 0) {
+      console.log("  → Insertion des plans GO+...");
+      const now = new Date().toISOString();
+      await db.insert(goPlusPlans).values([
+        {
+          name: "Standard",
+          description: "Carte GO+ Standard — accès aux réductions de base sur tous les services Mr Saint.",
+          price: 1000,
+          currency: "EUR",
+          discountPercentage: 5,
+          privileges: JSON.stringify([
+            "5% de réduction sur tous les services",
+            "Accès prioritaire aux nouvelles offres",
+            "Newsletter exclusive voyageurs",
+          ]),
+          durationDays: 365,
+          isActive: true,
+          createdAt: now,
+        },
+        {
+          name: "Premium",
+          description: "Carte GO+ Premium — réductions maximales et privilèges exclusifs pour les voyageurs exigeants.",
+          price: 1500,
+          currency: "EUR",
+          discountPercentage: 10,
+          privileges: JSON.stringify([
+            "10% de réduction sur tous les services",
+            "Accès prioritaire aux nouvelles offres",
+            "Newsletter exclusive voyageurs",
+            "Accompagnement personnalisé dédié",
+            "Invitations aux événements exclusifs",
+          ]),
+          durationDays: 365,
+          isActive: true,
+          createdAt: now,
+        },
+      ]);
+      console.log("  ✓ Plans GO+ insérés (Standard & Premium)");
+    } else {
+      console.log("  ✓ Plans GO+ déjà existants");
     }
 
     console.log("✓ Data integrity check completed");

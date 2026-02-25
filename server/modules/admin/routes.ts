@@ -31,9 +31,11 @@ import {
   insertServiceSchema,
   insertCreditTravelRequestSchema,
   insertChatbotSystemPromptSchema,
+  insertGoPlusPlanSchema,
 } from "@shared/schema";
 import { chatbotStorage } from "../chatbot/storage";
 import { ObjectStorageService } from "../../replit_integrations/object_storage";
+import { goPlusStorage } from "../go_plus/storage";
 
 export function registerAdminRoutes(app: Express) {
   // ============ AUTH ============
@@ -897,6 +899,72 @@ export function registerAdminRoutes(app: Express) {
 
       res.json({ success: true });
     } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  // ============ GO+ ADMIN ============
+
+  app.get("/api/admin/go-plus/plans", authMiddleware, async (_req, res) => {
+    try {
+      const plans = await goPlusStorage.getAllGoPlusPlans();
+      const parsed = plans.map(p => ({ ...p, price: p.price / 100, privileges: JSON.parse(p.privileges) }));
+      res.json({ success: true, plans: parsed });
+    } catch {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.post("/api/admin/go-plus/plans", authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const body = { ...req.body, price: Math.round(Number(req.body.price) * 100), createdAt: new Date().toISOString() };
+      const parsed = insertGoPlusPlanSchema.safeParse(body);
+      if (!parsed.success) return res.status(400).json({ error: parsed.error.errors[0].message });
+      const plan = await goPlusStorage.createGoPlusPlan(parsed.data);
+      res.json({ success: true, plan });
+    } catch {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.put("/api/admin/go-plus/plans/:id", authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { id } = req.params;
+      const updates: Record<string, unknown> = { ...req.body };
+      if (updates.price !== undefined) updates.price = Math.round(Number(updates.price) * 100);
+      if (updates.privileges && Array.isArray(updates.privileges)) updates.privileges = JSON.stringify(updates.privileges);
+      const plan = await goPlusStorage.updateGoPlusPlan(id, updates as any);
+      if (!plan) return res.status(404).json({ error: "Plan introuvable" });
+      res.json({ success: true, plan });
+    } catch {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.get("/api/admin/go-plus/cards", authMiddleware, async (_req, res) => {
+    try {
+      const cards = await goPlusStorage.getAllGoPlusCards();
+      res.json({ success: true, cards });
+    } catch {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.put("/api/admin/go-plus/cards/:id/suspend", authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { id } = req.params;
+      await goPlusStorage.updateGoPlusCardStatus(id, "suspended");
+      res.json({ success: true });
+    } catch {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.get("/api/admin/go-plus/transactions", authMiddleware, async (_req, res) => {
+    try {
+      const transactions = await goPlusStorage.getAllGoPlusTransactions();
+      res.json({ success: true, transactions });
+    } catch {
       res.status(500).json({ error: "Erreur serveur" });
     }
   });

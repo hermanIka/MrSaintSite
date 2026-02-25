@@ -9,7 +9,7 @@ import { ThemeProvider } from "@/modules/foundation";
 import { HomePage, AboutPage, TripsPage, TripDetailPage, PortfolioPage, NotFoundPage } from "@/modules/content";
 import { ContactPage, FAQPage } from "@/modules/interaction";
 import { FacilitationVisaPage, CreationAgencePage, ServicesPage, VoyageCreditPage } from "@/modules/process";
-import { ReservationPage } from "@/modules/transaction";
+import { ReservationPage, GoPlusPage, GoPlusSuccessPage, GoPlusFailedPage } from "@/modules/transaction";
 import {
   AdminLoginPage,
   AdminDashboard,
@@ -20,6 +20,7 @@ import {
   AdminServicesPage,
   AdminLogsPage,
   AdminCreditRequestsPage,
+  AdminGoPlusPage,
 } from "@/modules/admin";
 
 function Router() {
@@ -37,6 +38,9 @@ function Router() {
       <Route path="/voyages/:id" component={TripDetailPage} />
       <Route path="/portfolio" component={PortfolioPage} />
       <Route path="/contact" component={ContactPage} />
+      <Route path="/go-plus" component={GoPlusPage} />
+      <Route path="/go-plus/success" component={GoPlusSuccessPage} />
+      <Route path="/go-plus/failed" component={GoPlusFailedPage} />
       <Route path="/admin" component={AdminLoginPage} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/trips" component={AdminTripsPage} />
@@ -45,6 +49,7 @@ function Router() {
       <Route path="/admin/faq" component={AdminFaqPage} />
       <Route path="/admin/services" component={AdminServicesPage} />
       <Route path="/admin/credit-requests" component={AdminCreditRequestsPage} />
+      <Route path="/admin/go-plus" component={AdminGoPlusPage} />
       <Route path="/admin/logs" component={AdminLogsPage} />
       <Route component={NotFoundPage} />
     </Switch>

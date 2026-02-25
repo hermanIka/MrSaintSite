@@ -25,6 +25,9 @@
 export { default as ReservationPage } from "./components/ReservationPage";
 export { default as CalendarBooking } from "./components/CalendarBooking";
 export { PaymentMethodSelector } from "./components/PaymentMethodSelector";
+export { default as GoPlusPage } from "./components/GoPlusPage";
+export { default as GoPlusSuccessPage } from "./components/GoPlusSuccessPage";
+export { default as GoPlusFailedPage } from "./components/GoPlusFailedPage";
 
 export const TRANSACTION_STATUS = {
   calendly: true,

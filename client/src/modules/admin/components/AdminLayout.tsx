@@ -26,6 +26,7 @@ const navItems = [
   { href: "/admin/services", label: "Services & Prix", icon: Settings },
   { href: "/admin/trips", label: "Voyages", icon: Plane },
   { href: "/admin/credit-requests", label: "Demandes crédit", icon: CreditCard },
+  { href: "/admin/go-plus", label: "Cartes GO+", icon: Briefcase },
   { href: "/admin/testimonials", label: "Témoignages", icon: MessageSquare },
   { href: "/admin/portfolio", label: "Portfolio", icon: Briefcase },
   { href: "/admin/faq", label: "FAQ", icon: HelpCircle },
