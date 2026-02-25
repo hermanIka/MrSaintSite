@@ -2,7 +2,10 @@ import { randomUUID } from "crypto";
 import { goPlusStorage } from "./storage";
 import { MaishaPayProvider } from "../payment/providers/maishapay.provider";
 import { PawaPayProvider } from "../payment/providers/pawapay.provider";
+import { Resend } from "resend";
 import type { GoPlusCard, GoPlusPlan } from "@shared/schema";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 function getAppUrl(): string {
   return process.env.APP_URL
@@ -136,6 +139,73 @@ export class GoPlusService {
       createdAt: now.toISOString(),
       updatedAt: now.toISOString(),
     });
+
+    try {
+      const expiryFormatted = endDate.toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" });
+      await resend.emails.send({
+        from: "Mr Saint <onboarding@resend.dev>",
+        to: transaction.userId,
+        subject: `Votre carte GO+ Mr Saint est activée !`,
+        html: `
+          <!DOCTYPE html>
+          <html lang="fr">
+          <head><meta charset="UTF-8" /></head>
+          <body style="margin:0;padding:0;background:#0a0a0a;font-family:Arial,sans-serif;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:40px 20px;">
+              <tr><td align="center">
+                <table width="560" cellpadding="0" cellspacing="0" style="background:#111;border-radius:12px;overflow:hidden;border:1px solid #2a2a2a;">
+                  <tr>
+                    <td style="background:linear-gradient(135deg,#1a1200,#2d1f00);padding:36px 40px;text-align:center;border-bottom:2px solid #F2C94C;">
+                      <p style="margin:0 0 8px;color:#F2C94C;font-size:13px;letter-spacing:3px;text-transform:uppercase;">Mr Saint Travel</p>
+                      <h1 style="margin:0;color:#F2C94C;font-size:32px;font-weight:900;letter-spacing:-0.5px;">GO+</h1>
+                      <p style="margin:8px 0 0;color:#fff;font-size:15px;opacity:0.8;">Programme Fidélité</p>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:36px 40px;">
+                      <h2 style="margin:0 0 16px;color:#fff;font-size:22px;">Votre carte est activée !</h2>
+                      <p style="margin:0 0 28px;color:#aaa;font-size:15px;line-height:1.6;">
+                        Félicitations ! Votre carte <strong style="color:#F2C94C;">GO+ ${plan.name}</strong> est désormais active.
+                        Vous bénéficiez d'une réduction de <strong style="color:#F2C94C;">${plan.discountPercentage}%</strong> sur tous les services Mr Saint.
+                      </p>
+
+                      <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:24px;margin-bottom:28px;">
+                        <p style="margin:0 0 6px;color:#888;font-size:12px;text-transform:uppercase;letter-spacing:2px;">Numéro de carte</p>
+                        <p style="margin:0;color:#F2C94C;font-size:16px;font-family:monospace;font-weight:700;word-break:break-all;">${card.cardNumber}</p>
+                      </div>
+
+                      <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
+                        <tr>
+                          <td style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:16px;width:48%;">
+                            <p style="margin:0 0 4px;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:1px;">Plan</p>
+                            <p style="margin:0;color:#fff;font-size:15px;font-weight:600;">${plan.name}</p>
+                          </td>
+                          <td style="width:4%;"></td>
+                          <td style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:16px;width:48%;">
+                            <p style="margin:0 0 4px;color:#888;font-size:11px;text-transform:uppercase;letter-spacing:1px;">Expire le</p>
+                            <p style="margin:0;color:#fff;font-size:15px;font-weight:600;">${expiryFormatted}</p>
+                          </td>
+                        </tr>
+                      </table>
+
+                      <p style="margin:0;color:#666;font-size:13px;line-height:1.7;border-top:1px solid #222;padding-top:20px;">
+                        Conservez ce numéro de carte précieusement. Il vous sera demandé lors de vos réservations pour bénéficier de votre réduction.<br/><br/>
+                        Merci de votre confiance,<br/>
+                        <strong style="color:#F2C94C;">L'équipe Mr Saint Travel</strong>
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td></tr>
+            </table>
+          </body>
+          </html>
+        `,
+      });
+      console.log(`[GoPlusService] Email carte GO+ envoyé à ${transaction.userId}`);
+    } catch (emailErr) {
+      console.error(`[GoPlusService] Échec envoi email carte GO+ à ${transaction.userId}:`, emailErr);
+    }
 
     return card;
   }

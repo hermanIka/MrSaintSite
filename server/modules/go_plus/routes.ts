@@ -89,7 +89,17 @@ export function registerGoPlusRoutes(app: Express) {
     try {
       const tx = await goPlusStorage.getGoPlusTransactionById(req.params.transactionId);
       if (!tx) return res.status(404).json({ success: false, message: "Transaction introuvable" });
-      res.json({ success: true, transaction: tx });
+
+      if (tx.status === "paid") {
+        const card = await goPlusStorage.getUserActiveGoPlusCard(tx.userId);
+        return res.json({
+          success: true,
+          status: "paid",
+          cardNumber: card?.cardNumber || null,
+        });
+      }
+
+      res.json({ success: true, status: tx.status });
     } catch (err) {
       console.error("[GoPlusRoutes] Erreur GET /verify/:transactionId:", err);
       res.status(500).json({ success: false, message: "Erreur serveur" });

@@ -9,10 +9,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckCircle, Star, Zap, CreditCard, Smartphone, Shield, Loader2, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
+import { PAWAPAY_COUNTRIES, type PawaPayCountry } from "@shared/pawapay-countries";
 
 interface GoPlusPlan {
   id: string;
@@ -42,7 +44,9 @@ export default function GoPlusPage() {
   const [selectedPlan, setSelectedPlan] = useState<GoPlusPlan | null>(null);
   const [provider, setProvider] = useState<"maishapay" | "pawapay">("maishapay");
   const [email, setEmail] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState<PawaPayCountry | null>(null);
+  const [selectedCorrespondent, setSelectedCorrespondent] = useState("");
+  const [localPhone, setLocalPhone] = useState("");
   const [checkEmail, setCheckEmail] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -65,6 +69,8 @@ export default function GoPlusPage() {
       planId: string;
       provider: "maishapay" | "pawapay";
       phoneNumber?: string;
+      correspondent?: string;
+      countryCode?: string;
     }) => {
       const res = await apiRequest("POST", "/api/go-plus/purchase", data);
       return res.json() as Promise<PurchaseResult>;
@@ -96,22 +102,49 @@ export default function GoPlusPage() {
     setIsModalOpen(true);
   };
 
+  const handleCountryChange = (countryCode: string) => {
+    const country = PAWAPAY_COUNTRIES.find(c => c.code === countryCode) || null;
+    setSelectedCountry(country);
+    setSelectedCorrespondent(country?.operators.length === 1 ? country.operators[0].code : "");
+    setLocalPhone("");
+  };
+
   const handleSubmitPurchase = () => {
     if (!selectedPlan) return;
     if (!email || !email.includes("@")) {
       toast({ title: "Email requis", description: "Veuillez entrer un email valide", variant: "destructive" });
       return;
     }
-    if (provider === "pawapay" && !phoneNumber) {
-      toast({ title: "Numéro requis", description: "Veuillez entrer votre numéro de téléphone Mobile Money", variant: "destructive" });
-      return;
+    if (provider === "pawapay") {
+      if (!selectedCountry) {
+        toast({ title: "Pays requis", description: "Veuillez sélectionner votre pays", variant: "destructive" });
+        return;
+      }
+      if (selectedCountry.operators.length > 1 && !selectedCorrespondent) {
+        toast({ title: "Opérateur requis", description: "Veuillez choisir votre opérateur Mobile Money", variant: "destructive" });
+        return;
+      }
+      if (!localPhone || localPhone.trim().length < 6) {
+        toast({ title: "Numéro requis", description: "Veuillez entrer votre numéro de téléphone Mobile Money", variant: "destructive" });
+        return;
+      }
     }
+
+    const fullPhone = provider === "pawapay" && selectedCountry
+      ? selectedCountry.phonePrefix + localPhone.replace(/^0+/, "").replace(/\s/g, "")
+      : undefined;
+
+    const correspondent = provider === "pawapay"
+      ? (selectedCorrespondent || selectedCountry?.operators[0]?.code)
+      : undefined;
 
     purchaseMutation.mutate({
       userId: email,
       planId: selectedPlan.id,
       provider,
-      phoneNumber: provider === "pawapay" ? phoneNumber : undefined,
+      phoneNumber: fullPhone,
+      correspondent,
+      countryCode: provider === "pawapay" ? selectedCountry?.code : undefined,
     });
   };
 
@@ -352,17 +385,59 @@ export default function GoPlusPage() {
             </div>
 
             {provider === "pawapay" && (
-              <div>
-                <Label htmlFor="phone-purchase">Numéro Mobile Money</Label>
-                <Input
-                  id="phone-purchase"
-                  data-testid="input-purchase-phone"
-                  type="tel"
-                  placeholder="+33 6 00 00 00 00"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  className="mt-1.5"
-                />
+              <div className="space-y-3">
+                <div>
+                  <Label htmlFor="country-purchase">Pays</Label>
+                  <Select onValueChange={handleCountryChange} value={selectedCountry?.code || ""}>
+                    <SelectTrigger id="country-purchase" data-testid="select-country" className="mt-1.5">
+                      <SelectValue placeholder="Choisir ton pays..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PAWAPAY_COUNTRIES.map(country => (
+                        <SelectItem key={country.code} value={country.code}>
+                          {country.flag} {country.name} (+{country.phonePrefix})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {selectedCountry && selectedCountry.operators.length > 1 && (
+                  <div>
+                    <Label htmlFor="operator-purchase">Opérateur Mobile Money</Label>
+                    <Select onValueChange={setSelectedCorrespondent} value={selectedCorrespondent}>
+                      <SelectTrigger id="operator-purchase" data-testid="select-operator" className="mt-1.5">
+                        <SelectValue placeholder="Choisir ton opérateur..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {selectedCountry.operators.map(op => (
+                          <SelectItem key={op.code} value={op.code}>
+                            {op.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {selectedCountry && (
+                  <div>
+                    <Label htmlFor="phone-purchase">Numéro de téléphone</Label>
+                    <div className="flex gap-2 mt-1.5">
+                      <div className="flex items-center px-3 rounded-md border bg-muted text-muted-foreground text-sm font-mono min-w-fit">
+                        +{selectedCountry.phonePrefix}
+                      </div>
+                      <Input
+                        id="phone-purchase"
+                        data-testid="input-purchase-phone"
+                        type="tel"
+                        placeholder="6 00 00 00 00"
+                        value={localPhone}
+                        onChange={(e) => setLocalPhone(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
