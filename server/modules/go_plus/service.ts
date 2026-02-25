@@ -53,7 +53,7 @@ export class GoPlusService {
     if (provider === "maishapay") {
       const result = await maishaPayProvider.initPayment({
         provider: "maishapay",
-        amount: plan.price,
+        amount: plan.price / 100,
         currency: "USD",
         serviceId: `go-plus-${plan.id}`,
         serviceName: `Carte GO+ ${plan.name}`,
@@ -84,8 +84,8 @@ export class GoPlusService {
     if (provider === "pawapay") {
       const result = await pawaPayProvider.initPayment({
         provider: "pawapay",
-        amount: plan.price,
-        currency: plan.currency,
+        amount: plan.price / 100,
+        currency: "EUR",
         serviceId: `go-plus-${plan.id}`,
         serviceName: `Carte GO+ ${plan.name}`,
         customerEmail: userId,
