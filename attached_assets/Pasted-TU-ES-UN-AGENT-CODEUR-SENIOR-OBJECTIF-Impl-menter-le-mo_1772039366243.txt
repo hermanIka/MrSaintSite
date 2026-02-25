@@ -1,0 +1,206 @@
+TU ES UN AGENT CODEUR SENIOR.
+
+OBJECTIF :
+Implémenter le module GO+ permettant aux utilisateurs
+d’acheter une carte virtuelle Go+ donnant accès à des réductions
+et privilèges sur certains services.
+
+Les paiements doivent être gérés exclusivement via :
+- Maishapay (cartes bancaires)
+- Pawapay (mobile money)
+
+Aucune donnée bancaire ou mobile money ne doit être stockée.
+
+------------------------------------------------------------
+1️⃣ ARCHITECTURE DU MODULE
+------------------------------------------------------------
+
+Créer un module isolé :
+
+/modules/go_plus/
+
+Structure interne :
+- models/
+- services/
+- controllers/
+- routes/
+- webhooks/
+
+Le module doit être indépendant du reste du système.
+
+------------------------------------------------------------
+2️⃣ BASE DE DONNÉES
+------------------------------------------------------------
+
+Créer les tables suivantes :
+
+TABLE go_plus_plans
+- id (PK)
+- name
+- description
+- price
+- currency
+- discount_percentage
+- privileges (JSON)
+- duration_days
+- is_active
+- created_at
+- updated_at
+
+TABLE go_plus_cards
+- id (PK)
+- user_id (FK)
+- plan_id (FK)
+- card_number (UUID unique)
+- status (pending / active / expired / suspended)
+- start_date
+- end_date
+- created_at
+- updated_at
+
+TABLE go_plus_transactions
+- id (PK)
+- user_id
+- plan_id
+- provider (maishapay / pawapay)
+- provider_payment_id
+- amount
+- currency
+- status (pending / paid / failed)
+- raw_webhook_payload (JSON)
+- created_at
+- updated_at
+
+Aucune donnée carte bancaire ou mobile money ne doit être stockée.
+
+------------------------------------------------------------
+3️⃣ PROCESSUS D’ACHAT
+------------------------------------------------------------
+
+Quand utilisateur clique "Acheter Go+" :
+
+1. Vérifier qu’il est authentifié
+2. Créer transaction status = pending
+3. Selon moyen choisi :
+
+SI paiement carte :
+   → Appeler API backend Maishapay
+   → Générer lien de paiement sécurisé
+   → Rediriger utilisateur
+
+SI mobile money :
+   → Appeler API backend Pawapay
+   → Déclencher demande de paiement
+   → Retourner statut en attente
+
+Aucune logique métier critique côté frontend.
+
+------------------------------------------------------------
+4️⃣ WEBHOOKS SÉCURISÉS
+------------------------------------------------------------
+
+Créer endpoints :
+
+POST /webhooks/maishapay/go-plus
+POST /webhooks/pawapay/go-plus
+
+À réception :
+
+- Vérifier signature officielle du provider
+- Vérifier statut réel via API provider
+- Si paiement confirmé :
+      → transaction.status = paid
+      → créer go_plus_card
+      → activer carte
+- Si échec :
+      → transaction.status = failed
+
+Toujours vérifier via API provider avant activation.
+
+------------------------------------------------------------
+5️⃣ ACTIVATION CARTE GO+
+------------------------------------------------------------
+
+À activation :
+
+- Générer card_number = UUID sécurisé
+- start_date = now()
+- end_date = now() + duration_days
+- status = active
+
+Créer fonction globale :
+
+getUserActiveGoPlus(user_id)
+
+Retourne :
+- active + plan
+- expired
+- none
+
+------------------------------------------------------------
+6️⃣ APPLICATION AUTOMATIQUE DES RÉDUCTIONS
+------------------------------------------------------------
+
+Créer service :
+
+applyGoPlusDiscount(user_id, service_price)
+
+Logique :
+- Vérifier carte active
+- Appliquer discount_percentage
+- Retourner prix réduit
+- Journaliser utilisation
+
+Aucune réduction calculée côté frontend.
+
+------------------------------------------------------------
+7️⃣ SÉCURITÉ
+------------------------------------------------------------
+
+- Clés API Maishapay et Pawapay en variables d’environnement backend
+- Aucune clé exposée frontend
+- Protection contre double paiement (idempotency)
+- Protection contre double activation
+- Validation serveur obligatoire
+
+------------------------------------------------------------
+8️⃣ FRONTEND
+------------------------------------------------------------
+
+Créer page /go-plus affichant :
+- plans actifs
+- prix
+- privilèges
+- bouton Acheter
+
+Créer pages :
+- /go-plus/success
+- /go-plus/failed
+
+Afficher carte active dans profil utilisateur.
+
+------------------------------------------------------------
+9️⃣ ADMIN
+------------------------------------------------------------
+
+Interface admin sécurisée :
+- créer / modifier plans
+- voir transactions
+- suspendre carte
+- voir cartes actives
+
+Aucune donnée bancaire visible.
+
+------------------------------------------------------------
+VALIDATION FINALE
+------------------------------------------------------------
+
+✔ Achat via Maishapay fonctionne
+✔ Achat via Pawapay fonctionne
+✔ Webhooks activent automatiquement la carte
+✔ Réductions appliquées dynamiquement
+✔ Carte expire automatiquement
+✔ Aucune dépendance Stripe ou LemonSqueezy
+✔ Aucune donnée sensible stockée
+
+LIVRER CODE PRODUCTION READY.
