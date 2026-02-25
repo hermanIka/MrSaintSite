@@ -215,25 +215,26 @@ export default function ContactPage() {
                     Contact direct
                   </h3>
                   <div className="space-y-6">
-                    <Link href="/reservation">
-                      <div
-                        data-testid="link-whatsapp"
-                        className="flex items-center gap-4 hover-elevate active-elevate-2 p-4 rounded-lg transition-all cursor-pointer"
-                      >
-                        <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-                          <SiWhatsapp className="w-6 h-6 text-white" />
-                        </div>
-                        <div>
-                          <div className="font-medium text-foreground">
-                            WhatsApp
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            Réserver d'abord
-                          </div>
-                        </div>
-                        <Calendar className="w-5 h-5 text-primary ml-auto" />
+                    <a
+                      href="https://wa.me/33666013866"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-testid="link-whatsapp"
+                      className="flex items-center gap-4 hover-elevate active-elevate-2 p-4 rounded-lg transition-all cursor-pointer"
+                    >
+                      <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
+                        <SiWhatsapp className="w-6 h-6 text-white" />
                       </div>
-                    </Link>
+                      <div>
+                        <div className="font-medium text-foreground">
+                          WhatsApp
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          +33 6 66 01 38 66
+                        </div>
+                      </div>
+                      <SiWhatsapp className="w-5 h-5 text-green-500 ml-auto" />
+                    </a>
 
                     <Link href="/reservation">
                       <div

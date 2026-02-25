@@ -46,15 +46,16 @@ export function Footer() {
               >
                 <Linkedin className="w-5 h-5" />
               </a>
-              <Link href="/reservation">
-                <span
-                  data-testid="link-whatsapp-footer"
-                  className="w-10 h-10 flex items-center justify-center rounded-md bg-white/5 hover-elevate active-elevate-2 text-white hover:text-primary transition-colors"
-                  aria-label="WhatsApp - Réserver"
-                >
-                  <SiWhatsapp className="w-5 h-5" />
-                </span>
-              </Link>
+              <a
+                href="https://wa.me/33666013866"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="link-whatsapp-footer"
+                className="w-10 h-10 flex items-center justify-center rounded-md bg-white/5 hover-elevate active-elevate-2 text-white hover:text-primary transition-colors"
+                aria-label="WhatsApp - Mr Saint"
+              >
+                <SiWhatsapp className="w-5 h-5" />
+              </a>
             </div>
           </div>
 
