@@ -94,15 +94,17 @@ export function FeaturedTripsCarousel() {
 
   if (isLoading) {
     return (
-      <section className="py-20 overflow-hidden relative" style={{ background: "linear-gradient(to bottom, #000000, #0a0a0a 40%, var(--background))" }}>
+      <section className="py-20 overflow-hidden relative bg-gradient-to-b from-muted/40 to-background dark:from-black dark:via-[#0a0a0a] dark:to-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-heading font-bold text-white mb-2">Voyages <span className="text-primary">Phares</span></h2>
-            <p className="text-white/60">Chargement...</p>
+            <h2 className="text-4xl font-heading font-bold text-foreground mb-2">
+              Voyages <span className="text-primary">Phares</span>
+            </h2>
+            <p className="text-muted-foreground">Chargement...</p>
           </div>
           <div className="flex gap-8 justify-center">
             {[1, 2, 3].map(i => (
-              <div key={i} className="flex-shrink-0 w-[340px] h-[380px] rounded-xl bg-white/5 animate-pulse" />
+              <div key={i} className="flex-shrink-0 w-[340px] h-[380px] rounded-xl bg-muted/30 animate-pulse" />
             ))}
           </div>
         </div>
@@ -117,13 +119,12 @@ export function FeaturedTripsCarousel() {
 
   return (
     <section
-      className="py-20 overflow-hidden relative"
+      className="py-20 overflow-hidden relative bg-gradient-to-b from-muted/40 via-muted/10 to-background dark:from-black dark:via-[#0a0a0a] dark:to-background"
       data-testid="section-featured-trips"
-      style={{ background: "linear-gradient(to bottom, #000000, #0a0a0a 40%, var(--background))" }}
     >
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ backgroundImage: "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(242,201,76,0.07) 0%, transparent 70%)" }}
+        style={{ backgroundImage: "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(242,201,76,0.06) 0%, transparent 70%)" }}
       />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-14 text-center">
@@ -131,7 +132,7 @@ export function FeaturedTripsCarousel() {
           Tendances
         </span>
         <h2
-          className="text-4xl sm:text-5xl font-heading font-bold text-white mb-4"
+          className="text-4xl sm:text-5xl font-heading font-bold text-foreground mb-4"
           data-testid="text-featured-title"
         >
           Voyages <span className="text-primary">Phares</span>
@@ -141,7 +142,7 @@ export function FeaturedTripsCarousel() {
           <div className="h-1 w-8 rounded-full bg-primary" />
           <div className="h-px w-16 bg-primary/30" />
         </div>
-        <p className="text-white/60 max-w-lg mx-auto text-base">
+        <p className="text-muted-foreground max-w-lg mx-auto text-base">
           Nos destinations les plus prisées, soigneusement sélectionnées par nos experts voyagistes
         </p>
       </div>
@@ -156,14 +157,8 @@ export function FeaturedTripsCarousel() {
           ))}
         </div>
 
-        <div
-          className="absolute left-0 top-0 bottom-0 w-24 pointer-events-none z-10"
-          style={{ background: "linear-gradient(to right, #000, transparent)" }}
-        />
-        <div
-          className="absolute right-0 top-0 bottom-0 w-24 pointer-events-none z-10"
-          style={{ background: "linear-gradient(to left, #0a0a0a, transparent)" }}
-        />
+        <div className="absolute left-0 top-0 bottom-0 w-24 pointer-events-none z-10 bg-gradient-to-r from-background dark:from-black to-transparent" />
+        <div className="absolute right-0 top-0 bottom-0 w-24 pointer-events-none z-10 bg-gradient-to-l from-background dark:from-[#0a0a0a] to-transparent" />
       </div>
 
       <style>{`
