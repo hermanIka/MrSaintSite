@@ -80,7 +80,6 @@ export default function AboutPage() {
           </p>
         </div>
       </section>
-
       <section className="py-24 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -154,7 +153,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-
       <section className="py-24 bg-muted/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -190,7 +188,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-
       <section className="py-24 bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -224,7 +221,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-
       <section className="py-24 bg-primary text-primary-foreground">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-6">
@@ -238,9 +234,7 @@ export default function AboutPage() {
               data-testid="button-cta-contact"
               size="lg"
               variant="secondary"
-            >
-              Discutons de votre projet
-            </Button>
+            >Consultez Maintenant</Button>
           </Link>
         </div>
       </section>
