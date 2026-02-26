@@ -136,7 +136,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       <section className="py-24 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -186,9 +185,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       <FeaturedTripsCarousel />
-
       <section className="py-24 bg-black text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -224,7 +221,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
       <section className="py-24 bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -312,7 +308,6 @@ export default function HomePage() {
           ) : null}
         </div>
       </section>
-
       <section className="py-24 bg-primary text-primary-foreground">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-6">
@@ -327,9 +322,7 @@ export default function HomePage() {
               data-testid="button-cta-contact"
               size="lg"
               variant="secondary"
-            >
-              Me contacter
-            </Button>
+            >Consultez-Moi</Button>
           </Link>
         </div>
       </section>
