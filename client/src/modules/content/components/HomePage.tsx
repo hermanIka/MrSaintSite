@@ -5,7 +5,7 @@ import { Layout } from "@/modules/foundation";
 import { SEO } from "@/components/SEO";
 import { useQuery } from "@tanstack/react-query";
 import type { Testimonial } from "@shared/schema";
-import { Plane, FileText, Briefcase, Shield, Users, Globe, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plane, FileText, Briefcase, Shield, Users, Globe, ChevronLeft, ChevronRight, CreditCard } from "lucide-react";
 import { useState } from "react";
 import heroImage from "@assets/generated_images/Luxury_travel_hero_image_4477beea.png";
 import { FeaturedTripsCarousel } from "./FeaturedTripsCarousel";
@@ -45,12 +45,12 @@ export default function HomePage() {
       testId: "card-service-agency",
     },
     {
-      icon: Plane,
-      title: "Voyages organisés",
+      icon: CreditCard,
+      title: "Voyage à Crédit",
       description:
-        "Découvrez nos voyages business exclusifs vers Dubaï, Istanbul, la Chine et plus encore. Expériences premium.",
-      link: "/voyages",
-      testId: "card-service-trips",
+        "Partez maintenant, payez en plusieurs fois. Financez votre voyage ou votre visa en toute flexibilité grâce à notre programme de crédit.",
+      link: "/voyage-credit",
+      testId: "card-service-credit",
     },
   ];
 
