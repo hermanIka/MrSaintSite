@@ -28,7 +28,7 @@ export function Navigation() {
     { href: "/services", label: "Services" },
     { href: "/go-plus", label: "GO+" },
     { href: "/portfolio", label: "Portfolio" },
-    { href: "/faq", label: "FAQ" },
+    { href: "/voyages", label: "Nos Voyages" },
     { href: "/contact", label: "Contact" },
   ];
 

@@ -322,7 +322,7 @@ export default function HomePage() {
             Contactez-moi dès aujourd'hui pour discuter de votre projet de
             voyage ou de création d'agence.
           </p>
-          <Link href="/contact">
+          <Link href="/reservation">
             <Button
               data-testid="button-cta-contact"
               size="lg"

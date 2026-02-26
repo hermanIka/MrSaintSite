@@ -104,6 +104,16 @@ export function Footer() {
                   </span>
                 </Link>
               </li>
+              <li>
+                <Link href="/faq">
+                  <span
+                    data-testid="link-footer-faq"
+                    className="text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                  >
+                    FAQ
+                  </span>
+                </Link>
+              </li>
             </ul>
           </div>
 
