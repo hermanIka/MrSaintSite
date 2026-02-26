@@ -71,7 +71,7 @@ export function Navigation() {
                   data-testid="button-reserve-service"
                   className="ml-4"
                   size="default"
-                >Consulter</Button>
+                >Consultation</Button>
               </Link>
             </div>
 
