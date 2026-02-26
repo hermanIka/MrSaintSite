@@ -41,7 +41,7 @@ export default function AboutPage() {
   const stats = [
     { value: "7+", label: "Années d'expérience" },
     { value: "500+", label: "Clients accompagnés" },
-    { value: "50+", label: "Agences créées" },
+    { value: "15+", label: "Agences créées" },
     { value: "98%", label: "Taux de satisfaction" },
   ];
 
@@ -233,7 +233,7 @@ export default function AboutPage() {
           <p className="text-lg mb-10 opacity-90">
             Que vous souhaitiez voyager ou créer votre agence, nous sommes là pour vous accompagner.
           </p>
-          <Link href="/contact">
+          <Link href="/reservation">
             <Button
               data-testid="button-cta-contact"
               size="lg"
