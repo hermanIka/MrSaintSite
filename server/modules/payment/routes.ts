@@ -136,6 +136,7 @@ export function registerPaymentRoutes(app: Express): void {
         countryCode,
         metadata,
         paymentMode,
+        source,
       } = req.body;
 
       if (!provider || !amount || !serviceId || !serviceName || !customerEmail) {
@@ -166,6 +167,7 @@ export function registerPaymentRoutes(app: Express): void {
         countryCode,
         metadata,
         paymentMode: paymentMode || "direct",
+        source: source || "reservation",
       };
 
       const result = await paymentService.initPayment(request);
@@ -264,13 +266,16 @@ export function registerPaymentRoutes(app: Express): void {
         return res.redirect("/reservation?payment=error&message=payment_not_found");
       }
 
+      const paymentSource = (existingPayment as any).source || "reservation";
+      const returnPath = paymentSource === "visa" ? "/facilitation-visa" : "/reservation";
+
       if (existingPayment.status === "success") {
-        return res.redirect(`/reservation?payment=success&id=${paymentId}&provider=maishapay`);
+        return res.redirect(`${returnPath}?payment=success&id=${paymentId}&provider=maishapay`);
       }
 
       if (existingPayment.status !== "pending" && existingPayment.status !== "processing") {
         console.warn("[MaishaPay] Callback rejected - payment not in pending state:", paymentId, existingPayment.status);
-        return res.redirect("/reservation?payment=error&message=invalid_state");
+        return res.redirect(`${returnPath}?payment=error&message=invalid_state`);
       }
 
       if (!isProduction) {
@@ -288,7 +293,7 @@ export function registerPaymentRoutes(app: Express): void {
       const paymentResult = isSuccess ? "success" : "failed";
       const message = description ? encodeURIComponent(description as string) : "";
       
-      res.redirect(`/reservation?payment=${paymentResult}&id=${paymentId}&provider=maishapay${message ? `&message=${message}` : ""}`);
+      res.redirect(`${returnPath}?payment=${paymentResult}&id=${paymentId}&provider=maishapay${message ? `&message=${message}` : ""}`);
     } catch (error) {
       console.error("[MaishaPay] Callback error:", error instanceof Error ? error.message : "unknown");
       res.redirect("/reservation?payment=error&message=callback_error");

@@ -84,7 +84,7 @@ class PaymentService {
     return { valid: true, expectedAmount };
   }
 
-  async initPayment(request: PaymentInitRequest & { paymentMode?: string }): Promise<PaymentInitResponse> {
+  async initPayment(request: PaymentInitRequest & { paymentMode?: string; source?: string }): Promise<PaymentInitResponse> {
     const provider = this.getProvider(request.provider);
     
     if (!provider) {
@@ -138,6 +138,7 @@ class PaymentService {
           customerName: request.customerName || null,
           customerPhone: request.customerPhone || null,
           paymentMode,
+          source: request.source || "reservation",
           metadata: request.metadata ? JSON.stringify(request.metadata) : null,
           createdAt: now,
           updatedAt: now,

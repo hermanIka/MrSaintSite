@@ -32,10 +32,14 @@ import {
   insertCreditTravelRequestSchema,
   insertChatbotSystemPromptSchema,
   insertGoPlusPlanSchema,
+  insertVisaRequestSchema,
 } from "@shared/schema";
 import { chatbotStorage } from "../chatbot/storage";
 import { ObjectStorageService } from "../../replit_integrations/object_storage";
 import { goPlusStorage } from "../go_plus/storage";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export function registerAdminRoutes(app: Express) {
   // ============ AUTH ============
@@ -964,6 +968,133 @@ export function registerAdminRoutes(app: Express) {
     try {
       const transactions = await goPlusStorage.getAllGoPlusTransactions();
       res.json({ success: true, transactions });
+    } catch {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  // ============ VISA REQUESTS (Public submission) ============
+
+  app.post("/api/visa-requests", async (req, res) => {
+    try {
+      const now = new Date().toISOString();
+      const requestData = {
+        ...req.body,
+        createdAt: now,
+        updatedAt: now,
+      };
+
+      const validatedData = insertVisaRequestSchema.parse(requestData);
+      const request = await adminStorage.createVisaRequest(validatedData);
+
+      const visaTypeLabels: Record<string, string> = {
+        tourisme: "Tourisme",
+        business: "Business",
+        etudes: "Études",
+        travail: "Travail",
+      };
+      const visaLabel = visaTypeLabels[validatedData.visaType] || validatedData.visaType;
+
+      try {
+        await resend.emails.send({
+          from: "Mr Saint <onboarding@resend.dev>",
+          to: "matandusaint@gmail.com",
+          subject: `[Demande Visa] ${validatedData.firstName} ${validatedData.lastName} — ${visaLabel}`,
+          html: `
+            <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #fff;">
+              <div style="background: #000; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+                <h1 style="color: #F2C94C; margin: 0; font-size: 24px;">Mr Saint</h1>
+                <p style="color: #fff; margin: 4px 0; font-size: 14px;">Nouvelle demande de visa</p>
+              </div>
+              <div style="border: 1px solid #e0e0e0; border-top: none; padding: 24px; border-radius: 0 0 8px 8px;">
+                <h2 style="color: #333; margin-top: 0;">Informations du demandeur</h2>
+                <table style="width: 100%; border-collapse: collapse;">
+                  <tr><td style="padding: 8px 0; color: #666; width: 40%;"><strong>Nom complet</strong></td><td style="padding: 8px 0;">${validatedData.firstName} ${validatedData.lastName}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #666;"><strong>Email</strong></td><td style="padding: 8px 0;">${validatedData.email}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #666;"><strong>Téléphone</strong></td><td style="padding: 8px 0;">${validatedData.phone}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #666;"><strong>Nationalité</strong></td><td style="padding: 8px 0;">${validatedData.nationality}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #666;"><strong>Date de naissance</strong></td><td style="padding: 8px 0;">${validatedData.birthDate}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #666;"><strong>Type de visa</strong></td><td style="padding: 8px 0; color: #F2C94C; font-weight: bold;">${visaLabel}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #666;"><strong>Destination</strong></td><td style="padding: 8px 0;">${validatedData.destination}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #666;"><strong>Mode de paiement</strong></td><td style="padding: 8px 0;">${validatedData.paymentMethod || "N/A"}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #666;"><strong>Montant payé</strong></td><td style="padding: 8px 0; color: green; font-weight: bold;">${validatedData.amount}€</td></tr>
+                  <tr><td style="padding: 8px 0; color: #666;"><strong>ID Paiement</strong></td><td style="padding: 8px 0; font-size: 12px; font-family: monospace;">${validatedData.paymentId || "N/A"}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #666;"><strong>Réf. Demande</strong></td><td style="padding: 8px 0; font-size: 12px; font-family: monospace;">${request.id}</td></tr>
+                </table>
+                <div style="background: #f9f9f9; padding: 16px; border-radius: 6px; margin-top: 16px;">
+                  <p style="margin: 0 0 8px 0; color: #333; font-weight: bold;">Documents uploadés :</p>
+                  <ul style="margin: 0; color: #555; line-height: 1.8;">
+                    <li>Passeport : ${validatedData.passportUrl ? "✓ Reçu" : "✗ Manquant"}</li>
+                    <li>Photo récente : ${validatedData.photoUrl ? "✓ Reçu" : "✗ Manquant"}</li>
+                    <li>Document justificatif : ${validatedData.supportingDocUrl ? "✓ Reçu" : "Non fourni"}</li>
+                  </ul>
+                </div>
+                <p style="margin-top: 24px; color: #888; font-size: 12px;">Accédez au tableau de bord admin pour traiter cette demande.</p>
+              </div>
+            </div>
+          `,
+        });
+      } catch (emailError) {
+        console.error("[Visa] Email notification failed:", emailError);
+      }
+
+      res.status(201).json({
+        success: true,
+        message: "Votre demande de visa a été soumise avec succès. Vous serez contacté dans les 48 heures.",
+        requestId: request.id,
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      }
+      console.error("Error creating visa request:", error);
+      res.status(500).json({ error: "Erreur lors de la soumission de votre demande" });
+    }
+  });
+
+  // ============ VISA REQUESTS (Admin) ============
+
+  app.get("/api/admin/visa-requests", authMiddleware, async (_req, res) => {
+    try {
+      const requests = await adminStorage.getAllVisaRequests();
+      res.json(requests);
+    } catch {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.get("/api/admin/visa-requests/:id", authMiddleware, async (req, res) => {
+    try {
+      const request = await adminStorage.getVisaRequestById(req.params.id);
+      if (!request) return res.status(404).json({ error: "Demande non trouvée" });
+      res.json(request);
+    } catch {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.put("/api/admin/visa-requests/:id/status", authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { id } = req.params;
+      const { status, adminNotes } = req.body;
+
+      if (!["pending", "processing", "approved", "rejected"].includes(status)) {
+        return res.status(400).json({ error: "Statut invalide" });
+      }
+
+      const request = await adminStorage.updateVisaRequestStatus(id, status, adminNotes);
+      if (!request) return res.status(404).json({ error: "Demande non trouvée" });
+
+      await adminStorage.createLog({
+        action: "UPDATE",
+        entityType: "visa_request",
+        entityId: id,
+        details: `Demande visa mise à jour: ${status}`,
+        adminId: req.admin!.adminId,
+        createdAt: new Date().toISOString(),
+      });
+
+      res.json(request);
     } catch {
       res.status(500).json({ error: "Erreur serveur" });
     }

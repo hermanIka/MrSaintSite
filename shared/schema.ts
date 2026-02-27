@@ -268,6 +268,7 @@ export const payments = pgTable("payments", {
   customerName: text("customer_name"),
   customerPhone: text("customer_phone"),
   paymentMode: text("payment_mode").notNull().default("direct"),
+  source: text("source").notNull().default("reservation"),
   metadata: text("metadata"),
   paidAt: text("paid_at"),
   createdAt: text("created_at").notNull(),
@@ -382,3 +383,50 @@ export const insertChatbotSystemPromptSchema = createInsertSchema(chatbotSystemP
 
 export type InsertChatbotSystemPrompt = z.infer<typeof insertChatbotSystemPromptSchema>;
 export type ChatbotSystemPrompt = typeof chatbotSystemPrompts.$inferSelect;
+
+// ==========================================
+// VISA REQUESTS MODULE
+// ==========================================
+
+export const visaRequests = pgTable("visa_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  lastName: text("last_name").notNull(),
+  firstName: text("first_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  nationality: text("nationality").notNull(),
+  birthDate: text("birth_date").notNull(),
+  visaType: text("visa_type").notNull(), // tourisme, business, etudes, travail
+  destination: text("destination").notNull(),
+  passportUrl: text("passport_url").notNull(),
+  photoUrl: text("photo_url").notNull(),
+  supportingDocUrl: text("supporting_doc_url"),
+  paymentId: text("payment_id"),
+  paymentMethod: text("payment_method"), // maishapay, pawapay
+  amount: integer("amount").notNull().default(75),
+  status: text("status").notNull().default("pending"), // pending, processing, approved, rejected
+  adminNotes: text("admin_notes"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export const insertVisaRequestSchema = createInsertSchema(visaRequests).omit({
+  id: true,
+});
+
+export type InsertVisaRequest = z.infer<typeof insertVisaRequestSchema>;
+export type VisaRequest = typeof visaRequests.$inferSelect;
+
+export const VISA_TYPES = [
+  { value: "tourisme", label: "Tourisme" },
+  { value: "business", label: "Business" },
+  { value: "etudes", label: "Études" },
+  { value: "travail", label: "Travail" },
+] as const;
+
+export const VISA_REQUEST_STATUS = [
+  { value: "pending", label: "En attente", color: "bg-yellow-500" },
+  { value: "processing", label: "En cours", color: "bg-blue-500" },
+  { value: "approved", label: "Approuvée", color: "bg-green-500" },
+  { value: "rejected", label: "Rejetée", color: "bg-red-500" },
+] as const;

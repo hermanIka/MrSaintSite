@@ -1,18 +1,25 @@
+import { useState } from "react";
 import { Layout } from "@/modules/foundation";
 import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, FileText, Plane } from "lucide-react";
-import { Link } from "wouter";
+import { CheckCircle2, MessageCircle, FileText } from "lucide-react";
+import { Link, useLocation } from "wouter";
 import visaImage from "@assets/generated_images/Visa_facilitation_service_image_24df3a0c.png";
+import { VisaApplicationForm } from "./VisaApplicationForm";
 
 export default function FacilitationVisaPage() {
-  const visaTypes = [
-    { type: "Tourisme", description: "Pour vos vacances et découvertes" },
-    { type: "Business", description: "Pour vos déplacements professionnels" },
-    { type: "Études", description: "Pour vos projets académiques" },
-    { type: "Travail", description: "Pour vos opportunités professionnelles" },
-  ];
+  const [location] = useLocation();
+  const [showForm, setShowForm] = useState(false);
+
+  const urlParams = new URLSearchParams(
+    typeof window !== "undefined" ? window.location.search : ""
+  );
+  const paymentStatus = urlParams.get("payment");
+  const paymentId = urlParams.get("id") || undefined;
+  const paymentProvider = urlParams.get("provider") || undefined;
+
+  const isPendingReturn = paymentStatus === "success" && paymentProvider === "maishapay";
 
   const processSteps = [
     {
@@ -48,7 +55,7 @@ export default function FacilitationVisaPage() {
 
   return (
     <Layout>
-      <SEO 
+      <SEO
         title="Facilitation Visa"
         description="Service de facilitation visa pour Dubaï, Canada, États-Unis, Europe. Taux de réussite 95%. Accompagnement complet de votre dossier."
         keywords="visa, facilitation visa, Dubaï, Canada, États-Unis, Europe, Chine, démarches visa"
@@ -62,7 +69,7 @@ export default function FacilitationVisaPage() {
           style={{ backgroundImage: `url(${visaImage})` }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/70" />
-        
+
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1
             data-testid="text-page-title"
@@ -89,37 +96,6 @@ export default function FacilitationVisaPage() {
               l'intégralité du processus pour vous garantir une expérience
               sereine et efficace.
             </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-20 bg-black text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-4">
-              Types de visa
-            </h2>
-            <p className="text-lg text-white/70">
-              Nous traitons tous les types de demandes
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {visaTypes.map((visa, index) => (
-              <Card
-                key={index}
-                data-testid={`card-visa-${visa.type.toLowerCase()}`}
-                className="bg-white/5 border-white/10 hover-elevate active-elevate-2 transition-all"
-              >
-                <CardContent className="p-6 text-center">
-                  <Plane className="w-10 h-10 text-primary mx-auto mb-4" />
-                  <h3 className="text-lg font-heading font-semibold mb-2 text-white">
-                    {visa.type}
-                  </h3>
-                  <p className="text-sm text-white/70">{visa.description}</p>
-                </CardContent>
-              </Card>
-            ))}
           </div>
         </div>
       </section>
@@ -182,38 +158,107 @@ export default function FacilitationVisaPage() {
         </div>
       </section>
 
+      {/* Section principale : choix ou formulaire */}
       <section className="py-20 bg-background">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Card className="border-primary/20">
-            <CardContent className="p-12">
-              <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                  <FileText className="w-8 h-8 text-primary" />
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+
+          {/* Si retour MaishaPay ou formulaire ouvert → afficher le formulaire */}
+          {(isPendingReturn || showForm) ? (
+            <Card className="border-primary/20">
+              <CardContent className="p-8 sm:p-10">
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <FileText className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-heading font-bold text-foreground">
+                      Demande de visa — 75€
+                    </h3>
+                    <p className="text-sm text-muted-foreground">Remplissez le formulaire ci-dessous</p>
+                  </div>
                 </div>
-                <h3 className="text-2xl font-heading font-bold mb-4">
-                  Tarification
-                </h3>
-                <p className="text-4xl font-heading font-bold text-primary mb-2">
-                  À partir de 150€
-                </p>
-                <p className="text-muted-foreground mb-8">
-                  Prix variable selon le type de visa et la destination
-                </p>
-                <Link href="/contact">
-                  <Button
-                    data-testid="button-start-request"
-                    size="lg"
-                    className="w-full rounded-full text-lg py-6"
+                <VisaApplicationForm
+                  pendingPaymentId={isPendingReturn ? paymentId : undefined}
+                  pendingProvider={isPendingReturn ? paymentProvider : undefined}
+                />
+                {!isPendingReturn && (
+                  <button
+                    type="button"
+                    onClick={() => setShowForm(false)}
+                    className="mt-6 text-sm text-muted-foreground underline underline-offset-4"
                   >
-                    Commencer ma demande
-                  </Button>
-                </Link>
-                <p className="text-xs text-muted-foreground mt-4">
-                  * Paiement sécurisé - Système de paiement disponible prochainement
+                    Retour au choix
+                  </button>
+                )}
+              </CardContent>
+            </Card>
+          ) : (
+            /* Carte de choix — deux options */
+            <Card className="border-primary/20">
+              <CardContent className="p-8 sm:p-12">
+                <div className="text-center mb-10">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                    <FileText className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-2xl font-heading font-bold text-foreground mb-2">
+                    Commencez votre démarche visa
+                  </h3>
+                  <p className="text-muted-foreground max-w-md mx-auto">
+                    Vous hésitez ? Consultez d'abord un expert pour évaluer votre dossier,
+                    ou déposez directement votre demande.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {/* Option 1 : Consulter d'abord */}
+                  <div className="flex flex-col p-6 rounded-xl border border-border bg-muted/20 hover-elevate">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                      <MessageCircle className="w-5 h-5 text-primary" />
+                    </div>
+                    <h4 className="text-lg font-heading font-semibold text-foreground mb-2">
+                      Consulter D'abord
+                    </h4>
+                    <p className="text-sm text-muted-foreground mb-6 flex-1">
+                      Un expert analyse votre dossier et vous guide sur la marche à suivre. Consultation à <strong>20€</strong>.
+                    </p>
+                    <Link href="/reservation?service=visa">
+                      <Button
+                        data-testid="button-consult-first"
+                        variant="outline"
+                        className="w-full"
+                      >
+                        Prendre rendez-vous — 20€
+                      </Button>
+                    </Link>
+                  </div>
+
+                  {/* Option 2 : Commencer la demande */}
+                  <div className="flex flex-col p-6 rounded-xl border border-primary/30 bg-primary/5">
+                    <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center mb-4">
+                      <FileText className="w-5 h-5 text-primary" />
+                    </div>
+                    <h4 className="text-lg font-heading font-semibold text-foreground mb-2">
+                      Commencer ma demande
+                    </h4>
+                    <p className="text-sm text-muted-foreground mb-6 flex-1">
+                      Remplissez votre dossier, uploadez vos documents et réglez les frais de traitement. Traitement en <strong>75€</strong>.
+                    </p>
+                    <Button
+                      data-testid="button-start-request"
+                      className="w-full"
+                      onClick={() => setShowForm(true)}
+                    >
+                      Déposer ma demande — 75€
+                    </Button>
+                  </div>
+                </div>
+
+                <p className="text-xs text-muted-foreground text-center mt-8">
+                  Paiement sécurisé — Carte bancaire ou Mobile Money
                 </p>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </section>
     </Layout>
