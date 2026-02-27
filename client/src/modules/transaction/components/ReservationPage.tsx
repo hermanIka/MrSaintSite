@@ -3,15 +3,16 @@ import { Layout } from "@/modules/foundation";
 import { SEO } from "@/components/SEO";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Link, useSearch } from "wouter";
-import { FileText, Briefcase, Plane, CheckCircle, Calendar as CalendarIcon, CreditCard, Lock, ArrowLeft, Clock, Loader2, XCircle, Smartphone } from "lucide-react";
+import { Link, useSearch, useLocation } from "wouter";
+import { FileText, Briefcase, CheckCircle, Calendar as CalendarIcon, CreditCard, Lock, ArrowLeft, Clock, Loader2, XCircle, Smartphone, Banknote } from "lucide-react";
 import CalendarBooking from "./CalendarBooking";
 import CalendlyWidget from "./CalendlyWidget";
 import { PaymentMethodSelector } from "./PaymentMethodSelector";
 import { useToast } from "@/hooks/use-toast";
+import { usePrices } from "@/hooks/usePrices";
 import reservationHero from "@/assets/images/reservation-hero.png";
 
-type ServiceType = "visa" | "agence" | "voyage" | null;
+type ServiceType = "visa" | "agence" | "credit" | null;
 type Step = "select" | "calendar" | "payment" | "verifying" | "success";
 type PaymentMode = "direct" | "consultation";
 
@@ -22,6 +23,8 @@ interface SelectedSlotInfo {
 }
 
 export default function ReservationPage() {
+  const [, setLocation] = useLocation();
+  const { prices } = usePrices();
   const [selectedService, setSelectedService] = useState<ServiceType>(null);
   const [currentStep, setCurrentStep] = useState<Step>("select");
   const [paymentMode, setPaymentMode] = useState<PaymentMode>("direct");
@@ -40,7 +43,7 @@ export default function ReservationPage() {
     const id = params.get("id");
     const serviceParam = params.get("service");
 
-    if (!paymentStatus && serviceParam && ["visa", "agence", "voyage"].includes(serviceParam)) {
+    if (!paymentStatus && serviceParam && ["visa", "agence"].includes(serviceParam)) {
       setSelectedService(serviceParam as ServiceType);
       setCurrentStep("calendar");
       return;
@@ -86,27 +89,30 @@ export default function ReservationPage() {
       icon: FileText,
       title: "Facilitation Visa",
       description: "Demande de visa pour votre destination",
-      price: 75,
-      priceLabel: "À partir de 75€",
+      price: prices.visa,
+      priceLabel: `${prices.visa}€`,
       features: ["Analyse du dossier", "Constitution des documents", "Suivi de la demande"],
+      externalUrl: undefined as string | undefined,
     },
     {
       id: "agence" as const,
       icon: Briefcase,
       title: "Création d'Agence",
       description: "Formation et accompagnement complet",
-      price: 750,
-      priceLabel: "750€",
-      features: ["Formation 4 semaines", "Coaching 6 mois", "Accès au réseau"],
+      price: prices.agence_classique,
+      priceLabel: `À partir de ${prices.agence_classique}€`,
+      features: ["Formation intensive", "Coaching personnalisé", "Accès au réseau partenaires"],
+      externalUrl: undefined as string | undefined,
     },
     {
-      id: "voyage" as const,
-      icon: Plane,
-      title: "Voyage Organisé",
-      description: "Voyage business clé en main",
-      price: 1200,
-      priceLabel: "À partir de 1 200€",
-      features: ["Vol + Hébergement", "Transferts inclus", "Guide francophone"],
+      id: "credit" as const,
+      icon: Banknote,
+      title: "Voyage à Crédit",
+      description: "Financement de voyage sur mesure",
+      price: 0,
+      priceLabel: "Sur demande",
+      features: ["Financement personnalisé", "Durée flexible", "Réservé GO+ Gold"],
+      externalUrl: "/voyage-credit",
     },
   ];
 
@@ -159,7 +165,7 @@ export default function ReservationPage() {
     setCurrentStep("payment");
   };
 
-  const CONSULTATION_PRICE = 20;
+  const CONSULTATION_PRICE = prices.consultation;
 
   const handleContactFirst = () => {
     if (selectedService) {
@@ -332,7 +338,7 @@ export default function ReservationPage() {
                             ? "border-primary ring-2 ring-primary/20"
                             : "border-primary/20"
                         }`}
-                        onClick={() => setSelectedService(service.id)}
+                        onClick={() => service.externalUrl ? setLocation(service.externalUrl) : setSelectedService(service.id as ServiceType)}
                       >
                         <CardHeader className="pb-4">
                           <div className="flex items-center justify-between mb-4">
@@ -397,7 +403,7 @@ export default function ReservationPage() {
                           onClick={handleContactFirst}
                         >
                           <CalendarIcon className="w-5 h-5 mr-2" />
-                          Consulter d'abord (20€)
+                          Consulter d'abord ({prices.consultation}€)
                         </Button>
                     </div>
                   </CardContent>
@@ -438,13 +444,13 @@ export default function ReservationPage() {
                     <CardHeader>
                       <CardTitle className="text-xl font-heading">
                         {paymentMode === "consultation" 
-                          ? `Consultation pour : ${selectedServiceData?.title} — 20€`
+                          ? `Consultation pour : ${selectedServiceData?.title} (${prices.consultation}€)`
                           : `Paiement pour : ${selectedServiceData?.title}`
                         }
                       </CardTitle>
                       {paymentMode === "consultation" && (
                         <p className="text-sm text-muted-foreground mt-1">
-                          Le prix de la consultation est de 20€, quel que soit le service choisi.
+                          Le prix de la consultation est de {prices.consultation}€, quel que soit le service choisi.
                         </p>
                       )}
                     </CardHeader>

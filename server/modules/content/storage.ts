@@ -17,11 +17,13 @@ import {
   type Service,
   type TripGalleryPhoto,
   type InsertTripGalleryPhoto,
+  type ServicePrice,
   trips,
   testimonials,
   portfolio,
   services,
   tripGalleryPhotos,
+  servicePrices,
 } from "@shared/schema";
 import { db } from "../../db";
 import { eq, and, asc } from "drizzle-orm";
@@ -54,6 +56,11 @@ export interface IContentStorage {
 
   getPublishedServices(): Promise<Service[]>;
   getServiceBySlug(slug: string): Promise<Service | undefined>;
+
+  getAllPrices(): Promise<ServicePrice[]>;
+  getPriceByKey(key: string): Promise<ServicePrice | undefined>;
+  upsertPrice(key: string, label: string, amount: number): Promise<ServicePrice>;
+  updatePrice(key: string, amount: number): Promise<ServicePrice | undefined>;
 }
 
 export class ContentDbStorage implements IContentStorage {
@@ -218,6 +225,41 @@ export class ContentDbStorage implements IContentStorage {
       .from(services)
       .where(and(eq(services.slug, slug), eq(services.status, "published")));
     return service;
+  }
+
+  async getAllPrices(): Promise<ServicePrice[]> {
+    return await db.select().from(servicePrices);
+  }
+
+  async getPriceByKey(key: string): Promise<ServicePrice | undefined> {
+    const [price] = await db.select().from(servicePrices).where(eq(servicePrices.key, key));
+    return price;
+  }
+
+  async upsertPrice(key: string, label: string, amount: number): Promise<ServicePrice> {
+    const existing = await this.getPriceByKey(key);
+    if (existing) {
+      const [updated] = await db
+        .update(servicePrices)
+        .set({ amount, updatedAt: new Date().toISOString() })
+        .where(eq(servicePrices.key, key))
+        .returning();
+      return updated;
+    }
+    const [created] = await db
+      .insert(servicePrices)
+      .values({ key, label, amount, updatedAt: new Date().toISOString() })
+      .returning();
+    return created;
+  }
+
+  async updatePrice(key: string, amount: number): Promise<ServicePrice | undefined> {
+    const [updated] = await db
+      .update(servicePrices)
+      .set({ amount, updatedAt: new Date().toISOString() })
+      .where(eq(servicePrices.key, key))
+      .returning();
+    return updated;
   }
 }
 

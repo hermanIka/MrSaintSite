@@ -15,6 +15,7 @@ import {
   CreditCard,
   Stamp,
   Building2,
+  DollarSign,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -26,6 +27,7 @@ interface AdminLayoutProps {
 const navItems = [
   { href: "/admin/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
   { href: "/admin/services", label: "Services & Prix", icon: Settings },
+  { href: "/admin/tarifs", label: "Tarifs", icon: DollarSign },
   { href: "/admin/trips", label: "Voyages", icon: Plane },
   { href: "/admin/visa-requests", label: "Demandes Visa", icon: Stamp },
   { href: "/admin/agency-requests", label: "Demandes Agence", icon: Building2 },

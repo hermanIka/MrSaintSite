@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, integer, boolean, serial } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -475,6 +475,19 @@ export const insertAgencyRequestSchema = createInsertSchema(agencyRequests).omit
 
 export type InsertAgencyRequest = z.infer<typeof insertAgencyRequestSchema>;
 export type AgencyRequest = typeof agencyRequests.$inferSelect;
+
+// Service prices schema
+export const servicePrices = pgTable("service_prices", {
+  id: serial("id").primaryKey(),
+  key: text("key").notNull().unique(),
+  label: text("label").notNull(),
+  amount: integer("amount").notNull(),
+  updatedAt: text("updated_at").notNull().default(sql`now()`),
+});
+
+export const insertServicePriceSchema = createInsertSchema(servicePrices).omit({ id: true });
+export type InsertServicePrice = z.infer<typeof insertServicePriceSchema>;
+export type ServicePrice = typeof servicePrices.$inferSelect;
 
 export const AGENCY_PACKS = [
   {

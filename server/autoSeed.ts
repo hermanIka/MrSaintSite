@@ -25,6 +25,7 @@ import {
 } from "@shared/schema";
 import * as crypto from "crypto";
 import { seedInitialPrompt } from "./modules/chatbot/seedPrompt";
+import { contentStorage } from "./modules/content/storage";
 
 function hashPassword(password: string): string {
   return crypto.createHash("sha256").update(password).digest("hex");
@@ -556,6 +557,19 @@ async function ensureDataIntegrity(): Promise<void> {
     } else {
       console.log("  ✓ Plans GO+ déjà existants (avec Gold)");
     }
+
+    // Service prices seeding
+    const defaultPrices = [
+      { key: "visa", label: "Facilitation Visa", amount: 600 },
+      { key: "consultation", label: "Consultation expert", amount: 20 },
+      { key: "agence_classique", label: "Agence Classique", amount: 800 },
+      { key: "agence_premium", label: "Agence Premium", amount: 1500 },
+      { key: "agence_elite", label: "Agence Elite", amount: 2500 },
+    ];
+    for (const p of defaultPrices) {
+      await contentStorage.upsertPrice(p.key, p.label, p.amount);
+    }
+    console.log("  ✓ Tarifs services initialisés");
 
     console.log("✓ Data integrity check completed");
   } catch (error) {

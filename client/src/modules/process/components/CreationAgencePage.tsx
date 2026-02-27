@@ -9,9 +9,11 @@ import { Link, useLocation } from "wouter";
 import agencyImage from "@assets/generated_images/Agency_coaching_service_image_40575f0c.png";
 import { AGENCY_PACKS } from "@shared/schema";
 import { AgencyApplicationForm } from "./AgencyApplicationForm";
+import { usePrices } from "@/hooks/usePrices";
 
 export default function CreationAgencePage() {
   const [location] = useLocation();
+  const { prices } = usePrices();
   const [selectedPack, setSelectedPack] = useState<string | null>(null);
   const [pendingPaymentId, setPendingPaymentId] = useState<string | undefined>();
   const [pendingProvider, setPendingProvider] = useState<string | undefined>();
@@ -43,7 +45,12 @@ export default function CreationAgencePage() {
     }
   }, [selectedPack]);
 
-  const activePack = AGENCY_PACKS.find(p => p.value === selectedPack);
+  const dynamicPacks = AGENCY_PACKS.map(pack => ({
+    ...pack,
+    price: prices[`agence_${pack.value}` as keyof typeof prices] ?? pack.price,
+  }));
+
+  const activePack = dynamicPacks.find(p => p.value === selectedPack);
 
   const results = [
     { metric: "+15", label: "Entrepreneurs accompagnés" },
@@ -93,7 +100,7 @@ export default function CreationAgencePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-            {AGENCY_PACKS.map((pack) => (
+            {dynamicPacks.map((pack) => (
               <div key={pack.value} className={`relative flex flex-col rounded-xl border-2 transition-all ${
                 pack.highlighted
                   ? "border-primary bg-gradient-to-b from-primary/5 to-background shadow-lg shadow-primary/10"

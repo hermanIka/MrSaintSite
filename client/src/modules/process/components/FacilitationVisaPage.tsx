@@ -7,10 +7,12 @@ import { MessageCircle, FileText, ChevronRight } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import visaImage from "@assets/generated_images/Visa_facilitation_service_image_24df3a0c.png";
 import { VisaApplicationForm } from "./VisaApplicationForm";
+import { usePrices } from "@/hooks/usePrices";
 
 export default function FacilitationVisaPage() {
   const [location] = useLocation();
   const [showForm, setShowForm] = useState(false);
+  const { prices } = usePrices();
 
   const urlParams = new URLSearchParams(
     typeof window !== "undefined" ? window.location.search : ""
@@ -128,7 +130,7 @@ export default function FacilitationVisaPage() {
                   </div>
                   <div>
                     <h3 className="text-xl font-heading font-bold text-foreground">
-                      Demande de visa · 75€
+                      Demande de visa · {prices.visa}€
                     </h3>
                     <p className="text-sm text-muted-foreground">Remplissez le formulaire ci-dessous</p>
                   </div>
@@ -175,7 +177,7 @@ export default function FacilitationVisaPage() {
                       Consulter D'abord
                     </h4>
                     <p className="text-sm text-muted-foreground mb-6 flex-1">
-                      Un expert analyse votre dossier et vous guide sur la marche à suivre. Consultation à <strong>20€</strong>.
+                      Un expert analyse votre dossier et vous guide sur la marche à suivre. Consultation à <strong>{prices.consultation}€</strong>.
                     </p>
                     <Link href="/reservation?service=visa">
                       <Button
@@ -183,7 +185,7 @@ export default function FacilitationVisaPage() {
                         variant="outline"
                         className="w-full"
                       >
-                        Prendre rendez-vous · 20€
+                        Prendre rendez-vous · {prices.consultation}€
                       </Button>
                     </Link>
                   </div>
@@ -197,14 +199,14 @@ export default function FacilitationVisaPage() {
                       Commencer ma demande
                     </h4>
                     <p className="text-sm text-muted-foreground mb-6 flex-1">
-                      Remplissez votre dossier, uploadez vos documents et réglez les frais de traitement. Traitement en <strong>75€</strong>.
+                      Remplissez votre dossier, uploadez vos documents et réglez les frais de traitement. Traitement en <strong>{prices.visa}€</strong>.
                     </p>
                     <Button
                       data-testid="button-start-request"
                       className="w-full"
                       onClick={() => setShowForm(true)}
                     >
-                      Déposer ma demande · 75€
+                      Déposer ma demande · {prices.visa}€
                     </Button>
                   </div>
                 </div>

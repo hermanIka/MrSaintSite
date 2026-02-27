@@ -24,6 +24,7 @@ import {
   Crown,
 } from "lucide-react";
 import { useGoPlusCard } from "@/hooks/useGoPlusCard";
+import { usePrices } from "@/hooks/usePrices";
 
 interface VisaFormData {
   lastName: string;
@@ -51,6 +52,7 @@ const POLLING_TIMEOUT = 10 * 60 * 1000;
 export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaApplicationFormProps) {
   const { toast } = useToast();
   const { card, isGold } = useGoPlusCard();
+  const { prices } = usePrices();
   const [step, setStep] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState<"maishapay" | "pawapay">("maishapay");
   const [selectedCountry, setSelectedCountry] = useState<PawaPayCountry | null>(null);
@@ -99,7 +101,7 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
         ...data,
         paymentId,
         paymentMethod: method,
-        amount: 75,
+        amount: prices.visa,
       });
       const result = await res.json();
       if (result.success) {
@@ -232,7 +234,7 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
 
       const res = await apiRequest("POST", "/api/payments/init", {
         provider: paymentMethod,
-        amount: 75,
+        amount: prices.visa,
         currency: "EUR",
         serviceId: "visa",
         serviceName: "Facilitation Visa",
@@ -318,7 +320,7 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
         <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-6" />
         <h3 className="text-xl font-heading font-semibold text-foreground mb-3">En attente de confirmation</h3>
         <p className="text-muted-foreground max-w-sm mx-auto">
-          Vérifiez votre téléphone et confirmez le paiement Mobile Money de <strong>75€</strong>.
+          Vérifiez votre téléphone et confirmez le paiement Mobile Money de <strong>{prices.visa}€</strong>.
         </p>
         <p className="text-xs text-muted-foreground mt-4">ID : {pollingTransactionId}</p>
       </div>
@@ -500,12 +502,12 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
               <span className="text-muted-foreground">Montant :</span>
               {goldEmailMatch ? (
                 <span className="font-bold text-base flex items-center gap-2">
-                  <span className="line-through text-muted-foreground">75€</span>
+                  <span className="line-through text-muted-foreground">{prices.visa}€</span>
                   <span className="text-green-600 dark:text-green-400">GRATUIT</span>
                   <Crown className="w-4 h-4 text-primary" />
                 </span>
               ) : (
-                <span className="font-bold text-primary text-base">75€</span>
+                <span className="font-bold text-primary text-base">{prices.visa}€</span>
               )}
             </div>
           </div>
@@ -678,7 +680,7 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
             {isSubmitting ? (
               <><Loader2 className="w-4 h-4 animate-spin" /> Traitement...</>
             ) : (
-              <><Lock className="w-4 h-4" /> Confirmer et Payer 75€</>
+              <><Lock className="w-4 h-4" /> Confirmer et Payer {prices.visa}€</>
             )}
           </Button>
         )}

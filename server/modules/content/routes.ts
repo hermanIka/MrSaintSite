@@ -97,4 +97,17 @@ export function registerContentRoutes(app: Express): void {
       res.status(500).json({ error: "Failed to fetch service" });
     }
   });
+
+  app.get("/api/prices", async (_req, res) => {
+    try {
+      const prices = await contentStorage.getAllPrices();
+      const priceMap: Record<string, number> = {};
+      for (const p of prices) {
+        priceMap[p.key] = p.amount;
+      }
+      res.json(priceMap);
+    } catch {
+      res.status(500).json({ error: "Failed to fetch prices" });
+    }
+  });
 }

@@ -1255,4 +1255,32 @@ export function registerAdminRoutes(app: Express) {
       res.status(500).json({ error: "Erreur serveur" });
     }
   });
+
+  // ============ TARIFS ============
+
+  app.get("/api/admin/prices", authMiddleware, async (_req, res) => {
+    try {
+      const prices = await contentStorage.getAllPrices();
+      res.json(prices);
+    } catch {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.put("/api/admin/prices/:key", authMiddleware, async (req, res) => {
+    try {
+      const { key } = req.params;
+      const { amount } = req.body;
+      if (typeof amount !== "number" || amount < 0) {
+        return res.status(400).json({ error: "Montant invalide" });
+      }
+      const updated = await contentStorage.updatePrice(key, amount);
+      if (!updated) {
+        return res.status(404).json({ error: "Tarif introuvable" });
+      }
+      res.json(updated);
+    } catch {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
 }
