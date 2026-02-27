@@ -122,9 +122,9 @@ export default function AboutPage() {
                   Je suis également le fondateur de plusieurs plateformes et entreprises innovantes :
                 </p>
                 <ul className="space-y-2">
-                  <li><strong className="text-foreground">Go Fly</strong> — la première OTA offrant aux agences de voyage et aux agents indépendants du monde entier la possibilité de créer, gérer et vendre leurs propres forfaits touristiques, connectant ainsi des milliers de voyageurs.</li>
-                  <li><strong className="text-foreground">Go Send</strong> — une application mobile qui facilite la livraison et l'expédition de colis à travers le monde.</li>
-                  <li><strong className="text-foreground">Go House</strong> — un marketplace immobilier.</li>
+                  <li><strong className="text-foreground">Go Fly</strong> : la première OTA offrant aux agences de voyage et aux agents indépendants du monde entier la possibilité de créer, gérer et vendre leurs propres forfaits touristiques, connectant ainsi des milliers de voyageurs.</li>
+                  <li><strong className="text-foreground">Go Send</strong> : une application mobile qui facilite la livraison et l'expédition de colis à travers le monde.</li>
+                  <li><strong className="text-foreground">Go House</strong> : un marketplace immobilier.</li>
                 </ul>
               </div>
               <div className="flex flex-wrap gap-4 mt-8">
