@@ -216,7 +216,7 @@ export default function GoPlusPage() {
       </section>
 
       <section className="py-20 bg-background">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
           <div className="text-center mb-14">
             <h2 className="text-3xl font-heading font-bold mb-3">Choisis ton plan</h2>
@@ -228,7 +228,7 @@ export default function GoPlusPage() {
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
           ) : (
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {plans.map((plan) => {
                 const isPremium = plan.name.toLowerCase() === "premium";
                 return (
