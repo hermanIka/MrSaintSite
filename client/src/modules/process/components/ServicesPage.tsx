@@ -101,9 +101,10 @@ export default function ServicesPage() {
       </section>
       <section className="py-24 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {isLoading ? (
               <>
+                <ServiceCardSkeleton />
                 <ServiceCardSkeleton />
                 <ServiceCardSkeleton />
               </>
@@ -112,7 +113,7 @@ export default function ServicesPage() {
                 Une erreur est survenue lors du chargement des services. Veuillez réessayer.
               </div>
             ) : services && services.length > 0 ? (
-              services.filter(s => s.slug !== "voyage" && s.slug !== "consultation").map((service) => {
+              services.filter(s => s.slug !== "voyage").map((service) => {
                 const Icon = iconMap[service.iconName || "FileText"] || FileText;
                 
                 return (
