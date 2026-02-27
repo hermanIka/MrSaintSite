@@ -46,8 +46,8 @@ export default function CreationAgencePage() {
   const activePack = AGENCY_PACKS.find(p => p.value === selectedPack);
 
   const results = [
-    { metric: "+50", label: "Entrepreneurs accompagnés" },
-    { metric: "85%", label: "Taux de réussite" },
+    { metric: "+15", label: "Entrepreneurs accompagnés" },
+    { metric: "100%", label: "Taux de réussite" },
     { metric: "6 mois", label: "Durée moyenne avant rentabilité" },
   ];
 
