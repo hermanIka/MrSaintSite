@@ -110,18 +110,18 @@ export default function TripDetailPage() {
                   </h2>
                   <div
                     data-testid="gallery-mosaic"
-                    className="columns-2 md:columns-3 gap-3 space-y-3"
+                    className="grid grid-cols-2 md:grid-cols-3 gap-3"
                   >
                     {galleryPhotos.map((photo) => (
                       <div
                         key={photo.id}
                         data-testid={`gallery-photo-${photo.id}`}
-                        className="relative group break-inside-avoid rounded-md overflow-hidden"
+                        className="relative group rounded-md overflow-hidden"
                       >
                         <img
                           src={photo.url}
                           alt={photo.caption || trip.destination}
-                          className="w-full object-cover rounded-md"
+                          className="w-full h-48 object-cover rounded-md"
                           loading="lazy"
                         />
                         {photo.caption && (
