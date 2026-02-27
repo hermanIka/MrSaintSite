@@ -109,12 +109,9 @@ export default function CreationAgencePage() {
 
                 <div className={`p-6 ${pack.highlighted ? "pt-8" : ""}`}>
                   <h3 className="text-xl font-heading font-bold text-foreground">{pack.label}</h3>
-                  <p className="text-sm text-muted-foreground mt-1 mb-2">
+                  <p className="text-sm text-muted-foreground mt-1 mb-4">
                     Tu peux lancer ton agence avec {pack.startBudget}
                   </p>
-                  <div className="text-3xl font-heading font-bold text-primary mb-4">
-                    {pack.price}€
-                  </div>
 
                   <ul className="space-y-2.5 mb-6">
                     {pack.features.map((f, i) => (
