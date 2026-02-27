@@ -115,7 +115,7 @@ export default function ServicesPage() {
                 Une erreur est survenue lors du chargement des services. Veuillez réessayer.
               </div>
             ) : services && services.length > 0 ? (
-              services.map((service) => {
+              services.filter(s => s.slug !== "voyage").map((service) => {
                 const Icon = iconMap[service.iconName || "FileText"] || FileText;
                 
                 return (
