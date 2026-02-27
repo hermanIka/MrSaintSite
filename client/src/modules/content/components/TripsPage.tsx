@@ -6,14 +6,16 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import type { Trip } from "@shared/schema";
-import { MapPin } from "lucide-react";
+import { MapPin, Crown } from "lucide-react";
 import { Link } from "wouter";
 import tripsHeroBanner from "@/assets/images/trips-hero-banner.png";
+import { useGoPlusCard } from "@/hooks/useGoPlusCard";
 
 export default function TripsPage() {
   const { data: trips = [], isLoading } = useQuery<Trip[]>({
     queryKey: ["/api/trips"],
   });
+  const { isGold } = useGoPlusCard();
 
   return (
     <Layout>
@@ -90,10 +92,15 @@ export default function TripsPage() {
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />
-                    <div className="absolute top-4 right-4">
+                    <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
                       <Badge className="bg-primary text-primary-foreground">
                         {trip.date}
                       </Badge>
+                      {isGold && trip.isFeatured && (
+                        <Badge data-testid={`badge-gold-priority-${trip.id}`} className="bg-amber-600 text-white gap-1">
+                          <Crown className="w-3 h-3" /> Prioritaire Gold
+                        </Badge>
+                      )}
                     </div>
                   </div>
                   <CardContent className="p-6">

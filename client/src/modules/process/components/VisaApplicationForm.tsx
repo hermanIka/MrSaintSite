@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +21,9 @@ import {
   FileText,
   User,
   Lock,
+  Crown,
 } from "lucide-react";
+import { useGoPlusCard } from "@/hooks/useGoPlusCard";
 
 interface VisaFormData {
   lastName: string;
@@ -47,6 +50,7 @@ const POLLING_TIMEOUT = 10 * 60 * 1000;
 
 export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaApplicationFormProps) {
   const { toast } = useToast();
+  const { card, isGold } = useGoPlusCard();
   const [step, setStep] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState<"maishapay" | "pawapay">("maishapay");
   const [selectedCountry, setSelectedCountry] = useState<PawaPayCountry | null>(null);
@@ -71,6 +75,7 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
   });
 
   const formValues = watch();
+  const goldEmailMatch = isGold && formValues.email?.toLowerCase() === card?.email;
 
   // Handle returning from MaishaPay redirect
   useEffect(() => {
@@ -160,6 +165,36 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
       toast({ title: "Erreur", description: "Erreur lors du téléchargement.", variant: "destructive" });
     } finally {
       setUploadingField(null);
+    }
+  }
+
+  async function submitVisaGoldFree() {
+    const data = formValues;
+    if (!data.passportUrl || !data.photoUrl) {
+      toast({ title: "Documents manquants", description: "Passeport et photo sont obligatoires.", variant: "destructive" });
+      return;
+    }
+    if (!card?.cardNumber) {
+      toast({ title: "Erreur", description: "Carte GO+ Gold introuvable. Vérifiez votre carte sur /go-plus.", variant: "destructive" });
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const res = await apiRequest("POST", "/api/visa-requests", {
+        ...data,
+        paymentId: `GOLD-FREE-${card.cardNumber}`,
+        paymentMethod: "go-plus-gold",
+        amount: 0,
+      });
+      const json = await res.json();
+      setRequestId(json.id?.toString() || null);
+      setSucceeded(true);
+      toast({ title: "Demande soumise !", description: "Votre demande visa gratuite (GO+ Gold) a été transmise." });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Erreur lors de la soumission.";
+      toast({ title: "Erreur", description: msg, variant: "destructive" });
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -307,6 +342,18 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
 
   return (
     <div className="space-y-6">
+      {/* Gold banner */}
+      {isGold && (
+        <div className={`rounded-lg border p-3 flex items-start gap-3 ${goldEmailMatch ? "border-primary/40 bg-primary/5" : "border-amber-500/30 bg-amber-500/5"}`}>
+          <Crown className={`w-4 h-4 flex-shrink-0 mt-0.5 ${goldEmailMatch ? "text-primary" : "text-amber-600 dark:text-amber-400"}`} />
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            {goldEmailMatch
+              ? <><strong className="text-foreground">Avantage GO+ Gold actif</strong> — Votre facilitation visa est <strong className="text-green-600 dark:text-green-400">100% gratuite</strong> avec votre carte Gold.</>
+              : <>Porteur GO+ Gold détecté. Entrez l'email associé à votre carte à l'étape 1 pour <strong className="text-foreground">activer la gratuité visa</strong>.</>
+            }
+          </p>
+        </div>
+      )}
       {/* Step indicator */}
       <div className="flex items-center justify-center gap-2 mb-8">
         {steps.map((s, i) => {
@@ -451,49 +498,72 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
               <span className="text-muted-foreground">Destination :</span>
               <span className="font-medium">{formValues.destination}</span>
               <span className="text-muted-foreground">Montant :</span>
-              <span className="font-bold text-primary text-base">75€</span>
+              {goldEmailMatch ? (
+                <span className="font-bold text-base flex items-center gap-2">
+                  <span className="line-through text-muted-foreground">75€</span>
+                  <span className="text-green-600 dark:text-green-400">GRATUIT</span>
+                  <Crown className="w-4 h-4 text-primary" />
+                </span>
+              ) : (
+                <span className="font-bold text-primary text-base">75€</span>
+              )}
             </div>
           </div>
 
-          <div className="space-y-3">
-            <h3 className="text-lg font-heading font-semibold text-foreground">Mode de paiement</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <button
-                type="button"
-                data-testid="button-payment-maishapay"
-                onClick={() => setPaymentMethod("maishapay")}
-                className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all text-left ${
-                  paymentMethod === "maishapay"
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover-elevate"
-                }`}
-              >
-                <CreditCard className="w-5 h-5 text-primary flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-sm text-foreground">Carte bancaire</p>
-                  <p className="text-xs text-muted-foreground">Visa, Mastercard, UnionPay</p>
-                </div>
-              </button>
-              <button
-                type="button"
-                data-testid="button-payment-pawapay"
-                onClick={() => setPaymentMethod("pawapay")}
-                className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all text-left ${
-                  paymentMethod === "pawapay"
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover-elevate"
-                }`}
-              >
-                <Smartphone className="w-5 h-5 text-primary flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-sm text-foreground">Mobile Money</p>
-                  <p className="text-xs text-muted-foreground">MTN, Orange, M-Pesa...</p>
-                </div>
-              </button>
+          {goldEmailMatch ? (
+            <div className="rounded-lg border border-primary/40 bg-primary/5 p-4 space-y-3" data-testid="banner-gold-free-visa">
+              <div className="flex items-center gap-2">
+                <Crown className="w-5 h-5 text-primary flex-shrink-0" />
+                <p className="font-semibold text-foreground text-sm">Avantage GO+ Gold — Facilitation visa offerte</p>
+              </div>
+              <p className="text-xs text-muted-foreground">Votre carte GO+ Gold (<strong className="text-foreground">{card?.cardNumber}</strong>) couvre l'intégralité des frais de facilitation visa. Aucun paiement requis.</p>
             </div>
-          </div>
+          ) : (
+            <div className="space-y-3">
+              <h3 className="text-lg font-heading font-semibold text-foreground">Mode de paiement</h3>
+              {isGold && (
+                <p className="text-xs text-amber-600 dark:text-amber-400">
+                  Entrez l'email associé à votre carte GO+ Gold à l'étape 1 pour activer la gratuité.
+                </p>
+              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  data-testid="button-payment-maishapay"
+                  onClick={() => setPaymentMethod("maishapay")}
+                  className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all text-left ${
+                    paymentMethod === "maishapay"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover-elevate"
+                  }`}
+                >
+                  <CreditCard className="w-5 h-5 text-primary flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-sm text-foreground">Carte bancaire</p>
+                    <p className="text-xs text-muted-foreground">Visa, Mastercard, UnionPay</p>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  data-testid="button-payment-pawapay"
+                  onClick={() => setPaymentMethod("pawapay")}
+                  className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all text-left ${
+                    paymentMethod === "pawapay"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover-elevate"
+                  }`}
+                >
+                  <Smartphone className="w-5 h-5 text-primary flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-sm text-foreground">Mobile Money</p>
+                    <p className="text-xs text-muted-foreground">MTN, Orange, M-Pesa...</p>
+                  </div>
+                </button>
+              </div>
+            </div>
+          )}
 
-          {paymentMethod === "pawapay" && (
+          {paymentMethod === "pawapay" && !goldEmailMatch && (
             <div className="space-y-4 p-4 rounded-lg bg-muted/30 border border-border">
               <div className="space-y-1.5">
                 <Label>Pays</Label>
@@ -582,6 +652,20 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
             }}
           >
             Suivant <ChevronRight className="w-4 h-4 ml-1" />
+          </Button>
+        ) : goldEmailMatch ? (
+          <Button
+            type="button"
+            data-testid="button-visa-submit-gold"
+            onClick={submitVisaGoldFree}
+            disabled={isSubmitting}
+            className="gap-2"
+          >
+            {isSubmitting ? (
+              <><Loader2 className="w-4 h-4 animate-spin" /> Traitement...</>
+            ) : (
+              <><Crown className="w-4 h-4" /> Soumettre gratuitement — GO+ Gold</>
+            )}
           </Button>
         ) : (
           <Button

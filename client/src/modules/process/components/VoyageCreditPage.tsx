@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,8 +37,12 @@ import {
   Plane,
   User,
   Briefcase,
+  Crown,
+  Lock,
 } from "lucide-react";
+import { Link } from "wouter";
 import voyageCreditHeroBanner from "@/assets/images/voyage-credit-hero-banner.png";
+import { useGoPlusCard } from "@/hooks/useGoPlusCard";
 
 const formSchema = z.object({
   lastName: z.string().min(2, "Nom requis"),
@@ -107,6 +111,44 @@ export function VoyageCreditPage() {
   const [showForm, setShowForm] = useState(false);
   const [uploadingField, setUploadingField] = useState<string | null>(null);
   const { toast } = useToast();
+  const { isGold, saveCard } = useGoPlusCard();
+  const [goldGateState, setGoldGateState] = useState<"landing" | "verify" | "denied">("landing");
+  const [goldCheckEmail, setGoldCheckEmail] = useState("");
+  const [goldCheckLoading, setGoldCheckLoading] = useState(false);
+
+  useEffect(() => {
+    if (isGold) setGoldGateState("landing");
+  }, [isGold]);
+
+  const handleStartRequest = () => {
+    if (isGold) {
+      setShowForm(true);
+    } else {
+      setGoldGateState("verify");
+    }
+  };
+
+  const checkGoldCard = async () => {
+    if (!goldCheckEmail.includes("@")) {
+      toast({ title: "Email requis", description: "Entrez un email valide.", variant: "destructive" });
+      return;
+    }
+    setGoldCheckLoading(true);
+    try {
+      const res = await fetch(`/api/go-plus/card/${encodeURIComponent(goldCheckEmail.toLowerCase())}`);
+      const data = await res.json();
+      if (data.status === "active" && data.card?.planName === "Gold") {
+        saveCard(goldCheckEmail, data.card);
+        setShowForm(true);
+      } else {
+        setGoldGateState("denied");
+      }
+    } catch {
+      setGoldGateState("denied");
+    } finally {
+      setGoldCheckLoading(false);
+    }
+  };
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -670,6 +712,125 @@ export function VoyageCreditPage() {
   };
 
   if (!showForm) {
+    const seo = (
+      <SEO
+        title="Voyage à Crédit - Financement de voyage"
+        description="Réalisez votre rêve de voyage avec notre solution de financement flexible. Étalez le coût sur plusieurs mois et partez sereinement."
+        keywords="voyage crédit, financement voyage, paiement échelonné, voyage à crédit"
+      />
+    );
+
+    if (goldGateState === "verify") {
+      return (
+        <Layout>
+          {seo}
+          <div className="min-h-screen flex items-center justify-center bg-background px-4 py-20" style={{ marginTop: "80px" }}>
+            <div className="w-full max-w-md space-y-6">
+              <div className="text-center space-y-3">
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                  <Crown className="w-8 h-8 text-primary" />
+                </div>
+                <h2 className="text-2xl font-heading font-bold">Voyage à Crédit</h2>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  Cette option est réservée aux porteurs de la carte <strong className="text-foreground">GO+ Gold</strong>. Vérifiez votre carte pour accéder au formulaire.
+                </p>
+              </div>
+              <Card>
+                <CardContent className="pt-6 space-y-4">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="gold-check-email">Email associé à votre carte GO+ Gold</Label>
+                    <Input
+                      id="gold-check-email"
+                      data-testid="input-gold-email"
+                      type="email"
+                      placeholder="votre@email.com"
+                      value={goldCheckEmail}
+                      onChange={e => setGoldCheckEmail(e.target.value)}
+                      onKeyDown={e => e.key === "Enter" && checkGoldCard()}
+                    />
+                  </div>
+                  <Button
+                    data-testid="button-verify-gold"
+                    className="w-full"
+                    onClick={checkGoldCard}
+                    disabled={goldCheckLoading || !goldCheckEmail.includes("@")}
+                  >
+                    {goldCheckLoading ? (
+                      <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Vérification...</>
+                    ) : (
+                      <><Crown className="w-4 h-4 mr-2" /> Vérifier ma carte GO+ Gold</>
+                    )}
+                  </Button>
+                  <p className="text-xs text-center text-muted-foreground">
+                    Pas encore de carte GO+ Gold ?{" "}
+                    <Link href="/go-plus" className="text-primary font-medium hover:underline">
+                      Obtenir la carte Gold (299€/an)
+                    </Link>
+                  </p>
+                </CardContent>
+              </Card>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full"
+                onClick={() => setGoldGateState("landing")}
+              >
+                Retour
+              </Button>
+            </div>
+          </div>
+        </Layout>
+      );
+    }
+
+    if (goldGateState === "denied") {
+      return (
+        <Layout>
+          {seo}
+          <div className="min-h-screen flex items-center justify-center bg-background px-4 py-20" style={{ marginTop: "80px" }}>
+            <div className="w-full max-w-lg space-y-6 text-center">
+              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                <Lock className="w-10 h-10 text-primary" />
+              </div>
+              <div className="space-y-3">
+                <h2 className="text-2xl font-heading font-bold">Accès Réservé GO+ Gold</h2>
+                <p className="text-muted-foreground leading-relaxed">
+                  Le service <strong className="text-foreground">Voyage à Crédit</strong> est exclusivement disponible pour les porteurs de la carte GO+ Gold. Pour y accéder, obtenez votre carte GO+ Gold et bénéficiez également de la facilitation visa gratuite et de l'assistance personnalisée.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link href="/go-plus">
+                  <Button data-testid="button-get-gold" size="lg" className="gap-2 w-full sm:w-auto">
+                    <Crown className="w-4 h-4" /> Obtenir la carte GO+ Gold
+                  </Button>
+                </Link>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => setGoldGateState("verify")}
+                  className="w-full sm:w-auto"
+                  data-testid="button-retry-verify"
+                >
+                  Réessayer avec un autre email
+                </Button>
+              </div>
+              <div className="border border-border rounded-lg p-4 bg-muted/30 text-left space-y-2">
+                <p className="text-sm font-medium text-foreground">Avantages inclus avec GO+ Gold (299€/an) :</p>
+                <ul className="space-y-1">
+                  {["Facilitation visa 100% gratuite", "Accès au Voyage à Crédit", "Assistance personnalisée", "Accès prioritaire aux offres exclusives"].map(adv => (
+                    <li key={adv} className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <CheckCircle className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                      {adv}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </Layout>
+      );
+    }
+
     return (
       <Layout>
         <SEO 
@@ -701,7 +862,7 @@ export function VoyageCreditPage() {
               <Button
                 size="lg"
                 data-testid="button-start-request-hero"
-                onClick={() => setShowForm(true)}
+                onClick={handleStartRequest}
               >
                 Faire une demande
                 <ArrowRight className="w-5 h-5 ml-2" />
@@ -747,7 +908,7 @@ export function VoyageCreditPage() {
             <Button
               size="lg"
               data-testid="button-start-request"
-              onClick={() => setShowForm(true)}
+              onClick={handleStartRequest}
             >
               Faire une demande
               <ArrowRight className="w-5 h-5 ml-2" />
@@ -783,6 +944,15 @@ export function VoyageCreditPage() {
               Retour
             </Button>
           </div>
+
+        {isGold && (
+          <div className="mb-4 rounded-lg border border-primary/40 bg-primary/5 p-3 flex items-center gap-3" data-testid="banner-gold-credit">
+            <Crown className="w-4 h-4 text-primary flex-shrink-0" />
+            <p className="text-sm text-foreground">
+              <strong>Accès GO+ Gold</strong> — Votre dossier Voyage à Crédit est traité en priorité par notre équipe.
+            </p>
+          </div>
+        )}
 
         <Card>
           <CardHeader>

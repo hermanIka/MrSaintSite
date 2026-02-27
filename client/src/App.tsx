@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { HelmetProvider } from "react-helmet-async";
 
 import { ThemeProvider } from "@/modules/foundation";
+import { GoldAssistanceWidget } from "@/components/GoldAssistanceWidget";
 import { HomePage, AboutPage, TripsPage, TripDetailPage, PortfolioPage, NotFoundPage } from "@/modules/content";
 import { ContactPage, FAQPage } from "@/modules/interaction";
 import { FacilitationVisaPage, CreationAgencePage, ServicesPage, VoyageCreditPage } from "@/modules/process";
@@ -67,6 +68,7 @@ function App() {
         <ThemeProvider defaultTheme="light">
           <TooltipProvider>
             <Toaster />
+            <GoldAssistanceWidget />
             <Router />
           </TooltipProvider>
         </ThemeProvider>

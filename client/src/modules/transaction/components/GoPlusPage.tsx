@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Layout } from "@/modules/foundation";
 import goPlusCardImage from "@assets/go-plus-card.png";
@@ -10,11 +10,12 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle, Star, Zap, CreditCard, Smartphone, Shield, Loader2, AlertCircle } from "lucide-react";
+import { CheckCircle, Star, Zap, CreditCard, Smartphone, Shield, Loader2, AlertCircle, Crown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 import { PAWAPAY_COUNTRIES, type PawaPayCountry } from "@shared/pawapay-countries";
+import { useGoPlusCard } from "@/hooks/useGoPlusCard";
 
 interface GoPlusPlan {
   id: string;
@@ -41,6 +42,7 @@ interface PurchaseResult {
 export default function GoPlusPage() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const { isGold, saveCard } = useGoPlusCard();
   const [selectedPlan, setSelectedPlan] = useState<GoPlusPlan | null>(null);
   const [provider, setProvider] = useState<"maishapay" | "pawapay">("maishapay");
   const [email, setEmail] = useState("");
@@ -147,6 +149,13 @@ export default function GoPlusPage() {
       countryCode: provider === "pawapay" ? selectedCountry?.code : undefined,
     });
   };
+
+  // Persister la carte Gold dans localStorage après vérification réussie
+  useEffect(() => {
+    if (cardData?.status === "active" && cardData.card && checkEmail.includes("@")) {
+      saveCard(checkEmail, cardData.card);
+    }
+  }, [cardData, checkEmail]);
 
   const plans = plansData?.plans || [];
 

@@ -979,6 +979,20 @@ export function registerAdminRoutes(app: Express) {
   app.post("/api/visa-requests", async (req, res) => {
     try {
       const now = new Date().toISOString();
+
+      // Vérification Gold pour soumission gratuite
+      if (req.body.paymentMethod === "go-plus-gold") {
+        const email = req.body.email as string;
+        const card = await goPlusStorage.getUserActiveGoPlusCard(email?.toLowerCase?.() || email);
+        if (!card) {
+          return res.status(403).json({ error: "Carte GO+ Gold active requise pour bénéficier de ce service gratuit." });
+        }
+        const plan = await goPlusStorage.getGoPlusPlanById(card.planId);
+        if (!plan || plan.name !== "Gold") {
+          return res.status(403).json({ error: "Ce service est réservé aux porteurs de la carte GO+ Gold." });
+        }
+      }
+
       const requestData = {
         ...req.body,
         createdAt: now,
@@ -1017,8 +1031,8 @@ export function registerAdminRoutes(app: Express) {
                   <tr><td style="padding: 8px 0; color: #666;"><strong>Date de naissance</strong></td><td style="padding: 8px 0;">${validatedData.birthDate}</td></tr>
                   <tr><td style="padding: 8px 0; color: #666;"><strong>Type de visa</strong></td><td style="padding: 8px 0; color: #F2C94C; font-weight: bold;">${visaLabel}</td></tr>
                   <tr><td style="padding: 8px 0; color: #666;"><strong>Destination</strong></td><td style="padding: 8px 0;">${validatedData.destination}</td></tr>
-                  <tr><td style="padding: 8px 0; color: #666;"><strong>Mode de paiement</strong></td><td style="padding: 8px 0;">${validatedData.paymentMethod || "N/A"}</td></tr>
-                  <tr><td style="padding: 8px 0; color: #666;"><strong>Montant payé</strong></td><td style="padding: 8px 0; color: green; font-weight: bold;">${validatedData.amount}€</td></tr>
+                  <tr><td style="padding: 8px 0; color: #666;"><strong>Mode de paiement</strong></td><td style="padding: 8px 0;">${validatedData.paymentMethod === "go-plus-gold" ? "GO+ Gold (Gratuit)" : validatedData.paymentMethod || "N/A"}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #666;"><strong>Montant payé</strong></td><td style="padding: 8px 0; color: ${validatedData.amount === 0 ? "#B8860B" : "green"}; font-weight: bold;">${validatedData.amount === 0 ? "GRATUIT — Porteur GO+ Gold" : validatedData.amount + "€"}</td></tr>
                   <tr><td style="padding: 8px 0; color: #666;"><strong>ID Paiement</strong></td><td style="padding: 8px 0; font-size: 12px; font-family: monospace;">${validatedData.paymentId || "N/A"}</td></tr>
                   <tr><td style="padding: 8px 0; color: #666;"><strong>Réf. Demande</strong></td><td style="padding: 8px 0; font-size: 12px; font-family: monospace;">${request.id}</td></tr>
                 </table>
