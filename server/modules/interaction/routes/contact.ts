@@ -67,7 +67,7 @@ router.post("/", async (req, res) => {
             <li>Facilitation Visa</li>
             <li>Création d'Agence de Voyage</li>
             <li>Voyages Business Organisés</li>
-            <li>Consultation Stratégique</li>
+            <li>Consultation Voyage</li>
           </ul>
           
           <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;" />

@@ -80,10 +80,10 @@ const servicesData: InsertService[] = [
     createdAt: new Date().toISOString(),
   },
   {
-    name: "Consultation Stratégique",
+    name: "Consultation Voyage",
     slug: "consultation",
     shortDescription: "Conseil personnalisé pour votre projet voyage",
-    fullDescription: "Session de consultation individuelle pour répondre à toutes vos questions sur le secteur du voyage, l'import-export ou le développement de votre activité.",
+    fullDescription: "Réservez votre consultation personnalisée pour réussir votre voyage, obtenir votre visa sans stress, ou lancer une agence de voyage rentable et prospère.\n\nVotre projet peut devenir réalité tout commence ici.",
     price: 95,
     priceLabel: "",
     priceUnit: "/ session",
