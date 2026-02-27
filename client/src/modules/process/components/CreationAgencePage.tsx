@@ -141,7 +141,7 @@ export default function CreationAgencePage() {
                 <div className="p-6 pt-0 mt-auto flex flex-col gap-2">
                   <Button
                     data-testid={`button-start-${pack.value}`}
-                    className="w-full"
+                    className={`w-full ${!pack.highlighted ? "hover:bg-primary hover:text-primary-foreground hover:border-primary" : ""}`}
                     variant={pack.highlighted ? "default" : "outline"}
                     onClick={() => setSelectedPack(pack.value)}
                   >
