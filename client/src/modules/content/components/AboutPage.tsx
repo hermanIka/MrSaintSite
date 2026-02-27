@@ -115,11 +115,14 @@ export default function AboutPage() {
                   obstacles administratifs, et accompagner ceux qui souhaitent créer leur 
                   propre entreprise dans ce domaine passionnant.
                 </p>
-                <p>
-                  Aujourd'hui, Mr Saint c'est plus de 500 clients satisfaits, des dizaines 
-                  d'agences créées grâce à notre programme de formation, et une réputation 
-                  d'excellence dans la facilitation visa.
-                </p>
+                <p>Aujourd'hui, Mr Saint c'est plus de 500 clients satisfaits, des dizaines d'agences créées grâce à notre programme de formation, et une réputation d'excellence dans la facilitation visa.
+
+                Je suis le fondateur de plusieurs plateformes et entreprises innovante  comme;
+                Go Fly : la première OTA offrant aux agences de voyage et aux agents indépendants du monde entier la possibilité de créer, gérer et vendre leurs propres forfaits touristiques, connectant ainsi des milliers de voyageurs.
+
+                Go Send : une application mobile qui facilite la livraison et l’expédition de colis au monde 
+                Go House : un marketplace immobilier.
+</p>
               </div>
               <div className="flex flex-wrap gap-4 mt-8">
                 <Link href="/services">
