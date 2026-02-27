@@ -147,7 +147,7 @@ export default function TripsPage() {
             Vous avez un projet de voyage spécifique ? Contactez-moi pour créer
             ensemble le voyage qui correspond parfaitement à vos attentes.
           </p>
-          <Link href="/contact">
+          <Link href="/reservation">
             <Button
               data-testid="button-custom-trip"
               size="lg"
