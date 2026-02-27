@@ -85,9 +85,9 @@ export default function ServicesPage() {
           </p>
         </div>
       </section>
-      <section className="py-24 bg-background">
+      <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 gap-6 max-w-3xl mx-auto">
+          <div className="grid grid-cols-2 gap-6 max-w-2xl mx-auto">
             {isLoading ? (
               <>
                 <ServiceCardSkeleton />
@@ -120,9 +120,9 @@ export default function ServicesPage() {
                         {service.shortDescription}
                       </p>
                     </CardHeader>
-                    <CardContent className="space-y-4 flex-1 flex flex-col">
-                      <ul className="space-y-2.5 flex-1">
-                        {(service.features || []).slice(0, 4).map((feature, i) => (
+                    <CardContent className="space-y-3 flex-1 flex flex-col">
+                      <ul className="space-y-2 flex-1">
+                        {(service.features || []).slice(0, 3).map((feature, i) => (
                           <li key={i} data-testid={`text-feature-${service.slug}-${i}`} className="flex items-start gap-2 text-sm">
                             <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                             <span>{feature}</span>
