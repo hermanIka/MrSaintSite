@@ -72,21 +72,17 @@ export default function CreationAgencePage() {
         </div>
       </section>
 
-      <section className="py-20 bg-background">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="prose max-w-none">
-            <h2 className="text-3xl font-heading font-bold text-foreground mb-6">
-              Lancez votre agence de voyage avec un expert
-            </h2>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-              Fort de 7 ans d'expérience et fondateur de Go Fly, l'une des agences leaders du marché, je vous
-              accompagne dans la création et le développement de votre propre agence de voyage.
-            </p>
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              Mon programme complet vous donne toutes les clés pour réussir : formation, coaching, parrainage et même
-              des solutions de financement pour démarrer sereinement.
-            </p>
-          </div>
+      <section className="py-8 bg-background border-b border-border">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center gap-6">
+          <p className="text-base text-muted-foreground leading-relaxed flex-1">
+            <span className="font-semibold text-foreground">7 ans d'expérience, fondateur de Go Fly</span> — formation, coaching et financement pour lancer votre agence. Choisissez votre forfait et démarrez.
+          </p>
+          <a href="#forfaits" className="flex-shrink-0">
+            <Button data-testid="button-cta-forfaits">
+              <Rocket className="w-4 h-4 mr-2" />
+              Voir les forfaits
+            </Button>
+          </a>
         </div>
       </section>
 
