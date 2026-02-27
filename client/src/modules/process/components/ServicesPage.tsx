@@ -1,6 +1,5 @@
 import { Layout } from "@/modules/foundation";
 import { SEO } from "@/components/SEO";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { 
@@ -28,24 +27,22 @@ const iconMap: Record<string, LucideIcon> = {
 
 function ServiceCardSkeleton() {
   return (
-    <Card className="border-border flex flex-col">
-      <CardHeader className="pb-4">
-        <div className="flex items-center gap-3 mb-2">
+    <div className="relative flex flex-col rounded-xl border-2 border-border bg-card">
+      <div className="p-6 flex-1 flex flex-col">
+        <div className="flex items-center gap-3 mb-3">
           <Skeleton className="w-10 h-10 rounded-full flex-shrink-0" />
           <Skeleton className="h-6 w-3/4" />
         </div>
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-5/6" />
-      </CardHeader>
-      <CardContent className="space-y-4 flex-1 flex flex-col">
-        <div className="space-y-2 flex-1">
+        <Skeleton className="h-4 w-full mb-1" />
+        <Skeleton className="h-4 w-5/6 mb-5" />
+        <div className="space-y-2.5 mb-5">
           {[1, 2, 3, 4].map((i) => (
             <Skeleton key={i} className="h-4 w-full" />
           ))}
         </div>
         <Skeleton className="h-10 w-full" />
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -87,7 +84,7 @@ export default function ServicesPage() {
       </section>
       <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 gap-6 max-w-2xl mx-auto">
+          <div className="grid grid-cols-2 gap-6 max-w-4xl mx-auto">
             {isLoading ? (
               <>
                 <ServiceCardSkeleton />
@@ -102,30 +99,28 @@ export default function ServicesPage() {
                 const Icon = iconMap[service.iconName || "FileText"] || FileText;
                 
                 return (
-                  <Card
+                  <div
                     key={service.id}
                     data-testid={`section-service-${service.slug}`}
-                    className="relative border-border flex flex-col"
+                    className="relative flex flex-col rounded-xl border-2 border-border bg-card transition-all hover:border-primary/40"
                   >
-                    <CardHeader className="pb-4">
-                      <div className="flex items-center gap-3 mb-2">
+                    <div className="p-6 flex-1 flex flex-col">
+                      <div className="flex items-center gap-3 mb-3">
                         <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                           <Icon className="w-5 h-5 text-primary" />
                         </div>
-                        <CardTitle data-testid={`text-service-title-${service.slug}`} className="text-xl font-heading">
+                        <h3 data-testid={`text-service-title-${service.slug}`} className="text-xl font-heading font-bold text-foreground">
                           {service.name}
-                        </CardTitle>
+                        </h3>
                       </div>
-                      <p data-testid={`text-service-subtitle-${service.slug}`} className="text-sm text-muted-foreground">
+                      <p data-testid={`text-service-subtitle-${service.slug}`} className="text-sm text-muted-foreground mb-5">
                         {service.shortDescription}
                       </p>
-                    </CardHeader>
-                    <CardContent className="space-y-3 flex-1 flex flex-col">
-                      <ul className="space-y-2 flex-1">
-                        {(service.features || []).slice(0, 3).map((feature, i) => (
+                      <ul className="space-y-2.5 flex-1 mb-5">
+                        {(service.features || []).slice(0, 4).map((feature, i) => (
                           <li key={i} data-testid={`text-feature-${service.slug}-${i}`} className="flex items-start gap-2 text-sm">
                             <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                            <span>{feature}</span>
+                            <span className="text-foreground">{feature}</span>
                           </li>
                         ))}
                       </ul>
@@ -138,8 +133,8 @@ export default function ServicesPage() {
                           <ArrowRight className="w-4 h-4" />
                         </Button>
                       </Link>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 );
               })
             ) : (
