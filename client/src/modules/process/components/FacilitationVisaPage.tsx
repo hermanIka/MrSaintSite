@@ -3,7 +3,7 @@ import { Layout } from "@/modules/foundation";
 import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MessageCircle, FileText } from "lucide-react";
+import { MessageCircle, FileText, ChevronRight } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import visaImage from "@assets/generated_images/Visa_facilitation_service_image_24df3a0c.png";
 import { VisaApplicationForm } from "./VisaApplicationForm";
@@ -91,35 +91,23 @@ export default function FacilitationVisaPage() {
         </div>
       </section>
 
-      <section className="py-20 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-4">
-              Notre processus
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Un accompagnement en 4 étapes simples
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {processSteps.map((step) => (
-              <div
-                key={step.step}
-                data-testid={`card-step-${step.step}`}
-                className="relative"
-              >
-                <div className="text-center">
-                  <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-2xl font-heading font-bold mx-auto mb-6">
+      <section className="py-6 bg-background border-b border-border">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-row flex-wrap justify-center items-center gap-x-2 gap-y-2">
+            {processSteps.map((step, i) => (
+              <div key={step.step} className="flex items-center gap-x-2">
+                <div
+                  data-testid={`card-step-${step.step}`}
+                  className="flex items-center gap-2"
+                >
+                  <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center flex-shrink-0">
                     {step.step}
-                  </div>
-                  <h3 className="text-xl font-heading font-semibold mb-3 text-foreground">
-                    {step.title}
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {step.description}
-                  </p>
+                  </span>
+                  <span className="text-sm font-medium text-foreground">{step.title}</span>
                 </div>
+                {i < processSteps.length - 1 && (
+                  <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                )}
               </div>
             ))}
           </div>
