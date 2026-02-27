@@ -195,15 +195,6 @@ export default function ServicesPage() {
                 Réserver maintenant
               </Button>
             </Link>
-            <Link href="/contact">
-              <Button
-                data-testid="button-contact"
-                size="lg"
-                variant="outline"
-              >
-                Nous contacter
-              </Button>
-            </Link>
           </div>
         </div>
       </section>
