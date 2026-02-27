@@ -503,15 +503,15 @@ async function ensureDataIntegrity(): Promise<void> {
       const now = new Date().toISOString();
       await db.insert(goPlusPlans).values([
         {
-          name: "Standard",
-          description: "Carte GO+ Standard — accès aux réductions de base sur tous les services Mr Saint.",
-          price: 1000,
+          name: "Classique",
+          description: "Voyagez malin et économisez davantage.",
+          price: 7900,
           currency: "EUR",
-          discountPercentage: 5,
+          discountPercentage: 10,
           privileges: JSON.stringify([
-            "5% de réduction sur tous les services",
-            "Accès prioritaire aux nouvelles offres",
-            "Newsletter exclusive voyageurs",
+            "Jusqu'à -10% sur vos forfaits touristiques",
+            "-25% sur le service de facilitation visa",
+            "Accès prioritaire aux offres promotionnelles",
           ]),
           durationDays: 365,
           isActive: true,
@@ -519,23 +519,38 @@ async function ensureDataIntegrity(): Promise<void> {
         },
         {
           name: "Premium",
-          description: "Carte GO+ Premium — réductions maximales et privilèges exclusifs pour les voyageurs exigeants.",
-          price: 1500,
+          description: "Plus de confort. Plus d'avantages. Plus de liberté.",
+          price: 17900,
           currency: "EUR",
-          discountPercentage: 10,
+          discountPercentage: 15,
           privileges: JSON.stringify([
-            "10% de réduction sur tous les services",
-            "Accès prioritaire aux nouvelles offres",
-            "Newsletter exclusive voyageurs",
-            "Accompagnement personnalisé dédié",
-            "Invitations aux événements exclusifs",
+            "Jusqu'à -15% sur vos forfaits touristiques",
+            "-35% sur la facilitation visa",
+            "Séjours gratuits dans nos Airbnbs partenaires jusqu'à 10 jours cumulés par an (selon disponibilité)",
+            "Traitement prioritaire de vos dossiers",
+          ]),
+          durationDays: 365,
+          isActive: true,
+          createdAt: now,
+        },
+        {
+          name: "Gold",
+          description: "L'expérience GO sans limite.",
+          price: 29900,
+          currency: "EUR",
+          discountPercentage: 15,
+          privileges: JSON.stringify([
+            "Facilitation visa 100% gratuite",
+            "Accès à l'option Voyage à Crédit",
+            "Assistance personnalisée",
+            "Accès prioritaire aux offres exclusives",
           ]),
           durationDays: 365,
           isActive: true,
           createdAt: now,
         },
       ]);
-      console.log("  ✓ Plans GO+ insérés (Standard & Premium)");
+      console.log("  ✓ Plans GO+ insérés (Classique, Premium & Gold)");
     } else {
       console.log("  ✓ Plans GO+ déjà existants");
     }

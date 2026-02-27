@@ -171,9 +171,18 @@ export default function GoPlusPage() {
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-white mb-5 leading-tight">
                 Carte <span className="text-primary">GO+</span>
               </h1>
-              <p className="text-lg text-white/70 max-w-md">
-                Rejoins le club exclusif Mr Saint et profite de réductions jusqu'à <span className="text-primary font-semibold">10%</span> sur tous tes achats.
-              </p>
+              <div className="text-lg text-white/70 max-w-md space-y-4">
+                <p>
+                  La Carte Go+ une carte virtuelle qui vous ouvre l'accès à des réductions exclusives jusqu'à{" "}
+                  <span className="text-primary font-semibold">-15%</span> sur vos achats et vos voyages.
+                </p>
+                <p>
+                  Utilisez la même carte pour bénéficier d'avantages dans la boutique Go Store 🛍️, chez Go Send 📦 pour vos livraisons, et chez Go Fly ✈️ pour vos forfaits touristiques.
+                </p>
+                <p className="font-medium text-white/90">
+                  Une seule carte.<br />Plus d'avantages.<br />Moins de dépenses.
+                </p>
+              </div>
             </div>
 
             <div className="flex-1 flex justify-center md:justify-end order-1 md:order-2">
