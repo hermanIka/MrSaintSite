@@ -45,17 +45,6 @@ export default function CreationAgencePage() {
 
   const activePack = AGENCY_PACKS.find(p => p.value === selectedPack);
 
-  const learnings = [
-    "Gestion administrative et légale d'une agence",
-    "Stratégies de marketing digital et acquisition clients",
-    "Négociation avec les prestataires et fournisseurs",
-    "Conception de packages voyage attractifs",
-    "Gestion financière et comptabilité",
-    "Service client excellence et fidélisation",
-    "Outils digitaux et logiciels métier",
-    "Développement de votre réseau professionnel",
-  ];
-
   const results = [
     { metric: "+50", label: "Entrepreneurs accompagnés" },
     { metric: "85%", label: "Taux de réussite" },
@@ -97,23 +86,6 @@ export default function CreationAgencePage() {
               Mon programme complet vous donne toutes les clés pour réussir : formation, coaching, parrainage et même
               des solutions de financement pour démarrer sereinement.
             </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-20 bg-background">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-4">Ce que vous allez apprendre</h2>
-            <p className="text-lg text-muted-foreground">Un programme exhaustif pour maîtriser tous les aspects du métier</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {learnings.map((learning, index) => (
-              <div key={index} data-testid={`item-learning-${index}`} className="flex items-start gap-3">
-                <CheckCircle2 className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
-                <span className="text-foreground text-lg">{learning}</span>
-              </div>
-            ))}
           </div>
         </div>
       </section>
