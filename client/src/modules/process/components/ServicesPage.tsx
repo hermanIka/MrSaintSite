@@ -27,7 +27,7 @@ const iconMap: Record<string, LucideIcon> = {
 
 function ServiceCardSkeleton() {
   return (
-    <div className="relative flex flex-col rounded-xl border-2 border-border bg-card">
+    <div className="relative flex-1 flex flex-col rounded-xl border-2 border-border bg-card">
       <div className="p-6 flex-1 flex flex-col">
         <div className="flex items-center gap-3 mb-3">
           <Skeleton className="w-10 h-10 rounded-full flex-shrink-0" />
@@ -84,14 +84,14 @@ export default function ServicesPage() {
       </section>
       <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 gap-6 max-w-4xl mx-auto">
+          <div className="flex flex-row gap-6 max-w-4xl mx-auto">
             {isLoading ? (
               <>
                 <ServiceCardSkeleton />
                 <ServiceCardSkeleton />
               </>
             ) : isError ? (
-              <div className="col-span-full text-center py-12 text-muted-foreground">
+              <div className="w-full text-center py-12 text-muted-foreground">
                 Une erreur est survenue lors du chargement des services. Veuillez réessayer.
               </div>
             ) : services && services.length > 0 ? (
@@ -102,7 +102,7 @@ export default function ServicesPage() {
                   <div
                     key={service.id}
                     data-testid={`section-service-${service.slug}`}
-                    className="relative flex flex-col rounded-xl border-2 border-border bg-card transition-all hover:border-primary/40"
+                    className="relative flex-1 flex flex-col rounded-xl border-2 border-border bg-card transition-all hover:border-primary/40"
                   >
                     <div className="p-6 flex-1 flex flex-col">
                       <div className="flex items-center gap-3 mb-3">
@@ -138,7 +138,7 @@ export default function ServicesPage() {
                 );
               })
             ) : (
-              <div className="col-span-full text-center py-12 text-muted-foreground">
+              <div className="w-full text-center py-12 text-muted-foreground">
                 Aucun service disponible pour le moment.
               </div>
             )}
