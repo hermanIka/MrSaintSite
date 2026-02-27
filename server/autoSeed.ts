@@ -497,9 +497,11 @@ async function ensureDataIntegrity(): Promise<void> {
       console.log("  ✓ Admin created");
     }
 
-    const existingGoPlusPlans = await db.select().from(goPlusPlans).limit(1);
-    if (existingGoPlusPlans.length === 0) {
-      console.log("  → Insertion des plans GO+...");
+    const existingGoPlusPlans = await db.select().from(goPlusPlans);
+    const hasGoldPlan = existingGoPlusPlans.some(p => p.name === "Gold");
+    if (!hasGoldPlan) {
+      console.log("  → Mise à jour des plans GO+ (Classique 79€, Premium 179€, Gold 299€)...");
+      await db.delete(goPlusPlans);
       const now = new Date().toISOString();
       await db.insert(goPlusPlans).values([
         {
@@ -550,9 +552,9 @@ async function ensureDataIntegrity(): Promise<void> {
           createdAt: now,
         },
       ]);
-      console.log("  ✓ Plans GO+ insérés (Classique, Premium & Gold)");
+      console.log("  ✓ Plans GO+ insérés (Classique 79€, Premium 179€, Gold 299€)");
     } else {
-      console.log("  ✓ Plans GO+ déjà existants");
+      console.log("  ✓ Plans GO+ déjà existants (avec Gold)");
     }
 
     console.log("✓ Data integrity check completed");
