@@ -38,7 +38,14 @@ export default function ReservationPage() {
     const params = new URLSearchParams(searchString);
     const paymentStatus = params.get("payment");
     const id = params.get("id");
-    
+    const serviceParam = params.get("service");
+
+    if (!paymentStatus && serviceParam && ["visa", "agence", "voyage"].includes(serviceParam)) {
+      setSelectedService(serviceParam as ServiceType);
+      setCurrentStep("calendar");
+      return;
+    }
+
     if (paymentStatus === "success" && id) {
       setPaymentId(id);
       fetch(`/api/payments/status/${encodeURIComponent(id)}`)
