@@ -73,16 +73,10 @@ export default function CreationAgencePage() {
       </section>
 
       <section className="py-8 bg-background border-b border-border">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center gap-6">
-          <p className="text-base text-muted-foreground leading-relaxed flex-1">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <p className="text-base text-muted-foreground leading-relaxed">
             <span className="font-semibold text-foreground">7 ans d'expérience, fondateur de Go Fly</span> — formation, coaching et financement pour lancer votre agence. Choisissez votre forfait et démarrez.
           </p>
-          <a href="#forfaits" className="flex-shrink-0">
-            <Button data-testid="button-cta-forfaits">
-              <Rocket className="w-4 h-4 mr-2" />
-              Voir les forfaits
-            </Button>
-          </a>
         </div>
       </section>
 
