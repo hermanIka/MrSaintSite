@@ -3,7 +3,7 @@ import { Layout } from "@/modules/foundation";
 import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle2, MessageCircle, FileText } from "lucide-react";
+import { MessageCircle, FileText } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import visaImage from "@assets/generated_images/Visa_facilitation_service_image_24df3a0c.png";
 import { VisaApplicationForm } from "./VisaApplicationForm";
@@ -42,15 +42,6 @@ export default function FacilitationVisaPage() {
       title: "Obtention",
       description: "Vous recevez votre visa et êtes prêt à voyager",
     },
-  ];
-
-  const advantages = [
-    "Taux de réussite de 95%",
-    "Traitement rapide et efficace",
-    "Accompagnement personnalisé",
-    "Gestion complète des démarches",
-    "Support 7j/7",
-    "Garantie satisfaction",
   ];
 
   return (
@@ -129,29 +120,6 @@ export default function FacilitationVisaPage() {
                     {step.description}
                   </p>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-20 bg-black text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-4">
-              Nos avantages
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {advantages.map((advantage, index) => (
-              <div
-                key={index}
-                data-testid={`item-advantage-${index}`}
-                className="flex items-center gap-3"
-              >
-                <CheckCircle2 className="w-6 h-6 text-primary flex-shrink-0" />
-                <span className="text-lg">{advantage}</span>
               </div>
             ))}
           </div>
