@@ -12,4 +12,5 @@ export { AdminServicesPage } from "./components/AdminServicesPage";
 export { AdminLogsPage } from "./components/AdminLogsPage";
 export { AdminCreditRequestsPage } from "./components/AdminCreditRequestsPage";
 export { AdminGoPlusPage } from "./components/AdminGoPlusPage";
+export { AdminVisaRequestsPage } from "./components/AdminVisaRequestsPage";
 export { useAdminAuth } from "./hooks/useAdminAuth";

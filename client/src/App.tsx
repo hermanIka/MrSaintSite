@@ -21,6 +21,7 @@ import {
   AdminLogsPage,
   AdminCreditRequestsPage,
   AdminGoPlusPage,
+  AdminVisaRequestsPage,
 } from "@/modules/admin";
 
 function Router() {
@@ -50,6 +51,7 @@ function Router() {
       <Route path="/admin/services" component={AdminServicesPage} />
       <Route path="/admin/credit-requests" component={AdminCreditRequestsPage} />
       <Route path="/admin/go-plus" component={AdminGoPlusPage} />
+      <Route path="/admin/visa-requests" component={AdminVisaRequestsPage} />
       <Route path="/admin/logs" component={AdminLogsPage} />
       <Route component={NotFoundPage} />
     </Switch>
