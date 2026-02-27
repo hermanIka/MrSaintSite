@@ -183,7 +183,7 @@ export default function PortfolioPage() {
               <div className="text-sm text-muted-foreground">Taux de réussite</div>
             </div>
             <div>
-              <div className="text-3xl sm:text-4xl font-bold text-primary">8+</div>
+              <div className="text-3xl sm:text-4xl font-bold text-primary">7+</div>
               <div className="text-sm text-muted-foreground">Années d'expérience</div>
             </div>
           </div>
