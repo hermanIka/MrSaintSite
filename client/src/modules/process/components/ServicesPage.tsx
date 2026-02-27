@@ -99,7 +99,6 @@ export default function ServicesPage() {
           </p>
         </div>
       </section>
-
       <section className="py-24 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -175,7 +174,6 @@ export default function ServicesPage() {
           </div>
         </div>
       </section>
-
       <section className="py-24 bg-primary text-primary-foreground">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-6">
@@ -191,9 +189,7 @@ export default function ServicesPage() {
                 data-testid="button-reserve-now"
                 size="lg"
                 variant="secondary"
-              >
-                Réserver maintenant
-              </Button>
+              >Consultez maintenant</Button>
             </Link>
           </div>
         </div>
