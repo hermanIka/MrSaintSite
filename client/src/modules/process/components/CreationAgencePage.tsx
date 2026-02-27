@@ -4,7 +4,7 @@ import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, TrendingUp, Users, Rocket, DollarSign, Star, ArrowLeft, Building2 } from "lucide-react";
+import { CheckCircle2, TrendingUp, Rocket, DollarSign, Star, ArrowLeft, Building2 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import agencyImage from "@assets/generated_images/Agency_coaching_service_image_40575f0c.png";
 import { AGENCY_PACKS } from "@shared/schema";
@@ -44,13 +44,6 @@ export default function CreationAgencePage() {
   }, [selectedPack]);
 
   const activePack = AGENCY_PACKS.find(p => p.value === selectedPack);
-
-  const modules = [
-    { title: "Formation complète", description: "Toutes les compétences pour gérer une agence de voyage professionnelle" },
-    { title: "Coaching personnalisé", description: "Accompagnement individuel adapté à votre projet et vos objectifs" },
-    { title: "Parrainage", description: "Mentorat continu et partage d'expérience pour votre réussite" },
-    { title: "Financement", description: "Solutions de financement et aide au démarrage de votre activité" },
-  ];
 
   const learnings = [
     "Gestion administrative et légale d'une agence",
@@ -104,32 +97,6 @@ export default function CreationAgencePage() {
               Mon programme complet vous donne toutes les clés pour réussir : formation, coaching, parrainage et même
               des solutions de financement pour démarrer sereinement.
             </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-20 bg-black text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-4">Le programme complet</h2>
-            <p className="text-lg text-white/70">Tout ce dont vous avez besoin pour réussir</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {modules.map((module, index) => {
-              const icons = [Users, TrendingUp, Rocket, DollarSign];
-              const Icon = icons[index];
-              return (
-                <Card key={index} data-testid={`card-module-${index}`} className="bg-white/5 border-white/10 hover-elevate active-elevate-2 transition-all">
-                  <CardContent className="p-6 text-center">
-                    <div className="w-14 h-14 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                      <Icon className="w-7 h-7 text-primary" />
-                    </div>
-                    <h3 className="text-lg font-heading font-semibold mb-3 text-white">{module.title}</h3>
-                    <p className="text-sm text-white/70 leading-relaxed">{module.description}</p>
-                  </CardContent>
-                </Card>
-              );
-            })}
           </div>
         </div>
       </section>
