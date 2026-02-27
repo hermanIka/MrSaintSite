@@ -26,38 +26,24 @@ const iconMap: Record<string, LucideIcon> = {
   CreditCard,
 };
 
-function formatPrice(service: Service): string {
-  const parts: string[] = [];
-  if (service.priceLabel) {
-    parts.push(service.priceLabel);
-  }
-  parts.push(`${service.price}€`);
-  if (service.priceUnit) {
-    parts.push(service.priceUnit);
-  }
-  return parts.join(" ");
-}
-
 function ServiceCardSkeleton() {
   return (
-    <Card className="border-primary/20 flex flex-col h-full">
-      <CardHeader className="bg-primary/5 border-b border-primary/10">
-        <Skeleton className="w-14 h-14 rounded-lg mb-4" />
-        <Skeleton className="h-6 w-3/4 mb-2" />
-        <Skeleton className="h-4 w-1/2" />
+    <Card className="border-border flex flex-col">
+      <CardHeader className="pb-4">
+        <div className="flex items-center gap-3 mb-2">
+          <Skeleton className="w-10 h-10 rounded-full flex-shrink-0" />
+          <Skeleton className="h-6 w-3/4" />
+        </div>
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-5/6" />
       </CardHeader>
-      <CardContent className="p-6 flex-1 flex flex-col">
-        <Skeleton className="h-4 w-full mb-2" />
-        <Skeleton className="h-4 w-5/6 mb-6" />
-        <div className="space-y-2 mb-6 flex-1">
+      <CardContent className="space-y-4 flex-1 flex flex-col">
+        <div className="space-y-2 flex-1">
           {[1, 2, 3, 4].map((i) => (
             <Skeleton key={i} className="h-4 w-full" />
           ))}
         </div>
-        <div className="pt-4 border-t border-primary/10 mt-auto">
-          <Skeleton className="h-6 w-24 mb-4" />
-          <Skeleton className="h-10 w-full" />
-        </div>
+        <Skeleton className="h-10 w-full" />
       </CardContent>
     </Card>
   );
@@ -119,44 +105,39 @@ export default function ServicesPage() {
                   <Card
                     key={service.id}
                     data-testid={`section-service-${service.slug}`}
-                    className="border-primary/20 flex flex-col h-full transition-all duration-300 hover:border-primary/40 hover:shadow-lg"
+                    className="relative border-border flex flex-col"
                   >
-                    <CardHeader className="bg-primary/5 border-b border-primary/10">
-                      <div className="w-14 h-14 rounded-lg bg-primary flex items-center justify-center mb-4">
-                        <Icon className="w-7 h-7 text-primary-foreground" />
-                      </div>
-                      <CardTitle>
-                        <div data-testid={`text-service-title-${service.slug}`} className="text-2xl font-heading mb-1">{service.name}</div>
-                        <div data-testid={`text-service-subtitle-${service.slug}`} className="text-sm text-muted-foreground font-normal">
-                          {service.shortDescription}
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Icon className="w-5 h-5 text-primary" />
                         </div>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-6 flex-1 flex flex-col">
-                      <p data-testid={`text-service-desc-${service.slug}`} className="text-muted-foreground mb-6 leading-relaxed">
-                        {service.fullDescription}
+                        <CardTitle data-testid={`text-service-title-${service.slug}`} className="text-xl font-heading">
+                          {service.name}
+                        </CardTitle>
+                      </div>
+                      <p data-testid={`text-service-subtitle-${service.slug}`} className="text-sm text-muted-foreground">
+                        {service.shortDescription}
                       </p>
-                      
-                      <ul className="space-y-2 mb-6 flex-1">
+                    </CardHeader>
+                    <CardContent className="space-y-4 flex-1 flex flex-col">
+                      <ul className="space-y-2.5 flex-1">
                         {(service.features || []).slice(0, 4).map((feature, i) => (
                           <li key={i} data-testid={`text-feature-${service.slug}-${i}`} className="flex items-start gap-2 text-sm">
                             <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                            <span className="text-muted-foreground">{feature}</span>
+                            <span>{feature}</span>
                           </li>
                         ))}
                       </ul>
-
-                      <div className="pt-4 border-t border-primary/10 mt-auto">
-                        <Link href={service.ctaLink || "/reservation"}>
-                          <Button
-                            data-testid={`button-service-${service.slug}`}
-                            className="w-full gap-2"
-                          >
-                            {service.ctaText || "Commencer Maintenant"}
-                            <ArrowRight className="w-4 h-4" />
-                          </Button>
-                        </Link>
-                      </div>
+                      <Link href={service.ctaLink || "/reservation"}>
+                        <Button
+                          data-testid={`button-service-${service.slug}`}
+                          className="w-full gap-2"
+                        >
+                          {service.ctaText || "Commencer Maintenant"}
+                          <ArrowRight className="w-4 h-4" />
+                        </Button>
+                      </Link>
                     </CardContent>
                   </Card>
                 );
