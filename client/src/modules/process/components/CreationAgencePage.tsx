@@ -122,8 +122,7 @@ export default function CreationAgencePage() {
                 )}
 
                 <div className={`p-6 ${pack.highlighted ? "pt-8" : ""}`}>
-                  <h3 className="text-xl font-heading font-bold text-foreground mb-1">{pack.label}</h3>
-                  <p className="text-sm text-muted-foreground mb-4">{pack.description}</p>
+                  <h3 className="text-xl font-heading font-bold text-foreground mb-4">{pack.label}</h3>
 
                   <ul className="space-y-2.5 mb-6">
                     {pack.features.map((f, i) => (
