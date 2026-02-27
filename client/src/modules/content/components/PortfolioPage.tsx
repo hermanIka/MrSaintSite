@@ -59,7 +59,6 @@ export default function PortfolioPage() {
           </div>
         </div>
       </section>
-
       <section className="py-8 bg-muted/30 border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-2 justify-center">
@@ -78,7 +77,6 @@ export default function PortfolioPage() {
           </div>
         </div>
       </section>
-
       <section className="py-20 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {isLoading ? (
@@ -166,7 +164,6 @@ export default function PortfolioPage() {
           )}
         </div>
       </section>
-
       <section className="py-16 bg-muted/30">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl sm:text-3xl font-heading font-bold mb-4">
@@ -178,7 +175,7 @@ export default function PortfolioPage() {
           </p>
           <div className="grid grid-cols-3 gap-8 mb-8">
             <div>
-              <div className="text-3xl sm:text-4xl font-bold text-primary">50+</div>
+              <div className="text-3xl sm:text-4xl font-bold text-primary">15+</div>
               <div className="text-sm text-muted-foreground">Projets accompagnés</div>
             </div>
             <div>
@@ -192,7 +189,6 @@ export default function PortfolioPage() {
           </div>
         </div>
       </section>
-
       <section className="py-24 bg-primary text-primary-foreground">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-6">
