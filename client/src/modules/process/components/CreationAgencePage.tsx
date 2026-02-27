@@ -48,7 +48,7 @@ export default function CreationAgencePage() {
   const results = [
     { metric: "+15", label: "Entrepreneurs accompagnés" },
     { metric: "100%", label: "Taux de réussite" },
-    { metric: "6 mois", label: "Durée moyenne avant rentabilité" },
+    { metric: "3 mois", label: "Durée moyenne avant rentabilité" },
   ];
 
   return (
