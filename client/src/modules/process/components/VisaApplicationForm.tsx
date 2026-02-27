@@ -348,7 +348,7 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
           <Crown className={`w-4 h-4 flex-shrink-0 mt-0.5 ${goldEmailMatch ? "text-primary" : "text-amber-600 dark:text-amber-400"}`} />
           <p className="text-xs leading-relaxed text-muted-foreground">
             {goldEmailMatch
-              ? <><strong className="text-foreground">Avantage GO+ Gold actif</strong> — Votre facilitation visa est <strong className="text-green-600 dark:text-green-400">100% gratuite</strong> avec votre carte Gold.</>
+              ? <><strong className="text-foreground">Avantage GO+ Gold actif :</strong> votre facilitation visa est <strong className="text-green-600 dark:text-green-400">100% gratuite</strong> avec votre carte Gold.</>
               : <>Porteur GO+ Gold détecté. Entrez l'email associé à votre carte à l'étape 1 pour <strong className="text-foreground">activer la gratuité visa</strong>.</>
             }
           </p>
@@ -514,7 +514,7 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
             <div className="rounded-lg border border-primary/40 bg-primary/5 p-4 space-y-3" data-testid="banner-gold-free-visa">
               <div className="flex items-center gap-2">
                 <Crown className="w-5 h-5 text-primary flex-shrink-0" />
-                <p className="font-semibold text-foreground text-sm">Avantage GO+ Gold — Facilitation visa offerte</p>
+                <p className="font-semibold text-foreground text-sm">Avantage GO+ Gold : facilitation visa offerte</p>
               </div>
               <p className="text-xs text-muted-foreground">Votre carte GO+ Gold (<strong className="text-foreground">{card?.cardNumber}</strong>) couvre l'intégralité des frais de facilitation visa. Aucun paiement requis.</p>
             </div>
@@ -664,7 +664,7 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
             {isSubmitting ? (
               <><Loader2 className="w-4 h-4 animate-spin" /> Traitement...</>
             ) : (
-              <><Crown className="w-4 h-4" /> Soumettre gratuitement — GO+ Gold</>
+              <><Crown className="w-4 h-4" /> Soumettre gratuitement (GO+ Gold)</>
             )}
           </Button>
         ) : (

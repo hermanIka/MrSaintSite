@@ -356,7 +356,7 @@ export default function GoPlusPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="font-heading">
-              Acheter GO+ {selectedPlan?.name} — {selectedPlan?.price}€
+              Acheter GO+ {selectedPlan?.name} ({selectedPlan?.price}€)
             </DialogTitle>
           </DialogHeader>
 
@@ -473,7 +473,7 @@ export default function GoPlusPage() {
             </Button>
 
             <p className="text-xs text-center text-muted-foreground">
-              Paiement sécurisé — aucune donnée bancaire stockée
+              Paiement sécurisé · aucune donnée bancaire stockée
             </p>
           </div>
         </DialogContent>

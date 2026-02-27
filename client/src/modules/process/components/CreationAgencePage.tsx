@@ -75,7 +75,7 @@ export default function CreationAgencePage() {
       <section className="py-8 bg-background border-b border-border">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="text-base text-muted-foreground leading-relaxed">
-            <span className="font-semibold text-foreground">7 ans d'expérience, fondateur de Go Fly</span> — formation, coaching et financement pour lancer votre agence. Choisissez votre forfait et démarrez.
+            <span className="font-semibold text-foreground">7 ans d'expérience, fondateur de Go Fly.</span> Formation, coaching et financement pour lancer votre agence. Choisissez votre forfait et démarrez.
           </p>
         </div>
       </section>
@@ -165,7 +165,7 @@ export default function CreationAgencePage() {
                   <ArrowLeft className="w-4 h-4" />
                 </Button>
                 <h3 className="text-xl font-heading font-semibold text-foreground">
-                  Inscription — {activePack.label}
+                  Inscription : {activePack.label}
                 </h3>
               </div>
               <Card className="border-primary/20">

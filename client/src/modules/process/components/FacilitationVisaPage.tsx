@@ -128,7 +128,7 @@ export default function FacilitationVisaPage() {
                   </div>
                   <div>
                     <h3 className="text-xl font-heading font-bold text-foreground">
-                      Demande de visa — 75€
+                      Demande de visa · 75€
                     </h3>
                     <p className="text-sm text-muted-foreground">Remplissez le formulaire ci-dessous</p>
                   </div>
@@ -183,7 +183,7 @@ export default function FacilitationVisaPage() {
                         variant="outline"
                         className="w-full"
                       >
-                        Prendre rendez-vous — 20€
+                        Prendre rendez-vous · 20€
                       </Button>
                     </Link>
                   </div>
@@ -204,13 +204,13 @@ export default function FacilitationVisaPage() {
                       className="w-full"
                       onClick={() => setShowForm(true)}
                     >
-                      Déposer ma demande — 75€
+                      Déposer ma demande · 75€
                     </Button>
                   </div>
                 </div>
 
                 <p className="text-xs text-muted-foreground text-center mt-8">
-                  Paiement sécurisé — Carte bancaire ou Mobile Money
+                  Paiement sécurisé · carte bancaire ou Mobile Money
                 </p>
               </CardContent>
             </Card>

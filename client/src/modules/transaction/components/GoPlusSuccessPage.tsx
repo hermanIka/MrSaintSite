@@ -140,7 +140,7 @@ export default function GoPlusSuccessPage() {
                   data-testid="badge-card-active"
                   className="bg-green-500/15 text-green-600 dark:text-green-400 border-green-500/30"
                 >
-                  Carte active — 1 an
+                  Carte active : 1 an
                 </Badge>
               </CardContent>
             </Card>

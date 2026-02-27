@@ -949,7 +949,7 @@ export function VoyageCreditPage() {
           <div className="mb-4 rounded-lg border border-primary/40 bg-primary/5 p-3 flex items-center gap-3" data-testid="banner-gold-credit">
             <Crown className="w-4 h-4 text-primary flex-shrink-0" />
             <p className="text-sm text-foreground">
-              <strong>Accès GO+ Gold</strong> — Votre dossier Voyage à Crédit est traité en priorité par notre équipe.
+              <strong>Accès GO+ Gold :</strong> votre dossier Voyage à Crédit est traité en priorité par notre équipe.
             </p>
           </div>
         )}
