@@ -20,12 +20,15 @@ import {
   type InsertCreditTravelRequest,
   type VisaRequest,
   type InsertVisaRequest,
+  type AgencyRequest,
+  type InsertAgencyRequest,
   admins,
   activityLogs,
   faqs,
   services,
   creditTravelRequests,
   visaRequests,
+  agencyRequests,
 } from "@shared/schema";
 import { db } from "../../db";
 import { eq, desc } from "drizzle-orm";
@@ -64,6 +67,12 @@ export interface IAdminStorage {
   getVisaRequestById(id: string): Promise<VisaRequest | undefined>;
   createVisaRequest(request: InsertVisaRequest): Promise<VisaRequest>;
   updateVisaRequestStatus(id: string, status: string, adminNotes?: string): Promise<VisaRequest | undefined>;
+
+  // Agency Requests
+  getAllAgencyRequests(): Promise<AgencyRequest[]>;
+  getAgencyRequestById(id: string): Promise<AgencyRequest | undefined>;
+  createAgencyRequest(request: InsertAgencyRequest): Promise<AgencyRequest>;
+  updateAgencyRequestStatus(id: string, status: string, adminNotes?: string): Promise<AgencyRequest | undefined>;
 }
 
 export class AdminDbStorage implements IAdminStorage {
@@ -259,6 +268,48 @@ export class AdminDbStorage implements IAdminStorage {
         updatedAt: new Date().toISOString(),
       })
       .where(eq(visaRequests.id, id))
+      .returning();
+    return updated;
+  }
+
+  // ============ AGENCY REQUESTS ============
+
+  async getAllAgencyRequests(): Promise<AgencyRequest[]> {
+    return await db
+      .select()
+      .from(agencyRequests)
+      .orderBy(desc(agencyRequests.createdAt));
+  }
+
+  async getAgencyRequestById(id: string): Promise<AgencyRequest | undefined> {
+    const [request] = await db
+      .select()
+      .from(agencyRequests)
+      .where(eq(agencyRequests.id, id));
+    return request;
+  }
+
+  async createAgencyRequest(request: InsertAgencyRequest): Promise<AgencyRequest> {
+    const [newRequest] = await db
+      .insert(agencyRequests)
+      .values({ ...request, status: "pending" })
+      .returning();
+    return newRequest;
+  }
+
+  async updateAgencyRequestStatus(
+    id: string,
+    status: string,
+    adminNotes?: string
+  ): Promise<AgencyRequest | undefined> {
+    const [updated] = await db
+      .update(agencyRequests)
+      .set({
+        status,
+        adminNotes: adminNotes ?? null,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(agencyRequests.id, id))
       .returning();
     return updated;
   }

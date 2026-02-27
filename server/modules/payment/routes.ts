@@ -267,7 +267,9 @@ export function registerPaymentRoutes(app: Express): void {
       }
 
       const paymentSource = (existingPayment as any).source || "reservation";
-      const returnPath = paymentSource === "visa" ? "/facilitation-visa" : "/reservation";
+      const returnPath = paymentSource === "visa" ? "/facilitation-visa"
+                       : paymentSource === "agence" ? "/creation-agence"
+                       : "/reservation";
 
       if (existingPayment.status === "success") {
         return res.redirect(`${returnPath}?payment=success&id=${paymentId}&provider=maishapay`);

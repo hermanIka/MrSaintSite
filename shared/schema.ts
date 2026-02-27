@@ -430,3 +430,81 @@ export const VISA_REQUEST_STATUS = [
   { value: "approved", label: "Approuvée", color: "bg-green-500" },
   { value: "rejected", label: "Rejetée", color: "bg-red-500" },
 ] as const;
+
+// ============ AGENCY REQUESTS ============
+
+export const agencyRequests = pgTable("agency_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  lastName: text("last_name").notNull(),
+  firstName: text("first_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  nationality: text("nationality").notNull(),
+  birthDate: text("birth_date").notNull(),
+  packName: text("pack_name").notNull(), // classique, premium, elite
+  packPrice: integer("pack_price").notNull(), // prix accompagnement en euros
+  message: text("message"), // motivation optionnelle
+  paymentId: text("payment_id"),
+  paymentMethod: text("payment_method"), // maishapay, pawapay
+  amount: integer("amount").notNull(),
+  status: text("status").notNull().default("pending"), // pending, processing, approved, rejected
+  adminNotes: text("admin_notes"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export const insertAgencyRequestSchema = createInsertSchema(agencyRequests).omit({
+  id: true,
+});
+
+export type InsertAgencyRequest = z.infer<typeof insertAgencyRequestSchema>;
+export type AgencyRequest = typeof agencyRequests.$inferSelect;
+
+export const AGENCY_PACKS = [
+  {
+    value: "classique",
+    label: "Agence Classique",
+    price: 800,
+    startBudget: "2 000€",
+    description: "Lancer ton agence avec 2 000€",
+    highlighted: false,
+    revenue: "1 500€ – 2 500€ / mois",
+    features: [
+      "Définition de la cible et du nom de votre agence",
+      "Stratégie marketing adaptée à votre niche",
+      "Plan de rentabilité en 2 à 3 mois",
+    ],
+  },
+  {
+    value: "premium",
+    label: "Agence Premium",
+    price: 1500,
+    startBudget: "6 000€",
+    description: "Lancer ton agence avec 6 000€",
+    highlighted: true,
+    revenue: "2 500€ – 5 000€ / mois",
+    features: [
+      "Création complète : nom, emplacement et type d'agence",
+      "Stratégie marketing et coaching personnalisé",
+      "Formation de vos agents",
+      "Accès aux partenaires : hôtels, vols, transport",
+      "Accompagnement sur 6 mois",
+    ],
+  },
+  {
+    value: "elite",
+    label: "Agence Elite",
+    price: 2500,
+    startBudget: "10 000€",
+    description: "Lancer ton agence avec 10 000€",
+    highlighted: false,
+    revenue: "25 000€ – 50 000€ / mois",
+    features: [
+      "Tout ce qui est inclus dans le forfait Premium",
+      "Réseau Go Groupe et avantages exclusifs",
+      "Tourisme + conciergerie (Airbnb & gestion propriétés)",
+      "Gestion complète de votre agence",
+      "Stratégie pour maximiser partenariats et ventes",
+    ],
+  },
+] as const;

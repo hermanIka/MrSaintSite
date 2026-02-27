@@ -33,6 +33,7 @@ import {
   insertChatbotSystemPromptSchema,
   insertGoPlusPlanSchema,
   insertVisaRequestSchema,
+  insertAgencyRequestSchema,
 } from "@shared/schema";
 import { chatbotStorage } from "../chatbot/storage";
 import { ObjectStorageService } from "../../replit_integrations/object_storage";
@@ -1090,6 +1091,117 @@ export function registerAdminRoutes(app: Express) {
         entityType: "visa_request",
         entityId: id,
         details: `Demande visa mise à jour: ${status}`,
+        adminId: req.admin!.adminId,
+        createdAt: new Date().toISOString(),
+      });
+
+      res.json(request);
+    } catch {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  // ============ AGENCY REQUESTS (Public submission) ============
+
+  app.post("/api/agency-requests", async (req, res) => {
+    try {
+      const now = new Date().toISOString();
+      const requestData = { ...req.body, createdAt: now, updatedAt: now };
+      const validatedData = insertAgencyRequestSchema.parse(requestData);
+      const request = await adminStorage.createAgencyRequest(validatedData);
+
+      const packLabels: Record<string, string> = {
+        classique: "Agence Classique",
+        premium: "Agence Premium",
+        elite: "Agence Elite",
+      };
+      const packLabel = packLabels[validatedData.packName] || validatedData.packName;
+
+      try {
+        await resend.emails.send({
+          from: "Mr Saint <onboarding@resend.dev>",
+          to: "matandusaint@gmail.com",
+          subject: `[Demande Agence] ${validatedData.firstName} ${validatedData.lastName} — ${packLabel}`,
+          html: `
+            <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #fff;">
+              <div style="background: #000; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+                <h1 style="color: #F2C94C; margin: 0; font-size: 24px;">Mr Saint</h1>
+                <p style="color: #fff; margin: 4px 0; font-size: 14px;">Nouvelle demande de création d'agence</p>
+              </div>
+              <div style="border: 1px solid #e0e0e0; border-top: none; padding: 24px; border-radius: 0 0 8px 8px;">
+                <h2 style="color: #333; margin-top: 0;">Forfait choisi : <span style="color: #F2C94C;">${packLabel} — ${validatedData.packPrice}€</span></h2>
+                <table style="width: 100%; border-collapse: collapse;">
+                  <tr><td style="padding: 8px 0; color: #666; width: 40%;"><strong>Nom complet</strong></td><td style="padding: 8px 0;">${validatedData.firstName} ${validatedData.lastName}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #666;"><strong>Email</strong></td><td style="padding: 8px 0;">${validatedData.email}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #666;"><strong>Téléphone</strong></td><td style="padding: 8px 0;">${validatedData.phone}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #666;"><strong>Nationalité</strong></td><td style="padding: 8px 0;">${validatedData.nationality}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #666;"><strong>Date de naissance</strong></td><td style="padding: 8px 0;">${validatedData.birthDate}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #666;"><strong>Mode de paiement</strong></td><td style="padding: 8px 0;">${validatedData.paymentMethod || "N/A"}</td></tr>
+                  <tr><td style="padding: 8px 0; color: #666;"><strong>Montant payé</strong></td><td style="padding: 8px 0; color: green; font-weight: bold;">${validatedData.amount}€</td></tr>
+                  <tr><td style="padding: 8px 0; color: #666;"><strong>Réf. Demande</strong></td><td style="padding: 8px 0; font-size: 12px; font-family: monospace;">${request.id}</td></tr>
+                </table>
+                ${validatedData.message ? `<div style="background: #f9f9f9; padding: 16px; border-radius: 6px; margin-top: 16px;"><p style="margin: 0 0 8px 0; color: #333; font-weight: bold;">Message du client :</p><p style="margin: 0; color: #555;">${validatedData.message}</p></div>` : ""}
+                <p style="margin-top: 24px; color: #888; font-size: 12px;">Accédez au tableau de bord admin pour traiter cette demande.</p>
+              </div>
+            </div>
+          `,
+        });
+      } catch (emailError) {
+        console.error("[Agency] Email notification failed:", emailError);
+      }
+
+      res.status(201).json({
+        success: true,
+        message: "Votre demande a été soumise avec succès. Vous serez contacté dans les 24 à 48 heures.",
+        requestId: request.id,
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      }
+      console.error("Error creating agency request:", error);
+      res.status(500).json({ error: "Erreur lors de la soumission de votre demande" });
+    }
+  });
+
+  // ============ AGENCY REQUESTS (Admin) ============
+
+  app.get("/api/admin/agency-requests", authMiddleware, async (_req, res) => {
+    try {
+      const requests = await adminStorage.getAllAgencyRequests();
+      res.json(requests);
+    } catch {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.get("/api/admin/agency-requests/:id", authMiddleware, async (req, res) => {
+    try {
+      const request = await adminStorage.getAgencyRequestById(req.params.id);
+      if (!request) return res.status(404).json({ error: "Demande non trouvée" });
+      res.json(request);
+    } catch {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.put("/api/admin/agency-requests/:id/status", authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { id } = req.params;
+      const { status, adminNotes } = req.body;
+
+      if (!["pending", "processing", "approved", "rejected"].includes(status)) {
+        return res.status(400).json({ error: "Statut invalide" });
+      }
+
+      const request = await adminStorage.updateAgencyRequestStatus(id, status, adminNotes);
+      if (!request) return res.status(404).json({ error: "Demande non trouvée" });
+
+      await adminStorage.createLog({
+        action: "UPDATE",
+        entityType: "agency_request",
+        entityId: id,
+        details: `Demande agence mise à jour: ${status}`,
         adminId: req.admin!.adminId,
         createdAt: new Date().toISOString(),
       });
