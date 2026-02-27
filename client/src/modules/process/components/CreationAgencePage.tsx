@@ -71,7 +71,6 @@ export default function CreationAgencePage() {
           <p className="text-lg sm:text-xl text-white/90">Formation, coaching et accompagnement complet</p>
         </div>
       </section>
-
       <section className="py-8 bg-background border-b border-border">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="text-base text-muted-foreground leading-relaxed">
@@ -79,7 +78,6 @@ export default function CreationAgencePage() {
           </p>
         </div>
       </section>
-
       {/* ============ FORFAITS ============ */}
       <section className="py-20 bg-background" id="forfaits">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -88,9 +86,7 @@ export default function CreationAgencePage() {
               <Building2 className="w-4 h-4 text-primary" />
               <span className="text-sm font-medium text-primary uppercase tracking-wider">Créez votre agence</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-4">
-              Choisissez votre forfait d'accompagnement
-            </h2>
+            <h2 className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-4">Choisis le type d'agence que  tu veux lancer</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Trois niveaux d'accompagnement pour lancer votre agence de voyage selon votre ambition et votre budget.
             </p>
@@ -185,7 +181,6 @@ export default function CreationAgencePage() {
           )}
         </div>
       </section>
-
       <section className="py-20 bg-black text-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
