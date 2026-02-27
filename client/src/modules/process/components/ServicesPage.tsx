@@ -149,9 +149,6 @@ export default function ServicesPage() {
                       </ul>
 
                       <div className="pt-4 border-t border-primary/10 mt-auto">
-                        <div data-testid={`text-service-price-${service.slug}`} className="text-lg font-semibold text-primary mb-4">
-                          {formatPrice(service)}
-                        </div>
                         <Link href={service.ctaLink || "/reservation"}>
                           <Button
                             data-testid={`button-service-${service.slug}`}
