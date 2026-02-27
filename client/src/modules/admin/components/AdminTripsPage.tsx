@@ -15,9 +15,10 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { useAdminAuth } from "../hooks/useAdminAuth";
-import { Plus, Pencil, Trash2, Loader2, Upload, Image as ImageIcon, Star } from "lucide-react";
-import type { Trip } from "@shared/schema";
+import { Plus, Pencil, Trash2, Loader2, Upload, Image as ImageIcon, Star, Images } from "lucide-react";
+import type { Trip, TripGalleryPhoto } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
 interface TripFormData {
@@ -55,7 +56,20 @@ export function AdminTripsPage() {
   const [formData, setFormData] = useState<TripFormData>(emptyFormData);
   const [isUploading, setIsUploading] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isUploadingGallery, setIsUploadingGallery] = useState(false);
+  const [galleryCaption, setGalleryCaption] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const galleryFileInputRef = useRef<HTMLInputElement>(null);
+
+  const { data: galleryPhotos = [], refetch: refetchGallery } = useQuery<TripGalleryPhoto[]>({
+    queryKey: ["/api/trips", editingTrip?.id, "gallery"],
+    enabled: !!editingTrip?.id,
+    queryFn: async () => {
+      const res = await fetch(`/api/trips/${editingTrip!.id}/gallery`);
+      if (!res.ok) throw new Error("Erreur chargement galerie");
+      return res.json();
+    },
+  });
 
   const { data: trips, isLoading } = useQuery<Trip[]>({
     queryKey: ["/api/admin/trips"],
@@ -258,6 +272,74 @@ export function AdminTripsPage() {
     }));
   };
 
+  const deleteGalleryPhotoMutation = useMutation({
+    mutationFn: async ({ tripId, photoId }: { tripId: string; photoId: string }) => {
+      const res = await fetch(`/api/admin/trips/${tripId}/gallery/${photoId}`, {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      });
+      if (!res.ok) throw new Error("Erreur de suppression");
+      return res.json();
+    },
+    onSuccess: () => {
+      refetchGallery();
+      queryClient.invalidateQueries({ queryKey: ["/api/trips", editingTrip?.id, "gallery"] });
+      toast({ title: "Photo supprimée" });
+    },
+    onError: () => {
+      toast({ title: "Erreur lors de la suppression", variant: "destructive" });
+    },
+  });
+
+  const handleGalleryFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editingTrip) return;
+    e.target.value = "";
+
+    if (!file.type.startsWith("image/")) {
+      toast({ title: "Veuillez sélectionner une image", variant: "destructive" });
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "L'image ne doit pas dépasser 5 Mo", variant: "destructive" });
+      return;
+    }
+
+    setIsUploadingGallery(true);
+    try {
+      const urlRes = await fetch("/api/admin/upload/request-url", {
+        method: "POST",
+        headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({ name: file.name, size: file.size, contentType: file.type }),
+      });
+      if (!urlRes.ok) throw new Error("Erreur URL upload");
+      const { uploadURL, objectPath } = await urlRes.json();
+
+      const uploadRes = await fetch(uploadURL, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type },
+      });
+      if (!uploadRes.ok) throw new Error("Erreur upload");
+
+      const addRes = await fetch(`/api/admin/trips/${editingTrip.id}/gallery`, {
+        method: "POST",
+        headers: { ...getAuthHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({ url: objectPath, caption: galleryCaption }),
+      });
+      if (!addRes.ok) throw new Error("Erreur enregistrement");
+
+      setGalleryCaption("");
+      refetchGallery();
+      queryClient.invalidateQueries({ queryKey: ["/api/trips", editingTrip.id, "gallery"] });
+      toast({ title: "Photo ajoutée à la galerie" });
+    } catch {
+      toast({ title: "Erreur lors de l'ajout de la photo", variant: "destructive" });
+    } finally {
+      setIsUploadingGallery(false);
+    }
+  };
+
   const isPending = createMutation.isPending || updateMutation.isPending;
 
   return (
@@ -413,6 +495,82 @@ export function AdminTripsPage() {
                     data-testid="switch-featured"
                   />
                 </div>
+
+                {/* Galerie photos — uniquement en mode édition */}
+                {editingTrip && (
+                  <>
+                    <Separator />
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <Images className="w-4 h-4 text-primary" />
+                        <Label className="text-base font-semibold">Galerie photos</Label>
+                      </div>
+
+                      {/* Photos existantes */}
+                      {galleryPhotos.length > 0 && (
+                        <div className="grid grid-cols-3 gap-2">
+                          {galleryPhotos.map((photo) => (
+                            <div key={photo.id} className="relative group rounded-md overflow-hidden border">
+                              <img
+                                src={photo.url}
+                                alt={photo.caption || "photo"}
+                                className="w-full h-24 object-cover"
+                                data-testid={`gallery-admin-photo-${photo.id}`}
+                              />
+                              {photo.caption && (
+                                <p className="text-xs text-muted-foreground px-1 py-0.5 truncate">{photo.caption}</p>
+                              )}
+                              <Button
+                                type="button"
+                                size="icon"
+                                variant="outline"
+                                className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity bg-background/80"
+                                onClick={() => deleteGalleryPhotoMutation.mutate({ tripId: editingTrip.id, photoId: photo.id })}
+                                disabled={deleteGalleryPhotoMutation.isPending}
+                                data-testid={`button-delete-gallery-photo-${photo.id}`}
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Ajouter une photo */}
+                      <div className="flex flex-col gap-2">
+                        <Input
+                          placeholder="Légende (optionnelle)"
+                          value={galleryCaption}
+                          onChange={(e) => setGalleryCaption(e.target.value)}
+                          data-testid="input-gallery-caption"
+                        />
+                        <input
+                          ref={galleryFileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleGalleryFileSelect}
+                          className="hidden"
+                          data-testid="input-gallery-file"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => galleryFileInputRef.current?.click()}
+                          disabled={isUploadingGallery}
+                          data-testid="button-add-gallery-photo"
+                        >
+                          {isUploadingGallery ? (
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          ) : (
+                            <Upload className="w-4 h-4 mr-2" />
+                          )}
+                          {isUploadingGallery ? "Upload en cours..." : "Ajouter une photo"}
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 <div className="flex justify-end gap-2 pt-4">
                   <Button type="button" variant="outline" onClick={closeDialog}>Annuler</Button>

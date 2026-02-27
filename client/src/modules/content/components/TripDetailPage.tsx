@@ -3,17 +3,11 @@ import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
-import type { Trip } from "@shared/schema";
+import type { Trip, TripGalleryPhoto } from "@shared/schema";
 import { useRoute, Link } from "wouter";
-import { Calendar, MapPin, CheckCircle2, XCircle } from "lucide-react";
+import { Calendar, MapPin, CheckCircle2, XCircle, Images } from "lucide-react";
 
 export default function TripDetailPage() {
   const [, params] = useRoute("/voyages/:id");
@@ -21,6 +15,11 @@ export default function TripDetailPage() {
 
   const { data: trip, isLoading } = useQuery<Trip>({
     queryKey: ["/api/trips", tripId],
+    enabled: !!tripId,
+  });
+
+  const { data: galleryPhotos = [] } = useQuery<TripGalleryPhoto[]>({
+    queryKey: ["/api/trips", tripId, "gallery"],
     enabled: !!tripId,
   });
 
@@ -102,27 +101,41 @@ export default function TripDetailPage() {
                 </p>
               </section>
 
-              <section className="mb-12">
-                <h2 className="text-2xl font-heading font-bold text-foreground mb-6">
-                  Itinéraire détaillé
-                </h2>
-                <Accordion type="single" collapsible className="w-full">
-                  {trip.itinerary.map((day, index) => (
-                    <AccordionItem
-                      key={index}
-                      value={`day-${index}`}
-                      data-testid={`accordion-day-${index + 1}`}
-                    >
-                      <AccordionTrigger className="text-lg font-heading">
-                        Jour {index + 1}
-                      </AccordionTrigger>
-                      <AccordionContent className="text-muted-foreground leading-relaxed">
-                        {day}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
-              </section>
+              {/* Galerie photos mosaïque */}
+              {galleryPhotos.length > 0 && (
+                <section className="mb-12">
+                  <h2 className="text-2xl font-heading font-bold text-foreground mb-6 flex items-center gap-2">
+                    <Images className="w-6 h-6 text-primary" />
+                    Découvrez la destination
+                  </h2>
+                  <div
+                    data-testid="gallery-mosaic"
+                    className="columns-2 md:columns-3 gap-3 space-y-3"
+                  >
+                    {galleryPhotos.map((photo) => (
+                      <div
+                        key={photo.id}
+                        data-testid={`gallery-photo-${photo.id}`}
+                        className="relative group break-inside-avoid rounded-md overflow-hidden"
+                      >
+                        <img
+                          src={photo.url}
+                          alt={photo.caption || trip.destination}
+                          className="w-full object-cover rounded-md"
+                          loading="lazy"
+                        />
+                        {photo.caption && (
+                          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-end rounded-md">
+                            <p className="text-white text-sm p-3 font-medium">
+                              {photo.caption}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
 
               <section>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

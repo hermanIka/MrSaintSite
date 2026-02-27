@@ -42,6 +42,15 @@ export function registerContentRoutes(app: Express): void {
     }
   });
 
+  app.get("/api/trips/:id/gallery", async (req, res) => {
+    try {
+      const photos = await contentStorage.getTripGalleryPhotos(req.params.id);
+      res.json(photos);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch gallery" });
+    }
+  });
+
   app.get("/api/testimonials", async (_req, res) => {
     try {
       const testimonials = await contentStorage.getAllTestimonials();

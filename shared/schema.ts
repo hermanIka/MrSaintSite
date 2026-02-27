@@ -25,6 +25,22 @@ export const insertTripSchema = createInsertSchema(trips).omit({
 export type InsertTrip = z.infer<typeof insertTripSchema>;
 export type Trip = typeof trips.$inferSelect;
 
+// Trip Gallery Photos schema
+export const tripGalleryPhotos = pgTable("trip_gallery_photos", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  tripId: varchar("trip_id").notNull(),
+  url: text("url").notNull(),
+  caption: text("caption"),
+  displayOrder: integer("display_order").notNull().default(0),
+});
+
+export const insertTripGalleryPhotoSchema = createInsertSchema(tripGalleryPhotos).omit({
+  id: true,
+});
+
+export type InsertTripGalleryPhoto = z.infer<typeof insertTripGalleryPhotoSchema>;
+export type TripGalleryPhoto = typeof tripGalleryPhotos.$inferSelect;
+
 // Testimonials schema
 export const testimonials = pgTable("testimonials", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),

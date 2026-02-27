@@ -212,6 +212,36 @@ export function registerAdminRoutes(app: Express) {
     }
   });
   
+
+  // ============ TRIP GALLERY ============
+
+  app.post('/api/admin/trips/:id/gallery', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { id } = req.params;
+      const { url, caption } = req.body;
+      if (!url) return res.status(400).json({ error: 'URL requise' });
+      const photo = await contentStorage.addTripGalleryPhoto({
+        tripId: id,
+        url,
+        caption: caption || null,
+        displayOrder: 0,
+      });
+      res.json(photo);
+    } catch (error) {
+      res.status(500).json({ error: 'Erreur serveur' });
+    }
+  });
+
+  app.delete('/api/admin/trips/:id/gallery/:photoId', authMiddleware, async (req: AuthenticatedRequest, res) => {
+    try {
+      const { photoId } = req.params;
+      await contentStorage.deleteTripGalleryPhoto(photoId);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: 'Erreur serveur' });
+    }
+  });
+
   // ============ TESTIMONIALS ============
   
   app.get("/api/admin/testimonials", authMiddleware, async (_req, res) => {

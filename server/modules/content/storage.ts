@@ -15,10 +15,13 @@ import {
   type Portfolio,
   type InsertPortfolio,
   type Service,
+  type TripGalleryPhoto,
+  type InsertTripGalleryPhoto,
   trips,
   testimonials,
   portfolio,
   services,
+  tripGalleryPhotos,
 } from "@shared/schema";
 import { db } from "../../db";
 import { eq, and, asc } from "drizzle-orm";
@@ -30,6 +33,10 @@ export interface IContentStorage {
   createTrip(trip: InsertTrip): Promise<Trip>;
   updateTrip(id: string, trip: Partial<InsertTrip>): Promise<Trip | undefined>;
   deleteTrip(id: string): Promise<boolean>;
+
+  getTripGalleryPhotos(tripId: string): Promise<TripGalleryPhoto[]>;
+  addTripGalleryPhoto(data: InsertTripGalleryPhoto): Promise<TripGalleryPhoto>;
+  deleteTripGalleryPhoto(id: string): Promise<boolean>;
 
   getAllTestimonials(): Promise<Testimonial[]>;
   getTestimonialById(id: string): Promise<Testimonial | undefined>;
@@ -79,6 +86,24 @@ export class ContentDbStorage implements IContentStorage {
 
   async deleteTrip(id: string): Promise<boolean> {
     const result = await db.delete(trips).where(eq(trips.id, id)).returning();
+    return result.length > 0;
+  }
+
+  async getTripGalleryPhotos(tripId: string): Promise<TripGalleryPhoto[]> {
+    return await db
+      .select()
+      .from(tripGalleryPhotos)
+      .where(eq(tripGalleryPhotos.tripId, tripId))
+      .orderBy(asc(tripGalleryPhotos.displayOrder));
+  }
+
+  async addTripGalleryPhoto(data: InsertTripGalleryPhoto): Promise<TripGalleryPhoto> {
+    const [photo] = await db.insert(tripGalleryPhotos).values(data).returning();
+    return photo;
+  }
+
+  async deleteTripGalleryPhoto(id: string): Promise<boolean> {
+    const result = await db.delete(tripGalleryPhotos).where(eq(tripGalleryPhotos.id, id)).returning();
     return result.length > 0;
   }
 
