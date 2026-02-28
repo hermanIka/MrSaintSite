@@ -117,7 +117,7 @@ export default function ServicesPage() {
                         {service.shortDescription}
                       </p>
                       <ul className="space-y-2.5 flex-1 mb-5">
-                        {(service.features || []).slice(0, 4).map((feature, i) => (
+                        {(service.features || []).slice(0, 6).map((feature, i) => (
                           <li key={i} data-testid={`text-feature-${service.slug}-${i}`} className="flex items-start gap-2 text-sm">
                             <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                             <span className="text-foreground">{feature}</span>
