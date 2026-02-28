@@ -22,6 +22,8 @@ import {
   User,
   Lock,
   Crown,
+  Mail,
+  Phone,
 } from "lucide-react";
 import { useGoPlusCard } from "@/hooks/useGoPlusCard";
 import { usePrices } from "@/hooks/usePrices";
@@ -295,21 +297,46 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
 
   if (succeeded) {
     return (
-      <div className="text-center py-12 px-4">
-        <div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
-          <CheckCircle className="w-10 h-10 text-green-600" />
+      <div className="py-10 px-4 space-y-6 max-w-lg mx-auto">
+        <div className="text-center">
+          <div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-5">
+            <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
+          </div>
+          <h3 className="text-2xl font-heading font-bold text-foreground mb-3">Demande reçue avec succès !</h3>
+          <p className="text-muted-foreground leading-relaxed">
+            Votre dossier a été transmis à notre équipe et est en cours de traitement.
+          </p>
         </div>
-        <h3 className="text-2xl font-heading font-bold text-foreground mb-3">Demande soumise avec succès !</h3>
-        <p className="text-muted-foreground mb-4 max-w-md mx-auto">
-          Votre demande de visa a été reçue et transmise à notre équipe. Vous serez contacté par email dans les 24 à 48 heures.
-        </p>
+
+        <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 flex gap-3 items-start">
+          <Phone className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-semibold text-foreground mb-1">Un agent vous contactera très prochainement</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Un agent voyagiste de notre équipe entrera en contact avec vous par <strong className="text-foreground">appel téléphonique ou vidéoconférence</strong> afin d'entamer la procédure ensemble et vous guider pas à pas.
+            </p>
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-4 flex gap-3 items-start">
+          <Mail className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-semibold text-foreground mb-1">Vérifiez votre boîte mail</p>
+            <p className="text-sm text-muted-foreground">
+              Un email de confirmation vous a été envoyé avec le récapitulatif de votre demande. Pensez à vérifier vos spams si vous ne le recevez pas dans les prochaines minutes.
+            </p>
+          </div>
+        </div>
+
         {requestId && (
-          <div className="inline-block px-4 py-2 bg-primary/10 rounded-lg border border-primary/20 mb-6">
-            <p className="text-xs text-muted-foreground mb-1">Numéro de référence</p>
-            <p className="text-sm font-mono font-semibold text-primary">{requestId}</p>
+          <div className="text-center">
+            <div className="inline-block px-4 py-2 bg-primary/10 rounded-lg border border-primary/20">
+              <p className="text-xs text-muted-foreground mb-1">Numéro de référence dossier</p>
+              <p className="text-sm font-mono font-semibold text-primary">{requestId}</p>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">Conservez ce numéro pour tout suivi de votre dossier.</p>
           </div>
         )}
-        <p className="text-sm text-muted-foreground">Conservez ce numéro de référence pour tout suivi de votre dossier.</p>
       </div>
     );
   }

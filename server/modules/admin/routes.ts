@@ -1080,7 +1080,54 @@ export function registerAdminRoutes(app: Express) {
           `,
         });
       } catch (emailError) {
-        console.error("[Visa] Email notification failed:", emailError);
+        console.error("[Visa] Email admin notification failed:", emailError);
+      }
+
+      try {
+        await resend.emails.send({
+          from: "Mr Saint <onboarding@resend.dev>",
+          to: validatedData.email,
+          subject: "Votre demande de facilitation visa a bien été reçue — Mr Saint",
+          html: `
+            <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #fff;">
+              <div style="background: #000; padding: 24px 20px; text-align: center; border-radius: 8px 8px 0 0;">
+                <h1 style="color: #F2C94C; margin: 0; font-size: 26px; letter-spacing: 1px;">Mr Saint</h1>
+                <p style="color: #fff; margin: 6px 0 0 0; font-size: 14px;">Agence de voyage & facilitation visa</p>
+              </div>
+              <div style="border: 1px solid #e0e0e0; border-top: none; padding: 32px 24px; border-radius: 0 0 8px 8px;">
+                <h2 style="color: #111; margin-top: 0; font-size: 20px;">Bonjour ${validatedData.firstName},</h2>
+                <p style="color: #444; line-height: 1.7; font-size: 15px;">
+                  Nous avons bien reçu votre demande de facilitation visa pour la destination <strong>${validatedData.destination}</strong>.
+                  Votre dossier est maintenant entre les mains de notre équipe.
+                </p>
+                <div style="background: #F2C94C10; border: 1px solid #F2C94C40; border-radius: 8px; padding: 20px; margin: 24px 0;">
+                  <p style="margin: 0; color: #111; font-size: 15px; font-weight: 600;">📞 Prochaine étape</p>
+                  <p style="margin: 10px 0 0 0; color: #444; line-height: 1.7; font-size: 14px;">
+                    Un agent voyagiste de notre équipe entrera en contact avec vous très prochainement par <strong>appel téléphonique ou vidéoconférence</strong> afin d'entamer la procédure ensemble et vous guider pas à pas dans votre démarche visa.
+                  </p>
+                </div>
+                <div style="background: #f9f9f9; border-radius: 6px; padding: 16px; margin-bottom: 24px;">
+                  <p style="margin: 0 0 10px 0; color: #555; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Récapitulatif de votre dossier</p>
+                  <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                    <tr><td style="padding: 5px 0; color: #888;">Nom :</td><td style="padding: 5px 0; color: #111; font-weight: 500;">${validatedData.firstName} ${validatedData.lastName}</td></tr>
+                    <tr><td style="padding: 5px 0; color: #888;">Type de visa :</td><td style="padding: 5px 0; color: #111; font-weight: 500;">${visaLabel}</td></tr>
+                    <tr><td style="padding: 5px 0; color: #888;">Destination :</td><td style="padding: 5px 0; color: #111; font-weight: 500;">${validatedData.destination}</td></tr>
+                    <tr><td style="padding: 5px 0; color: #888;">Référence dossier :</td><td style="padding: 5px 0; color: #F2C94C; font-weight: 700; font-family: monospace;">${request.id}</td></tr>
+                  </table>
+                </div>
+                <p style="color: #666; font-size: 14px; line-height: 1.6;">
+                  Conservez votre numéro de référence <strong style="color: #111;">${request.id}</strong> pour tout suivi de votre dossier.<br/>
+                  Pour toute question, vous pouvez nous joindre via WhatsApp ou notre formulaire de contact.
+                </p>
+                <div style="text-align: center; margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee;">
+                  <p style="color: #aaa; font-size: 12px; margin: 0;">© Mr Saint — Agence de voyage & facilitation visa</p>
+                </div>
+              </div>
+            </div>
+          `,
+        });
+      } catch (userEmailError) {
+        console.error("[Visa] User email notification failed:", userEmailError);
       }
 
       res.status(201).json({

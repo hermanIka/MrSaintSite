@@ -25,7 +25,7 @@ export const knowledgeBase = {
       title: "Facilitation Visa",
       subtitle: "Votre visa sans stress",
       description: "Accompagnement complet pour toutes vos démarches de visa. Nous analysons votre dossier, préparons vos documents et suivons votre demande jusqu'à l'obtention.",
-      price: "À partir de 75€",
+      price: "À partir de 600€",
       features: [
         "Analyse personnalisée du dossier",
         "Préparation complète des documents",

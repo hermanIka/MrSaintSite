@@ -70,7 +70,7 @@ Dis-moi, qu'est-ce qui t'amène aujourd'hui ?`,
 • Canada/USA : 2-4 semaines
 • Europe Schengen : 1-2 semaines
 
-💰 Tarif : À partir de 75€
+💰 Tarif : À partir de 600€
 📈 Taux de réussite : 95%
 
 Souhaitez-vous réserver une consultation ?`,
@@ -146,7 +146,7 @@ Voulez-vous en savoir plus sur la formation ?`,
     category: "pricing",
     response: `Voici nos tarifs :
 
-🛂 Facilitation Visa : À partir de 75€
+🛂 Facilitation Visa : À partir de 600€
 📚 Création d'Agence : À partir de 230€
 ✈️ Voyages Organisés : À partir de 750€
 

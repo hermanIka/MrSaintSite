@@ -22,14 +22,7 @@ import { payPalProvider } from "./providers/paypal.provider";
 import { db } from "../../db";
 import { payments } from "@shared/schema";
 import { eq } from "drizzle-orm";
-
-const CONSULTATION_PRICE = 20;
-
-const SERVICE_PRICES: Record<string, { price: number; consultationPrice: number }> = {
-  visa: { price: 75, consultationPrice: CONSULTATION_PRICE },
-  agence: { price: 750, consultationPrice: CONSULTATION_PRICE },
-  voyage: { price: 1200, consultationPrice: CONSULTATION_PRICE },
-};
+import { contentStorage } from "../content/storage";
 
 class PaymentService {
   private providers: Map<PaymentProvider, PaymentProviderInterface>;
@@ -65,23 +58,54 @@ class PaymentService {
     ];
   }
 
-  validateAmount(serviceId: string, amount: number, paymentMode: string = "direct"): { valid: boolean; expectedAmount: number; message?: string } {
-    const serviceConfig = SERVICE_PRICES[serviceId];
-    if (!serviceConfig) {
-      return { valid: false, expectedAmount: 0, message: `Service inconnu: ${serviceId}` };
+  async validateAmount(serviceId: string, amount: number, paymentMode: string = "direct"): Promise<{ valid: boolean; expectedAmount: number; message?: string }> {
+    try {
+      const allPrices = await contentStorage.getAllPrices();
+      const priceMap: Record<string, number> = {};
+      for (const p of allPrices) {
+        priceMap[p.key] = p.amount;
+      }
+
+      const consultationPrice = priceMap["consultation"] ?? 20;
+
+      if (paymentMode === "consultation") {
+        if (amount !== consultationPrice) {
+          return { valid: false, expectedAmount: consultationPrice, message: `Montant de consultation invalide. Attendu: ${consultationPrice}€, reçu: ${amount}€` };
+        }
+        return { valid: true, expectedAmount: consultationPrice };
+      }
+
+      if (serviceId === "visa") {
+        const visaPrice = priceMap["visa"] ?? 600;
+        if (amount !== visaPrice) {
+          return { valid: false, expectedAmount: visaPrice, message: `Montant visa invalide. Attendu: ${visaPrice}€, reçu: ${amount}€` };
+        }
+        return { valid: true, expectedAmount: visaPrice };
+      }
+
+      if (serviceId === "agence") {
+        const validAmounts = [
+          priceMap["agence_classique"] ?? 800,
+          priceMap["agence_premium"] ?? 1500,
+          priceMap["agence_elite"] ?? 2500,
+        ];
+        if (!validAmounts.includes(amount)) {
+          return { valid: false, expectedAmount: validAmounts[0], message: `Montant pack agence invalide. Reçu: ${amount}€` };
+        }
+        return { valid: true, expectedAmount: amount };
+      }
+
+      if (amount <= 0) {
+        return { valid: false, expectedAmount: 0, message: "Montant doit être positif." };
+      }
+      return { valid: true, expectedAmount: amount };
+    } catch (err) {
+      console.error("[Payment] Failed to fetch prices from DB, skipping strict validation:", err);
+      if (amount <= 0) {
+        return { valid: false, expectedAmount: 0, message: "Montant invalide." };
+      }
+      return { valid: true, expectedAmount: amount };
     }
-
-    const expectedAmount = paymentMode === "consultation" ? serviceConfig.consultationPrice : serviceConfig.price;
-
-    if (amount !== expectedAmount) {
-      return {
-        valid: false,
-        expectedAmount,
-        message: `Montant invalide. Attendu: ${expectedAmount}€, reçu: ${amount}€`,
-      };
-    }
-
-    return { valid: true, expectedAmount };
   }
 
   async initPayment(request: PaymentInitRequest & { paymentMode?: string; source?: string }): Promise<PaymentInitResponse> {
@@ -108,7 +132,7 @@ class PaymentService {
     }
 
     const paymentMode = request.paymentMode || "direct";
-    const validation = this.validateAmount(request.serviceId, request.amount, paymentMode);
+    const validation = await this.validateAmount(request.serviceId, request.amount, paymentMode);
     if (!validation.valid) {
       console.warn("[Payment] Amount validation failed:", validation.message);
       return {
