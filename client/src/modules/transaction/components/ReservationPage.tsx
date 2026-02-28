@@ -268,9 +268,9 @@ export default function ReservationPage() {
           <p
             data-testid="text-reservation-subtitle"
             className="text-xl text-white/80 max-w-2xl mx-auto"
-          >
-            Commencez votre projet en quelques clics. Paiement sécurisé, confirmation immédiate.
-          </p>
+          >Un expert voyagiste je t'aide de débloquer ton voyage , ton visa... et si tu souhaites lancer ton agence de voyage rentable je t'aide à le réaliser 
+
+          Prends rendez-vous et on démarre</p>
         </div>
       </section>
       <section className="py-16 bg-background border-b">
