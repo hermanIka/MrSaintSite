@@ -75,7 +75,6 @@ export default function FacilitationVisaPage() {
           </p>
         </div>
       </section>
-
       <section className="py-20 bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="prose max-w-none">
@@ -92,7 +91,6 @@ export default function FacilitationVisaPage() {
           </div>
         </div>
       </section>
-
       <section className="py-6 bg-background border-b border-border">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-row flex-wrap justify-center items-center gap-x-2 gap-y-2">
@@ -115,7 +113,6 @@ export default function FacilitationVisaPage() {
           </div>
         </div>
       </section>
-
       {/* Section principale : choix ou formulaire */}
       <section className="py-20 bg-background">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -152,7 +149,7 @@ export default function FacilitationVisaPage() {
             </Card>
           ) : (
             /* Carte de choix — deux options */
-            <Card className="border-primary/20">
+            (<Card className="border-primary/20">
               <CardContent className="p-8 sm:p-12">
                 <div className="text-center mb-10">
                   <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
@@ -195,9 +192,8 @@ export default function FacilitationVisaPage() {
                     <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center mb-4">
                       <FileText className="w-5 h-5 text-primary" />
                     </div>
-                    <h4 className="text-lg font-heading font-semibold text-foreground mb-2">
-                      Commencer ma demande
-                    </h4>
+                    <h4 className="text-lg font-heading font-semibold text-foreground mb-2">Commencer la facilitation de votre voyage
+</h4>
                     <p className="text-sm text-muted-foreground mb-6 flex-1">
                       Remplissez votre dossier, uploadez vos documents et réglez les frais de traitement. Traitement en <strong>{prices.visa}€</strong>.
                     </p>
@@ -215,7 +211,7 @@ export default function FacilitationVisaPage() {
                   Paiement sécurisé · carte bancaire ou Mobile Money
                 </p>
               </CardContent>
-            </Card>
+            </Card>)
           )}
         </div>
       </section>
