@@ -264,9 +264,7 @@ export default function ReservationPage() {
           <h1
             data-testid="text-reservation-title"
             className="text-4xl sm:text-5xl lg:text-6xl font-heading font-bold mb-6"
-          >
-            Réservez votre service
-          </h1>
+          >Réservez votre consultation</h1>
           <p
             data-testid="text-reservation-subtitle"
             className="text-xl text-white/80 max-w-2xl mx-auto"
@@ -275,7 +273,6 @@ export default function ReservationPage() {
           </p>
         </div>
       </section>
-
       <section className="py-16 bg-background border-b">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -306,7 +303,6 @@ export default function ReservationPage() {
           </div>
         </div>
       </section>
-
       <section className="py-24 bg-muted/30">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           {(currentStep === "select" || currentStep === "payment") && (
@@ -647,7 +643,6 @@ export default function ReservationPage() {
           )}
         </div>
       </section>
-
       <section className="py-16 bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
