@@ -385,12 +385,12 @@ export default function ReservationPage() {
                     <div className="flex flex-col sm:flex-row gap-4 justify-center flex-wrap">
                       <Button
                           data-testid="button-contact-first"
-                          variant="outline"
                           size="lg"
+                          className="bg-primary text-primary-foreground"
                           onClick={handleContactFirst}
                         >
                           <CalendarIcon className="w-5 h-5 mr-2" />
-                          Consulter d'abord ({prices.consultation}€)
+                          Consultez Maintenant ({prices.consultation}€)
                         </Button>
                     </div>
                   </CardContent>
