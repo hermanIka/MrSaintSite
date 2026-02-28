@@ -314,7 +314,6 @@ export function AgencyApplicationForm({
         <Star className="w-5 h-5 text-primary flex-shrink-0" />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-foreground">{packLabel}</p>
-          <p className="text-xs text-muted-foreground">CA estimé : {packRevenue}</p>
         </div>
         <span className="text-lg font-bold text-primary flex-shrink-0">{packPrice}€</span>
       </div>
