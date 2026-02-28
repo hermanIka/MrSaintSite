@@ -331,10 +331,6 @@ class PaymentService {
     }
   }
 
-  getServicePrices(): Record<string, { price: number; consultationPrice: number }> {
-    return { ...SERVICE_PRICES };
-  }
-
   private getProviderLabel(provider: PaymentProvider): string {
     const labels: Record<PaymentProvider, string> = {
       pawapay: "Mobile Money",
