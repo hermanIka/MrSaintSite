@@ -384,15 +384,6 @@ export default function ReservationPage() {
 
                     <div className="flex flex-col sm:flex-row gap-4 justify-center flex-wrap">
                       <Button
-                        data-testid="button-proceed-payment"
-                        size="lg"
-                        className="gap-2"
-                        onClick={handleDirectPayment}
-                      >
-                        <CreditCard className="w-5 h-5" />
-                        Payer directement ({selectedServiceData?.priceLabel})
-                      </Button>
-                      <Button
                           data-testid="button-contact-first"
                           variant="outline"
                           size="lg"
