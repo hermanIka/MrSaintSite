@@ -195,7 +195,7 @@ export default function FacilitationVisaPage() {
                     <h4 className="text-lg font-heading font-semibold text-foreground mb-2">Commencer la facilitation de votre voyage
 </h4>
                     <p className="text-sm text-muted-foreground mb-6 flex-1">
-                      Remplissez votre dossier, uploadez vos documents et réglez les frais de traitement. Traitement en <strong>{prices.visa}€</strong>.
+                      Je t'aide à réaliser ton projet de voyage avec succès
                     </p>
                     <Button
                       data-testid="button-start-request"
