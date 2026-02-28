@@ -371,9 +371,6 @@ export default function ReservationPage() {
                 <Card className="border-primary/20 bg-card">
                   <CardContent className="p-8">
                     <div className="text-center mb-8">
-                      <h3 data-testid="text-payment-title" className="text-2xl font-heading font-bold text-foreground mb-2">
-                        Prochaine étape : Paiement
-                      </h3>
                       <p className="text-muted-foreground">
                         Vous avez sélectionné :{" "}
                         <span data-testid="text-selected-service" className="font-medium text-primary">
