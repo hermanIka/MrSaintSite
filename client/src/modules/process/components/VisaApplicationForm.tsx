@@ -443,7 +443,6 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
           {[
             { field: "passportUrl" as const, label: "Copie du passeport", required: true, hint: "Pages d'identité + tampons récents" },
             { field: "photoUrl" as const, label: "Photo d'identité récente", required: true, hint: "Fond blanc, moins de 6 mois" },
-            { field: "supportingDocUrl" as const, label: "Document justificatif (optionnel)", required: false, hint: "Invitation, réservation hôtel, relevé bancaire..." },
           ].map(({ field, label, required, hint }) => (
             <div key={field} className="space-y-2">
               <Label>
