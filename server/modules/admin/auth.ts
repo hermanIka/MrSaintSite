@@ -7,7 +7,11 @@
 import { Request, Response, NextFunction } from "express";
 import * as crypto from "crypto";
 
-const JWT_SECRET = process.env.JWT_SECRET || "mr-saint-admin-secret-key-2024";
+if (!process.env.JWT_SECRET) {
+  console.error("[AUTH] ERREUR CRITIQUE : La variable JWT_SECRET n'est pas définie. Définissez-la dans vos variables d'environnement.");
+  process.exit(1);
+}
+const JWT_SECRET = process.env.JWT_SECRET as string;
 const TOKEN_EXPIRY = 24 * 60 * 60 * 1000; // 24 heures
 
 interface TokenPayload {
@@ -42,7 +46,6 @@ const invalidatedTokens: Set<string> = new Set();
 
 export function verifyToken(token: string): TokenPayload | null {
   try {
-    // Check if token was explicitly invalidated (logout)
     if (invalidatedTokens.has(token)) {
       return null;
     }
@@ -66,7 +69,6 @@ export function verifyToken(token: string): TokenPayload | null {
       return null;
     }
     
-    // Re-add to active sessions if valid (supports server restarts)
     if (!activeSessions.has(token)) {
       activeSessions.set(token, payload);
     }

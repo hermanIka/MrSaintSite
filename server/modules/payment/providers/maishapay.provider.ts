@@ -26,13 +26,7 @@ import type {
 } from "../types";
 
 function getAppUrl(): string {
-  return process.env.APP_URL 
-    ? process.env.APP_URL 
-    : process.env.REPLIT_DEPLOYMENTS_URL
-      ? `https://${process.env.REPLIT_DEPLOYMENTS_URL}`
-      : process.env.REPLIT_DEV_DOMAIN 
-        ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
-        : "http://localhost:5000";
+  return process.env.APP_URL || "http://localhost:5000";
 }
 
 export class MaishaPayProvider implements PaymentProviderInterface {

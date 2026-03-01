@@ -36,16 +36,36 @@ import {
   insertAgencyRequestSchema,
 } from "@shared/schema";
 import { chatbotStorage } from "../chatbot/storage";
-import { ObjectStorageService } from "../../replit_integrations/object_storage";
+import { localStorageService } from "../../services/localStorageService";
 import { goPlusStorage } from "../go_plus/storage";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+const loginRateLimit = new Map<string, { count: number; resetAt: number }>();
+const LOGIN_RATE_LIMIT = 10;
+const LOGIN_RATE_WINDOW_MS = 15 * 60 * 1000;
+
+function loginRateLimitMiddleware(req: any, res: any, next: any): void {
+  const ip = req.ip || req.connection.remoteAddress || "unknown";
+  const now = Date.now();
+  const entry = loginRateLimit.get(ip);
+  if (entry && now < entry.resetAt) {
+    if (entry.count >= LOGIN_RATE_LIMIT) {
+      res.status(429).json({ error: "Trop de tentatives de connexion. Réessayez dans 15 minutes." });
+      return;
+    }
+    entry.count++;
+  } else {
+    loginRateLimit.set(ip, { count: 1, resetAt: now + LOGIN_RATE_WINDOW_MS });
+  }
+  next();
+}
+
 export function registerAdminRoutes(app: Express) {
   // ============ AUTH ============
   
-  app.post("/api/admin/login", async (req, res) => {
+  app.post("/api/admin/login", loginRateLimitMiddleware, async (req, res) => {
     try {
       const { username, password } = req.body;
       
@@ -642,8 +662,6 @@ export function registerAdminRoutes(app: Express) {
   
   // ============ UPLOAD (Protected) ============
   
-  const objectStorageService = new ObjectStorageService();
-  
   /**
    * Request a presigned URL for admin file upload.
    * Protected by auth middleware - only admins can upload.
@@ -660,13 +678,12 @@ export function registerAdminRoutes(app: Express) {
         return res.status(400).json({ error: "Seules les images sont acceptées" });
       }
 
-      const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+      const MAX_SIZE = 5 * 1024 * 1024;
       if (typeof size !== "number" || size <= 0 || size > MAX_SIZE) {
         return res.status(400).json({ error: "Taille de fichier invalide (max 5 Mo)" });
       }
 
-      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
-      const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
+      const { uploadURL, objectPath } = await localStorageService.getSignedUploadUrl(name, contentType);
 
       await adminStorage.createLog({
         action: "UPLOAD",
@@ -703,13 +720,12 @@ export function registerAdminRoutes(app: Express) {
         return res.status(400).json({ error: "Type de fichier non supporté (images ou PDF uniquement)" });
       }
 
-      const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+      const MAX_SIZE = 10 * 1024 * 1024;
       if (typeof size !== "number" || size <= 0 || size > MAX_SIZE) {
         return res.status(400).json({ error: "Taille de fichier invalide (max 10 Mo)" });
       }
 
-      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
-      const objectPath = objectStorageService.normalizeObjectEntityPath(uploadURL);
+      const { uploadURL, objectPath } = await localStorageService.getSignedUploadUrl(name, contentType);
 
       res.json({
         uploadURL,

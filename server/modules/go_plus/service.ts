@@ -8,13 +8,7 @@ import type { GoPlusCard, GoPlusPlan } from "@shared/schema";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 function getAppUrl(): string {
-  return process.env.APP_URL
-    ? process.env.APP_URL
-    : process.env.REPLIT_DEPLOYMENTS_URL
-      ? `https://${process.env.REPLIT_DEPLOYMENTS_URL}`
-      : process.env.REPLIT_DEV_DOMAIN
-        ? `https://${process.env.REPLIT_DEV_DOMAIN}`
-        : "http://localhost:5000";
+  return process.env.APP_URL || "http://localhost:5000";
 }
 
 const maishaPayProvider = new MaishaPayProvider();

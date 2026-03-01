@@ -323,13 +323,7 @@ export function registerPaymentRoutes(app: Express): void {
         return res.status(400).send("Montant invalide");
       }
 
-      const appUrl = process.env.APP_URL 
-        ? process.env.APP_URL 
-        : process.env.REPLIT_DEPLOYMENTS_URL
-          ? `https://${process.env.REPLIT_DEPLOYMENTS_URL}`
-          : process.env.REPLIT_DEV_DOMAIN 
-            ? `https://${process.env.REPLIT_DEV_DOMAIN}` 
-            : "http://localhost:5000";
+      const appUrl = process.env.APP_URL || "http://localhost:5000";
 
       const callbackUrl = `${appUrl}/api/payments/maishapay/callback/${paymentId}`;
       
