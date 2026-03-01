@@ -463,6 +463,8 @@ export async function autoSeed(): Promise<void> {
     await seedInitialPrompt();
 
     console.log("✅ Auto-seed completed successfully!");
+
+    await ensureDataIntegrity();
   } catch (error) {
     console.error("⚠️ Auto-seed error (non-fatal):", error);
   }
