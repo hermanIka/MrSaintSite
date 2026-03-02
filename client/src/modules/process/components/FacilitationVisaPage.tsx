@@ -202,7 +202,7 @@ export default function FacilitationVisaPage() {
                       className="w-full"
                       onClick={() => setShowForm(true)}
                     >
-                      Déposer ma demande · {prices.visa}€
+                      Facilitation visa · {prices.visa}€
                     </Button>
                   </div>
                 </div>
