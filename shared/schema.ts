@@ -511,7 +511,7 @@ export const AGENCY_PACKS = [
     price: 1500,
     startBudget: "6 000€",
     description: "Lancer ton agence avec 6 000€",
-    accompagnementDescription: "Frais d'accompagnement et coaching personnalisé sur 6 mois",
+    accompagnementDescription: "Frais d'accompagnement et coaching personnalisé.",
     highlighted: true,
     revenue: "2 500€ – 5 000€ / mois",
     features: [
