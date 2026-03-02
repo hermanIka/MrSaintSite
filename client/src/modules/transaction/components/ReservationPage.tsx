@@ -349,9 +349,6 @@ export default function ReservationPage() {
                           <p data-testid={`text-desc-${service.id}`} className="text-sm text-muted-foreground">{service.description}</p>
                         </CardHeader>
                         <CardContent>
-                          <div data-testid={`text-price-${service.id}`} className="text-lg font-semibold text-primary mb-4">
-                            {service.priceLabel}
-                          </div>
                           <ul className="space-y-2">
                             {service.features.map((feature, i) => (
                               <li key={i} data-testid={`text-feature-${service.id}-${i}`} className="flex items-center gap-2 text-sm text-muted-foreground">
