@@ -45,6 +45,7 @@ export default function ReservationPage() {
 
     if (!paymentStatus && serviceParam && ["visa", "agence"].includes(serviceParam)) {
       setSelectedService(serviceParam as ServiceType);
+      setPaymentMode("consultation");
       setCurrentStep("calendar");
       return;
     }
