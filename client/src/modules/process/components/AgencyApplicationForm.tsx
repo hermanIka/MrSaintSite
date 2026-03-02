@@ -35,6 +35,7 @@ interface AgencyApplicationFormProps {
   packLabel: string;
   packPrice: number;
   packRevenue: string;
+  packDescription: string;
   pendingPaymentId?: string;
   pendingProvider?: string;
 }
@@ -48,6 +49,7 @@ export function AgencyApplicationForm({
   packLabel,
   packPrice,
   packRevenue,
+  packDescription,
   pendingPaymentId,
   pendingProvider,
 }: AgencyApplicationFormProps) {
@@ -310,10 +312,11 @@ export function AgencyApplicationForm({
   return (
     <div className="space-y-6">
       {/* Pack recap banner */}
-      <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
-        <Star className="w-5 h-5 text-primary flex-shrink-0" />
+      <div className="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
+        <Star className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-foreground">{packLabel}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{packDescription}</p>
         </div>
         <span className="text-lg font-bold text-primary flex-shrink-0">{packPrice}€</span>
       </div>
@@ -400,6 +403,7 @@ export function AgencyApplicationForm({
               <span className="font-medium text-green-600 dark:text-green-400">{packRevenue}</span>
               <span className="text-muted-foreground">Accompagnement :</span>
               <span className="font-bold text-primary text-base">{packPrice}€</span>
+              <span className="text-muted-foreground col-span-2 text-xs mt-1 italic">{packDescription}</span>
             </div>
           </div>
 

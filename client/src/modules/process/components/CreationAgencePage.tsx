@@ -182,6 +182,7 @@ export default function CreationAgencePage() {
                     packLabel={activePack.label}
                     packPrice={activePack.price}
                     packRevenue={activePack.revenue}
+                    packDescription={activePack.accompagnementDescription}
                     pendingPaymentId={pendingPaymentId}
                     pendingProvider={pendingProvider}
                   />

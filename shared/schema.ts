@@ -496,6 +496,7 @@ export const AGENCY_PACKS = [
     price: 800,
     startBudget: "2 000€",
     description: "Lancer ton agence avec 2 000€",
+    accompagnementDescription: "Frais d'accompagnement à la création de votre agence de voyage — budget de démarrage : 2 000€",
     highlighted: false,
     revenue: "1 500€ – 2 500€ / mois",
     features: [
@@ -510,6 +511,7 @@ export const AGENCY_PACKS = [
     price: 1500,
     startBudget: "6 000€",
     description: "Lancer ton agence avec 6 000€",
+    accompagnementDescription: "Frais d'accompagnement et coaching personnalisé sur 6 mois — budget de démarrage : 6 000€",
     highlighted: true,
     revenue: "2 500€ – 5 000€ / mois",
     features: [
@@ -526,6 +528,7 @@ export const AGENCY_PACKS = [
     price: 2500,
     startBudget: "10 000€",
     description: "Lancer ton agence avec 10 000€",
+    accompagnementDescription: "Frais d'accompagnement complet avec gestion d'agence et réseau Go Groupe — budget de démarrage : 10 000€",
     highlighted: false,
     revenue: "25 000€ – 50 000€ / mois",
     features: [
