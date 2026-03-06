@@ -15,4 +15,5 @@ export { AdminGoPlusPage } from "./components/AdminGoPlusPage";
 export { AdminVisaRequestsPage } from "./components/AdminVisaRequestsPage";
 export { AdminAgencyRequestsPage } from "./components/AdminAgencyRequestsPage";
 export { AdminPricesPage } from "./components/AdminPricesPage";
+export { AdminReservationsPage } from "./components/AdminReservationsPage";
 export { useAdminAuth } from "./hooks/useAdminAuth";

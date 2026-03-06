@@ -15,6 +15,7 @@ Key capabilities include:
 - Hybrid chatbot for customer interaction.
 - A new service for travel financing ("Voyage à Crédit") with an application and approval workflow.
 - Display of "featured trips" on the homepage.
+- Complete trip reservation module: form, payment (MaishaPay/PawaPay), email confirmation, and admin management panel.
 
 The business vision is to establish Mr Saint as a leading high-end travel service provider, leveraging technology to offer a seamless and sophisticated user experience.
 

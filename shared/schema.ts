@@ -476,6 +476,65 @@ export const insertAgencyRequestSchema = createInsertSchema(agencyRequests).omit
 export type InsertAgencyRequest = z.infer<typeof insertAgencyRequestSchema>;
 export type AgencyRequest = typeof agencyRequests.$inferSelect;
 
+// ============ TRIP RESERVATIONS MODULE ============
+
+export const tripClients = pgTable("trip_clients", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export const insertTripClientSchema = createInsertSchema(tripClients).omit({ id: true });
+export type InsertTripClient = z.infer<typeof insertTripClientSchema>;
+export type TripClient = typeof tripClients.$inferSelect;
+
+export const tripReservations = pgTable("trip_reservations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  clientId: varchar("client_id").notNull(),
+  tripId: varchar("trip_id").notNull(),
+  numberOfPeople: integer("number_of_people").notNull().default(1),
+  totalPrice: integer("total_price").notNull(),
+  amountPaid: integer("amount_paid").notNull().default(0),
+  paymentStatus: text("payment_status").notNull().default("pending"),
+  travelDate: text("travel_date"),
+  paymentId: text("payment_id"),
+  paymentProvider: text("payment_provider"),
+  notes: text("notes"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+});
+
+export const insertTripReservationSchema = createInsertSchema(tripReservations).omit({ id: true });
+export type InsertTripReservation = z.infer<typeof insertTripReservationSchema>;
+export type TripReservation = typeof tripReservations.$inferSelect;
+
+export const tripInvoices = pgTable("trip_invoices", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  reservationId: varchar("reservation_id").notNull(),
+  invoiceNumber: text("invoice_number").notNull(),
+  clientName: text("client_name").notNull(),
+  clientEmail: text("client_email").notNull(),
+  serviceDescription: text("service_description").notNull(),
+  amount: integer("amount").notNull(),
+  currency: text("currency").notNull().default("EUR"),
+  issueDate: text("issue_date").notNull(),
+  createdAt: text("created_at").notNull(),
+});
+
+export const insertTripInvoiceSchema = createInsertSchema(tripInvoices).omit({ id: true });
+export type InsertTripInvoice = z.infer<typeof insertTripInvoiceSchema>;
+export type TripInvoice = typeof tripInvoices.$inferSelect;
+
+export const TRIP_RESERVATION_STATUS = [
+  { value: "pending", label: "En attente", color: "bg-yellow-500" },
+  { value: "partial", label: "Acompte versé", color: "bg-blue-500" },
+  { value: "paid", label: "Payé", color: "bg-green-500" },
+  { value: "cancelled", label: "Annulé", color: "bg-red-500" },
+] as const;
+
 // Service prices schema
 export const servicePrices = pgTable("service_prices", {
   id: serial("id").primaryKey(),

@@ -15,6 +15,7 @@ import { registerInteractionRoutes } from "./modules/interaction";
 import { registerPaymentRoutes } from "./modules/payment";
 import { calendlyRoutes } from "./modules/calendly";
 import { registerGoPlusRoutes } from "./modules/go_plus/routes";
+import { registerReservationRoutes } from "./modules/reservation/routes";
 import { localStorageService } from "./services/localStorageService";
 import * as path from "path";
 import * as fs from "fs";
@@ -56,6 +57,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Module GO+ (cartes virtuelles de fidélité)
   registerGoPlusRoutes(app);
+
+  // Module Réservation Voyages
+  registerReservationRoutes(app);
   
   // Module Chatbot
   app.use("/api/chatbot", chatbotRoutes);

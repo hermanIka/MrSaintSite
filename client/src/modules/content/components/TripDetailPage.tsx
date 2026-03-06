@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Layout } from "@/modules/foundation";
 import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
@@ -6,12 +7,19 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import type { Trip, TripGalleryPhoto } from "@shared/schema";
-import { useRoute, Link } from "wouter";
+import { useRoute, Link, useSearch } from "wouter";
 import { Calendar, MapPin, CheckCircle2, XCircle, Images } from "lucide-react";
+import { TripReservationModal } from "@/modules/transaction/components/TripReservationModal";
 
 export default function TripDetailPage() {
   const [, params] = useRoute("/voyages/:id");
   const tripId = params?.id;
+  const searchString = useSearch();
+  const searchParams = new URLSearchParams(searchString);
+  const pendingPaymentId = searchParams.get("payment") === "success" ? (searchParams.get("id") || undefined) : undefined;
+  const pendingProvider = searchParams.get("provider") || undefined;
+
+  const [modalOpen, setModalOpen] = useState(!!pendingPaymentId);
 
   const { data: trip, isLoading } = useQuery<Trip>({
     queryKey: ["/api/trips", tripId],
@@ -55,7 +63,7 @@ export default function TripDetailPage() {
 
   return (
     <Layout>
-      <SEO 
+      <SEO
         title={trip.title}
         description={trip.description.substring(0, 160)}
         keywords={`voyage ${trip.destination}, voyage business, ${trip.destination}`}
@@ -219,18 +227,17 @@ export default function TripDetailPage() {
                     </div>
                   </div>
 
-                  <Link href="/contact">
-                    <Button
-                      data-testid="button-reserve-trip"
-                      size="lg"
-                      className="w-full rounded-full text-lg py-6 mb-4"
-                    >
-                      Réserver ma place
-                    </Button>
-                  </Link>
-                  
+                  <Button
+                    data-testid="button-reserve-trip"
+                    size="lg"
+                    className="w-full rounded-full text-lg py-6 mb-4"
+                    onClick={() => setModalOpen(true)}
+                  >
+                    Réserver ma place
+                  </Button>
+
                   <p className="text-xs text-center text-muted-foreground">
-                    * Système de réservation disponible prochainement
+                    Paiement sécurisé · Confirmation par email
                   </p>
                 </CardContent>
               </Card>
@@ -238,6 +245,14 @@ export default function TripDetailPage() {
           </div>
         </div>
       </div>
+
+      <TripReservationModal
+        trip={trip}
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        pendingPaymentId={pendingPaymentId}
+        pendingProvider={pendingProvider}
+      />
     </Layout>
   );
 }

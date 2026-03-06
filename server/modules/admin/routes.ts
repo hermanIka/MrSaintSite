@@ -35,6 +35,11 @@ import {
   insertVisaRequestSchema,
   insertAgencyRequestSchema,
 } from "@shared/schema";
+import {
+  getAllReservationsWithDetails,
+  getReservationDetail,
+  updateReservationStatus,
+} from "../reservation/service";
 import { chatbotStorage } from "../chatbot/storage";
 import { localStorageService } from "../../services/localStorageService";
 import { goPlusStorage } from "../go_plus/storage";
@@ -1342,6 +1347,40 @@ export function registerAdminRoutes(app: Express) {
         return res.status(404).json({ error: "Tarif introuvable" });
       }
       res.json(updated);
+    } catch {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  // ============ RESERVATIONS VOYAGES ============
+
+  app.get("/api/admin/reservations", authMiddleware, async (_req, res) => {
+    try {
+      const reservations = await getAllReservationsWithDetails();
+      res.json(reservations);
+    } catch {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.get("/api/admin/reservations/:id", authMiddleware, async (req, res) => {
+    try {
+      const detail = await getReservationDetail(req.params.id);
+      if (!detail) return res.status(404).json({ error: "Réservation introuvable" });
+      res.json(detail);
+    } catch {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  app.put("/api/admin/reservations/:id/status", authMiddleware, async (req, res) => {
+    try {
+      const { status } = req.body;
+      if (!["pending", "partial", "paid", "cancelled"].includes(status)) {
+        return res.status(400).json({ error: "Statut invalide" });
+      }
+      await updateReservationStatus(req.params.id, status);
+      res.json({ success: true });
     } catch {
       res.status(500).json({ error: "Erreur serveur" });
     }

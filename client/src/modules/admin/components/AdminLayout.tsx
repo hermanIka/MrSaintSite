@@ -16,6 +16,7 @@ import {
   Stamp,
   Building2,
   DollarSign,
+  CalendarDays,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -29,6 +30,7 @@ const navItems = [
   { href: "/admin/services", label: "Services & Prix", icon: Settings },
   { href: "/admin/tarifs", label: "Tarifs", icon: DollarSign },
   { href: "/admin/trips", label: "Voyages", icon: Plane },
+  { href: "/admin/reservations", label: "Réservations", icon: CalendarDays },
   { href: "/admin/visa-requests", label: "Demandes Visa", icon: Stamp },
   { href: "/admin/agency-requests", label: "Demandes Agence", icon: Building2 },
   { href: "/admin/credit-requests", label: "Demandes crédit", icon: CreditCard },
