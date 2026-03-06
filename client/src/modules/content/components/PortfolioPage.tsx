@@ -9,14 +9,16 @@ import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import type { Portfolio } from "@shared/schema";
 import { SERVICE_TYPES } from "@shared/schema";
-import { CheckCircle, Calendar, ArrowRight } from "lucide-react";
+import { CheckCircle, ArrowRight } from "lucide-react";
 import portfolioBanner from "@/assets/images/portfolio-banner.png";
+import { useTranslation } from "react-i18next";
 
 export default function PortfolioPage() {
   const [activeFilter, setActiveFilter] = useState<string>("all");
+  const { t } = useTranslation();
 
-  const queryKey = activeFilter !== "all" 
-    ? `/api/portfolio?serviceType=${activeFilter}` 
+  const queryKey = activeFilter !== "all"
+    ? `/api/portfolio?serviceType=${activeFilter}`
     : "/api/portfolio";
 
   const { data: portfolioItems = [], isLoading } = useQuery<Portfolio[]>({
@@ -24,13 +26,13 @@ export default function PortfolioPage() {
   });
 
   const filters = [
-    { value: "all", label: "Tous les projets" },
+    { value: "all", label: t("portfolio.filterAll") },
     ...SERVICE_TYPES,
   ];
 
   return (
     <Layout>
-      <SEO 
+      <SEO
         title="Portfolio & Réalisations"
         description="Découvrez les success stories des entrepreneurs accompagnés par Mr Saint. Témoignages, projets réalisés et parcours inspirants."
         keywords="portfolio, réalisations, témoignages, entrepreneurs, success stories"
@@ -50,11 +52,10 @@ export default function PortfolioPage() {
               data-testid="text-page-title"
               className="text-4xl sm:text-5xl font-heading font-bold mb-6"
             >
-              Réalisations et Entrepreneurs Accompagnés
+              {t("portfolio.heroTitle")}
             </h1>
             <p className="text-lg sm:text-xl text-white/90 leading-relaxed">
-              Découvrez les success stories des entrepreneurs que j'ai accompagnés. 
-              Chaque projet est une preuve concrète de résultats.
+              {t("portfolio.heroSubtitle")}
             </p>
           </div>
         </div>
@@ -95,13 +96,13 @@ export default function PortfolioPage() {
           ) : portfolioItems.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-lg text-muted-foreground mb-4">
-                {activeFilter !== "all" 
-                  ? "Aucun projet dans cette catégorie" 
-                  : "Portfolio en cours de construction"}
+                {activeFilter !== "all"
+                  ? t("portfolio.noItems")
+                  : t("portfolio.buildingPortfolio")}
               </p>
               {activeFilter !== "all" && (
                 <Button variant="outline" onClick={() => setActiveFilter("all")}>
-                  Voir tous les projets
+                  {t("portfolio.seeAll")}
                 </Button>
               )}
             </div>
@@ -133,8 +134,8 @@ export default function PortfolioPage() {
                     </div>
                     {item.clientLogo && (
                       <div className="absolute top-3 right-3 bg-white rounded-lg p-1.5 shadow-md">
-                        <img 
-                          src={item.clientLogo} 
+                        <img
+                          src={item.clientLogo}
                           alt={`Logo ${item.businessName}`}
                           className="w-6 h-6 object-contain"
                           loading="lazy"
@@ -146,11 +147,9 @@ export default function PortfolioPage() {
                     <h3 className="text-lg font-heading font-semibold mb-2 line-clamp-1">
                       {item.businessName}
                     </h3>
-                    
                     <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                       {item.description}
                     </p>
-                    
                     <div className="flex items-start gap-2 p-2.5 bg-primary/5 rounded-lg">
                       <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                       <p className="text-xs font-medium text-foreground line-clamp-2">
@@ -167,24 +166,23 @@ export default function PortfolioPage() {
       <section className="py-16 bg-muted/30">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl sm:text-3xl font-heading font-bold mb-4">
-            Des résultats, pas des promesses
+            {t("portfolio.statsTitle")}
           </h2>
           <p className="text-muted-foreground mb-8">
-            Chaque projet présenté est une réussite réelle. Des entrepreneurs comme vous 
-            qui ont fait le choix de se faire accompagner.
+            {t("portfolio.statsSubtitle")}
           </p>
           <div className="grid grid-cols-3 gap-8 mb-8">
             <div>
-              <div className="text-3xl sm:text-4xl font-bold text-primary">15+</div>
-              <div className="text-sm text-muted-foreground">Projets accompagnés</div>
+              <div className="text-3xl sm:text-4xl font-bold text-primary">{t("portfolio.stat0Value")}</div>
+              <div className="text-sm text-muted-foreground">{t("portfolio.stat0Label")}</div>
             </div>
             <div>
-              <div className="text-3xl sm:text-4xl font-bold text-primary">95%</div>
-              <div className="text-sm text-muted-foreground">Taux de réussite</div>
+              <div className="text-3xl sm:text-4xl font-bold text-primary">{t("portfolio.stat1Value")}</div>
+              <div className="text-sm text-muted-foreground">{t("portfolio.stat1Label")}</div>
             </div>
             <div>
-              <div className="text-3xl sm:text-4xl font-bold text-primary">7+</div>
-              <div className="text-sm text-muted-foreground">Années d'expérience</div>
+              <div className="text-3xl sm:text-4xl font-bold text-primary">{t("portfolio.stat2Value")}</div>
+              <div className="text-sm text-muted-foreground">{t("portfolio.stat2Label")}</div>
             </div>
           </div>
         </div>
@@ -192,11 +190,10 @@ export default function PortfolioPage() {
       <section className="py-24 bg-primary text-primary-foreground">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-6">
-            Vous aussi, lancez votre projet
+            {t("portfolio.ctaTitle")}
           </h2>
           <p className="text-lg mb-10 opacity-90">
-            Rejoignez les entrepreneurs qui ont réussi avec mon accompagnement.
-            Formation, coaching et parrainage personnalisés.
+            {t("portfolio.ctaSubtitle")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/creation-agence">
@@ -206,7 +203,7 @@ export default function PortfolioPage() {
                 variant="outline"
                 className="text-lg px-8 py-6 rounded-full bg-white text-primary border-white hover:bg-white/90"
               >
-                Commencer la formation
+                {t("portfolio.ctaBtn")}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
@@ -217,7 +214,7 @@ export default function PortfolioPage() {
                 variant="outline"
                 className="text-lg px-8 py-6 rounded-full bg-transparent text-white border-2 border-white hover:bg-white/10"
               >
-                Me contacter
+                {t("portfolio.ctaContact")}
               </Button>
             </Link>
           </div>

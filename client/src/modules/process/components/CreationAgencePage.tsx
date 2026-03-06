@@ -10,10 +10,12 @@ import agencyImage from "@assets/generated_images/Agency_coaching_service_image_
 import { AGENCY_PACKS } from "@shared/schema";
 import { AgencyApplicationForm } from "./AgencyApplicationForm";
 import { usePrices } from "@/hooks/usePrices";
+import { useTranslation } from "react-i18next";
 
 export default function CreationAgencePage() {
   const [location] = useLocation();
   const { prices } = usePrices();
+  const { t } = useTranslation();
   const [selectedPack, setSelectedPack] = useState<string | null>(null);
   const [pendingPaymentId, setPendingPaymentId] = useState<string | undefined>();
   const [pendingProvider, setPendingProvider] = useState<string | undefined>();
@@ -53,9 +55,9 @@ export default function CreationAgencePage() {
   const activePack = dynamicPacks.find(p => p.value === selectedPack);
 
   const results = [
-    { metric: "+15", label: "Entrepreneurs accompagnés" },
-    { metric: "100%", label: "Taux de réussite" },
-    { metric: "3 mois", label: "Durée moyenne avant rentabilité" },
+    { metric: t("agency.resultsLabel0"), label: t("agency.resultsDesc0") },
+    { metric: t("agency.resultsLabel1"), label: t("agency.resultsDesc1") },
+    { metric: t("agency.resultsLabel2"), label: t("agency.resultsDesc2") },
   ];
 
   return (
@@ -73,9 +75,9 @@ export default function CreationAgencePage() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/70" />
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 data-testid="text-page-title" className="text-4xl sm:text-5xl font-heading font-bold text-white mb-4">
-            Créez votre agence de voyage
+            {t("agency.pageTitle")}
           </h1>
-          <p className="text-lg sm:text-xl text-white/90">Formation, coaching et accompagnement complet</p>
+          <p className="text-lg sm:text-xl text-white/90">{t("agency.pageSubtitle")}</p>
         </div>
       </section>
       <section className="py-8 bg-background border-b border-border">
@@ -85,7 +87,6 @@ export default function CreationAgencePage() {
           </p>
         </div>
       </section>
-      {/* ============ FORFAITS ============ */}
       <section className="py-20 bg-background" id="forfaits">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -93,7 +94,7 @@ export default function CreationAgencePage() {
               <Building2 className="w-4 h-4 text-primary" />
               <span className="text-sm font-medium text-primary uppercase tracking-wider">Créez votre agence</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-4">Choisis le type d'agence que  tu veux lancer</h2>
+            <h2 className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-4">Choisis le type d'agence que tu veux lancer</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Trois niveaux d'accompagnement pour lancer votre agence de voyage selon votre ambition et votre budget.
             </p>
@@ -109,7 +110,7 @@ export default function CreationAgencePage() {
                 {pack.highlighted && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
                     <Badge className="px-4 py-1 text-xs font-semibold flex items-center gap-1">
-                      <Star className="w-3 h-3" /> Le plus populaire
+                      <Star className="w-3 h-3" /> {t("agency.packHighlighted")}
                     </Badge>
                   </div>
                 )}
@@ -117,7 +118,7 @@ export default function CreationAgencePage() {
                 <div className={`p-6 ${pack.highlighted ? "pt-8" : ""}`}>
                   <h3 className="text-xl font-heading font-bold text-foreground">{pack.label}</h3>
                   <p className="text-sm text-muted-foreground mt-1 mb-4">
-                    Tu peux lancer ton agence avec {pack.startBudget}
+                    {t("agency.packStartBudget")} {pack.startBudget}
                   </p>
 
                   <ul className="space-y-2.5 mb-6">
@@ -142,7 +143,7 @@ export default function CreationAgencePage() {
                     onClick={() => setSelectedPack(pack.value)}
                   >
                     <Rocket className="w-4 h-4 mr-2" />
-                    Commencer Maintenant
+                    {t("agency.choosePack")}
                   </Button>
                   <Link href={`/reservation?service=agence&pack=${pack.value}`}>
                     <Button
@@ -158,7 +159,6 @@ export default function CreationAgencePage() {
             ))}
           </div>
 
-          {/* Form section */}
           {selectedPack && activePack && (
             <div ref={formRef} className="max-w-2xl mx-auto">
               <div className="flex items-center gap-3 mb-6">
@@ -171,7 +171,7 @@ export default function CreationAgencePage() {
                   <ArrowLeft className="w-4 h-4" />
                 </Button>
                 <h3 className="text-xl font-heading font-semibold text-foreground">
-                  Inscription : {activePack.label}
+                  {t("agency.selectedPack")} : {activePack.label}
                 </h3>
               </div>
               <Card className="border-primary/20">

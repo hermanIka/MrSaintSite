@@ -9,17 +9,19 @@ import { ChevronDown, ChevronUp, Search, HelpCircle, FileText, Briefcase, Plane,
 import { Input } from "@/components/ui/input";
 import faqHeroBanner from "@/assets/images/faq-hero-banner.png";
 import type { Faq } from "@shared/schema";
+import { useTranslation } from "react-i18next";
 
 export default function FAQPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
+  const { t } = useTranslation();
 
   const categories = [
-    { id: "all", label: "Toutes", icon: HelpCircle },
-    { id: "visa", label: "Visa", icon: FileText },
-    { id: "agence", label: "Création d'agence", icon: Briefcase },
-    { id: "voyages", label: "Voyages", icon: Plane },
+    { id: "all", label: t("faq.catAll"), icon: HelpCircle },
+    { id: "visa", label: t("faq.catVisa"), icon: FileText },
+    { id: "agence", label: t("faq.catAgency"), icon: Briefcase },
+    { id: "voyages", label: t("faq.catTrips"), icon: Plane },
   ];
 
   const { data: faqs = [], isLoading } = useQuery<Faq[]>({
@@ -57,13 +59,13 @@ export default function FAQPage() {
             data-testid="text-faq-title"
             className="text-4xl sm:text-5xl lg:text-6xl font-heading font-bold mb-6"
           >
-            Foire Aux Questions
+            {t("faq.pageTitle")}
           </h1>
           <p
             data-testid="text-faq-subtitle"
             className="text-xl text-white/80 max-w-2xl mx-auto"
           >
-            Trouvez rapidement les réponses à vos questions
+            {t("faq.pageSubtitle")}
           </p>
         </div>
       </section>
@@ -75,7 +77,7 @@ export default function FAQPage() {
             <Input
               data-testid="input-faq-search"
               type="text"
-              placeholder="Rechercher une question..."
+              placeholder={t("faq.searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-12 py-6 text-lg"
@@ -113,7 +115,7 @@ export default function FAQPage() {
               <CardContent className="p-12 text-center">
                 <HelpCircle className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-lg text-muted-foreground">
-                  Aucune question ne correspond à votre recherche.
+                  {t("faq.noResults")}
                 </p>
                 <Button
                   data-testid="button-reset-search"
@@ -124,7 +126,7 @@ export default function FAQPage() {
                     setActiveCategory("all");
                   }}
                 >
-                  Réinitialiser la recherche
+                  {t("faq.resetSearch")}
                 </Button>
               </CardContent>
             </Card>
@@ -169,10 +171,10 @@ export default function FAQPage() {
       <section className="py-24 bg-primary text-primary-foreground">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-6">
-            Vous n'avez pas trouvé votre réponse ?
+            {t("faq.ctaTitle")}
           </h2>
           <p className="text-lg mb-10 opacity-90">
-            Notre équipe est disponible pour répondre à toutes vos questions personnellement.
+            {t("faq.ctaSubtitle")}
           </p>
           <Link href="/contact">
             <Button
@@ -180,7 +182,7 @@ export default function FAQPage() {
               size="lg"
               variant="secondary"
             >
-              Nous contacter
+              {t("faq.ctaBtn")}
             </Button>
           </Link>
         </div>

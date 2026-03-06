@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { X, Send, Bot, User, Loader2, RotateCcw } from "lucide-react";
 import chatBtnImage from "@assets/Mr_saint_photo_profil_1771948755492.jfif";
+import { useTranslation } from "react-i18next";
 
 interface Message {
   role: "user" | "assistant";
@@ -16,6 +17,7 @@ interface Message {
 const SESSION_STORAGE_KEY = "mr_saint_chat_session";
 
 export default function ChatWidget() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
@@ -243,9 +245,9 @@ export default function ChatWidget() {
                 <Bot className="w-5 h-5" />
               </div>
               <div>
-                <CardTitle className="text-base font-heading">Assistant Mr Saint</CardTitle>
+                <CardTitle className="text-base font-heading">{t("chat.title")}</CardTitle>
                 <p className="text-xs text-white/70">
-                  {isAvailable ? `En ligne ${chatMode === "ai" ? "(IA)" : "(FAQ)"}` : "Hors ligne"}
+                  {isAvailable ? `${t("chat.online")} ${chatMode === "ai" ? `(${t("chat.aiMode")})` : `(${t("chat.rulesMode")})`}` : "Offline"}
                 </p>
               </div>
             </div>
@@ -256,7 +258,7 @@ export default function ChatWidget() {
                 size="icon"
                 onClick={startNewSession}
                 className="text-white"
-                title="Nouvelle conversation"
+                title={t("chat.newConversation")}
               >
                 <RotateCcw className="w-4 h-4" />
               </Button>
@@ -321,7 +323,7 @@ export default function ChatWidget() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Posez votre question..."
+                placeholder={t("chat.placeholder")}
                 disabled={isLoading || !isAvailable}
                 className="flex-1"
                 maxLength={500}
@@ -341,11 +343,11 @@ export default function ChatWidget() {
 
       <div className="fixed bottom-4 right-4 sm:right-6 z-50 flex flex-wrap items-center gap-3">
         {!isOpen && (
-          <Badge 
+          <Badge
             data-testid="label-chat-prompt"
             className="shadow-lg"
           >
-            Posez-moi vos questions
+            {t("chat.greeting")}
           </Badge>
         )}
         <button

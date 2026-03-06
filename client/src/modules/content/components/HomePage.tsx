@@ -9,9 +9,11 @@ import { Plane, FileText, Briefcase, Shield, Users, Globe, ChevronLeft, ChevronR
 import { useState } from "react";
 import heroImage from "@assets/generated_images/Luxury_travel_hero_image_4477beea.png";
 import { FeaturedTripsCarousel } from "./FeaturedTripsCarousel";
+import { useTranslation } from "react-i18next";
 
 export default function HomePage() {
   const [testimonialIndex, setTestimonialIndex] = useState(0);
+  const { t } = useTranslation();
   
   const { data: testimonials = [], isLoading: testimonialsLoading, isError: testimonialsError } = useQuery<Testimonial[]>({
     queryKey: ["/api/testimonials"],
@@ -30,25 +32,22 @@ export default function HomePage() {
   const services = [
     {
       icon: FileText,
-      title: "Facilitation Visa",
-      description:
-        "Obtenez votre visa facilement. Tourisme, business ou études, nous gérons toutes vos démarches administratives.",
+      title: t("home.serviceVisaTitle"),
+      description: t("home.serviceVisaDesc"),
       link: "/facilitation-visa",
       testId: "card-service-visa",
     },
     {
       icon: Briefcase,
-      title: "Création d'agence",
-      description:
-        "Formation complète pour lancer votre propre agence de voyage. Accompagnement, financement et parrainage inclus.",
+      title: t("home.serviceAgencyTitle"),
+      description: t("home.serviceAgencyDesc"),
       link: "/creation-agence",
       testId: "card-service-agency",
     },
     {
       icon: CreditCard,
-      title: "Voyage à Crédit",
-      description:
-        "Partez maintenant, payez en plusieurs fois. Financez votre voyage ou votre visa en toute flexibilité grâce à notre programme de crédit.",
+      title: t("home.serviceCreditTitle"),
+      description: t("home.serviceCreditDesc"),
       link: "/voyage-credit",
       testId: "card-service-credit",
     },
@@ -57,23 +56,23 @@ export default function HomePage() {
   const benefits = [
     {
       icon: Shield,
-      title: "7 ans d'expertise",
-      description: "Une expérience solide dans le secteur du tourisme premium",
+      title: t("home.benefit0Title"),
+      description: t("home.benefit0Desc"),
     },
     {
       icon: Users,
-      title: "Accompagnement personnalisé",
-      description: "Un suivi sur mesure pour tous vos projets de voyage",
+      title: t("home.benefit1Title"),
+      description: t("home.benefit1Desc"),
     },
     {
       icon: Globe,
-      title: "Réseau international",
-      description: "Des partenaires de confiance dans le monde entier",
+      title: t("home.benefit2Title"),
+      description: t("home.benefit2Desc"),
     },
     {
       icon: Briefcase,
-      title: "Solutions complètes",
-      description: "De la facilitation visa au voyage organisé clé en main",
+      title: t("home.benefit3Title"),
+      description: t("home.benefit3Desc"),
     },
   ];
 
@@ -96,14 +95,13 @@ export default function HomePage() {
             data-testid="text-hero-title"
             className="text-4xl sm:text-5xl lg:text-6xl font-heading font-bold text-white mb-6 leading-tight"
           >
-            Voyager n'a jamais été aussi simple
+            {t("home.heroTitle")}
           </h1>
           <p
             data-testid="text-hero-subtitle"
             className="text-lg sm:text-xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed"
           >
-            Expert voyagiste depuis 7 ans, je vous accompagne dans tous vos
-            projets : facilitation visa, création d'agence, voyages organisés.
+            {t("home.heroSubtitle")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center flex-wrap">
             <Link href="/facilitation-visa">
@@ -111,7 +109,7 @@ export default function HomePage() {
                 data-testid="button-hero-visa"
                 size="lg"
               >
-                Facilitation Visa
+                {t("home.heroVisa")}
               </Button>
             </Link>
             <Link href="/creation-agence">
@@ -121,7 +119,7 @@ export default function HomePage() {
                 variant="outline"
                 className="text-white border-white hover:bg-white/10"
               >
-                Créer mon agence
+                {t("home.heroAgency")}
               </Button>
             </Link>
             <Link href="/voyages">
@@ -130,7 +128,7 @@ export default function HomePage() {
                 size="lg"
                 className="bg-primary text-primary-foreground hover:bg-primary/90"
               >
-                Nos voyages
+                {t("home.heroTrips")}
               </Button>
             </Link>
           </div>
@@ -143,10 +141,10 @@ export default function HomePage() {
               data-testid="text-services-title"
               className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-4"
             >
-              Nos Services Premium
+              {t("home.servicesTitle")}
             </h2>
             <p data-testid="text-services-subtitle" className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Des solutions sur mesure pour tous vos besoins en voyage et entrepreneuriat
+              {t("home.servicesSubtitle")}
             </p>
           </div>
 
@@ -175,7 +173,7 @@ export default function HomePage() {
                         variant="outline"
                         className="w-full"
                       >
-                        Commencer Maintenant
+                        {t("home.servicesCta")}
                       </Button>
                     </Link>
                   </CardContent>
@@ -190,10 +188,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 data-testid="text-why-title" className="text-3xl sm:text-4xl font-heading font-bold mb-4">
-              Pourquoi choisir Mr Saint ?
+              {t("home.whyTitle")}
             </h2>
             <p data-testid="text-why-subtitle" className="text-lg text-white/70 max-w-2xl mx-auto">
-              Une expertise reconnue au service de vos ambitions
+              {t("home.whySubtitle")}
             </p>
           </div>
 
@@ -225,10 +223,10 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-4">
-              Témoignages
+              {t("home.testimonialsTitle")}
             </h2>
             <p className="text-lg text-muted-foreground">
-              Ce que disent nos clients
+              {t("home.testimonialsSubtitle")}
             </p>
           </div>
 
@@ -246,7 +244,7 @@ export default function HomePage() {
             <Card className="border-destructive/20">
               <CardContent className="p-12 text-center">
                 <p className="text-muted-foreground">
-                  Impossible de charger les témoignages
+                  {t("home.testimonialsError")}
                 </p>
               </CardContent>
             </Card>
@@ -311,18 +309,17 @@ export default function HomePage() {
       <section className="py-24 bg-primary text-primary-foreground">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-6">
-            Prêt à réaliser votre projet ?
+            {t("home.ctaTitle")}
           </h2>
           <p className="text-lg mb-10 opacity-90">
-            Contactez-moi dès aujourd'hui pour discuter de votre projet de
-            voyage ou de création d'agence.
+            {t("home.ctaSubtitle")}
           </p>
           <Link href="/reservation">
             <Button
               data-testid="button-cta-contact"
               size="lg"
               variant="secondary"
-            >Consultez-Moi</Button>
+            >{t("home.ctaBtn")}</Button>
           </Link>
         </div>
       </section>

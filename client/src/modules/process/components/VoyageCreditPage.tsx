@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { Layout } from "@/modules/foundation";
 import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
@@ -111,6 +112,7 @@ export function VoyageCreditPage() {
   const [showForm, setShowForm] = useState(false);
   const [uploadingField, setUploadingField] = useState<string | null>(null);
   const { toast } = useToast();
+  const { t } = useTranslation();
   const { isGold, saveCard } = useGoPlusCard();
   const [goldGateState, setGoldGateState] = useState<"landing" | "verify" | "denied">("landing");
   const [goldCheckEmail, setGoldCheckEmail] = useState("");
@@ -193,8 +195,8 @@ export function VoyageCreditPage() {
     },
     onSuccess: () => {
       toast({
-        title: "Demande envoyée",
-        description: "Votre demande a été soumise avec succès. Nous vous contacterons sous 48 à 72 heures.",
+        title: t("credit.successTitle"),
+        description: t("credit.successDesc"),
       });
       setShowForm(false);
       setStep(0);
@@ -202,8 +204,8 @@ export function VoyageCreditPage() {
     },
     onError: () => {
       toast({
-        title: "Erreur",
-        description: "Une erreur est survenue. Veuillez réessayer.",
+        title: t("common.error"),
+        description: t("credit.submitting"),
         variant: "destructive",
       });
     },
@@ -237,13 +239,13 @@ export function VoyageCreditPage() {
 
       form.setValue(fieldName as any, objectPath);
       toast({
-        title: "Fichier téléchargé",
-        description: `${file.name} a été téléchargé avec succès.`,
+        title: t("visa.uploadSuccess"),
+        description: `${file.name}`,
       });
     } catch {
       toast({
-        title: "Erreur",
-        description: "Erreur lors du téléchargement du fichier.",
+        title: t("common.error"),
+        description: t("visa.uploadError"),
         variant: "destructive",
       });
     } finally {
@@ -262,7 +264,7 @@ export function VoyageCreditPage() {
           <div className="space-y-6">
             <h3 className="text-xl font-semibold flex items-center gap-2">
               <User className="w-5 h-5 text-primary" />
-              Informations personnelles
+              {t("credit.step1")}
             </h3>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
@@ -371,7 +373,7 @@ export function VoyageCreditPage() {
           <div className="space-y-6">
             <h3 className="text-xl font-semibold flex items-center gap-2">
               <Briefcase className="w-5 h-5 text-primary" />
-              Situation professionnelle
+              {t("credit.step2")}
             </h3>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
@@ -440,7 +442,7 @@ export function VoyageCreditPage() {
           <div className="space-y-6">
             <h3 className="text-xl font-semibold flex items-center gap-2">
               <Plane className="w-5 h-5 text-primary" />
-              Projet de voyage
+              {t("credit.step3")}
             </h3>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
@@ -556,7 +558,7 @@ export function VoyageCreditPage() {
           <div className="space-y-6">
             <h3 className="text-xl font-semibold flex items-center gap-2">
               <Wallet className="w-5 h-5 text-primary" />
-              Modalités de remboursement
+              {t("credit.step4")}
             </h3>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
@@ -631,18 +633,18 @@ export function VoyageCreditPage() {
           <div className="space-y-6">
             <h3 className="text-xl font-semibold flex items-center gap-2">
               <FileText className="w-5 h-5 text-primary" />
-              Documents requis
+              {t("credit.step5")}
             </h3>
             <p className="text-muted-foreground text-sm">
-              Téléchargez vos documents au format PDF ou image (max 10 Mo chacun)
+              {t("visa.uploadHint")}
             </p>
             <div className="grid gap-4">
               {[
-                { name: "identityDocumentUrl" as const, label: "Pièce d'identité (Passeport ou Carte) *", required: true },
-                { name: "incomeProofUrl" as const, label: "Justificatif de revenus *", required: true },
-                { name: "addressProofUrl" as const, label: "Justificatif de domicile *", required: true },
-                { name: "recentPhotoUrl" as const, label: "Photo récente *", required: true },
-                { name: "explanatoryLetterUrl" as const, label: "Lettre explicative (optionnelle)", required: false },
+                { name: "identityDocumentUrl" as const, label: t("visa.docIdentity"), required: true },
+                { name: "incomeProofUrl" as const, label: t("credit.docIncome"), required: true },
+                { name: "addressProofUrl" as const, label: t("credit.docAddress"), required: true },
+                { name: "recentPhotoUrl" as const, label: t("visa.docPhoto"), required: true },
+                { name: "explanatoryLetterUrl" as const, label: t("credit.docLetter"), required: false },
               ].map((doc) => (
                 <div key={doc.name} className="border rounded-md p-4">
                   <Label className="mb-2 block">{doc.label}</Label>
@@ -678,7 +680,7 @@ export function VoyageCreditPage() {
           <div className="space-y-6">
             <h3 className="text-xl font-semibold flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-primary" />
-              Confirmation
+              {t("credit.step5")}
             </h3>
             <Card>
               <CardContent className="pt-6">
@@ -691,10 +693,7 @@ export function VoyageCreditPage() {
                       onCheckedChange={(checked) => form.setValue("acceptConditions", !!checked)}
                     />
                     <Label htmlFor="acceptConditions" className="text-sm leading-relaxed">
-                      Je certifie que les informations fournies sont exactes et complètes.
-                      J'accepte que ma demande soit étudiée par l'équipe de Mr Saint Travel Agency.
-                      Je comprends que l'acceptation de ma demande n'est pas automatique et sera
-                      communiquée sous 48 à 72 heures.
+                      {t("credit.acceptConditions")}
                     </Label>
                   </div>
                   {form.formState.errors.acceptConditions && (
@@ -730,20 +729,20 @@ export function VoyageCreditPage() {
                 <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
                   <Crown className="w-8 h-8 text-primary" />
                 </div>
-                <h2 className="text-2xl font-heading font-bold">Voyage à Crédit</h2>
+                <h2 className="text-2xl font-heading font-bold">{t("credit.pageTitle")}</h2>
                 <p className="text-muted-foreground text-sm leading-relaxed">
-                  Cette option est réservée aux porteurs de la carte <strong className="text-foreground">GO+ Gold</strong>. Vérifiez votre carte pour accéder au formulaire.
+                  {t("credit.goldRequired")}
                 </p>
               </div>
               <Card>
                 <CardContent className="pt-6 space-y-4">
                   <div className="space-y-1.5">
-                    <Label htmlFor="gold-check-email">Email associé à votre carte GO+ Gold</Label>
+                    <Label htmlFor="gold-check-email">{t("credit.verifyEmail")}</Label>
                     <Input
                       id="gold-check-email"
                       data-testid="input-gold-email"
                       type="email"
-                      placeholder="votre@email.com"
+                      placeholder={t("credit.verifyEmailPlaceholder")}
                       value={goldCheckEmail}
                       onChange={e => setGoldCheckEmail(e.target.value)}
                       onKeyDown={e => e.key === "Enter" && checkGoldCard()}
@@ -756,15 +755,14 @@ export function VoyageCreditPage() {
                     disabled={goldCheckLoading || !goldCheckEmail.includes("@")}
                   >
                     {goldCheckLoading ? (
-                      <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Vérification...</>
+                      <><Loader2 className="w-4 h-4 animate-spin mr-2" /> {t("credit.verifying")}</>
                     ) : (
-                      <><Crown className="w-4 h-4 mr-2" /> Vérifier ma carte GO+ Gold</>
+                      <><Crown className="w-4 h-4 mr-2" /> {t("credit.verifyCard")}</>
                     )}
                   </Button>
                   <p className="text-xs text-center text-muted-foreground">
-                    Pas encore de carte GO+ Gold ?{" "}
                     <Link href="/go-plus" className="text-primary font-medium hover:underline">
-                      Obtenir la carte Gold (299€/an)
+                      {t("credit.getGoldCard")}
                     </Link>
                   </p>
                 </CardContent>
@@ -775,7 +773,7 @@ export function VoyageCreditPage() {
                 className="w-full"
                 onClick={() => setGoldGateState("landing")}
               >
-                Retour
+                {t("common.back")}
               </Button>
             </div>
           </div>
@@ -793,15 +791,13 @@ export function VoyageCreditPage() {
                 <Lock className="w-10 h-10 text-primary" />
               </div>
               <div className="space-y-3">
-                <h2 className="text-2xl font-heading font-bold">Accès Réservé GO+ Gold</h2>
-                <p className="text-muted-foreground leading-relaxed">
-                  Le service <strong className="text-foreground">Voyage à Crédit</strong> est exclusivement disponible pour les porteurs de la carte GO+ Gold. Pour y accéder, obtenez votre carte GO+ Gold et bénéficiez également de la facilitation visa gratuite et de l'assistance personnalisée.
-                </p>
+                <h2 className="text-2xl font-heading font-bold">{t("credit.goldRequired")}</h2>
+                <p className="text-muted-foreground leading-relaxed">{t("credit.goldRequiredDesc")}</p>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link href="/go-plus">
                   <Button data-testid="button-get-gold" size="lg" className="gap-2 w-full sm:w-auto">
-                    <Crown className="w-4 h-4" /> Obtenir la carte GO+ Gold
+                    <Crown className="w-4 h-4" /> {t("credit.getGoldCard")}
                   </Button>
                 </Link>
                 <Button
@@ -811,7 +807,7 @@ export function VoyageCreditPage() {
                   className="w-full sm:w-auto"
                   data-testid="button-retry-verify"
                 >
-                  Réessayer avec un autre email
+                  {t("credit.verifyCard")}
                 </Button>
               </div>
               <div className="border border-border rounded-lg p-4 bg-muted/30 text-left space-y-2">
@@ -849,22 +845,18 @@ export function VoyageCreditPage() {
           </div>
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl">
-              <span className="inline-block px-4 py-1 rounded-full bg-primary/20 text-primary text-sm font-medium mb-4">
-                Nouveau Service
-              </span>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-bold mb-6">
-                Voyage à Crédit
+                {t("credit.pageTitle")}
               </h1>
               <p className="text-xl text-gray-300 mb-8">
-                Réalisez votre rêve de voyage sans attendre. Grâce à notre solution de financement
-                flexible, étalez le coût de votre voyage sur plusieurs mois et partez sereinement.
+                {t("credit.heroDesc")}
               </p>
               <Button
                 size="lg"
                 data-testid="button-start-request-hero"
                 onClick={handleStartRequest}
               >
-                Faire une demande
+                {t("credit.startRequest")}
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </div>
@@ -874,16 +866,17 @@ export function VoyageCreditPage() {
         <section className="py-16 bg-card/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-2xl font-heading font-bold text-center mb-4">
-              Comment ça fonctionne ?
+              {t("credit.advantagesTitle")}
             </h2>
-            <p className="text-center text-muted-foreground max-w-2xl mx-auto mb-12">
-              Le voyage à crédit est une solution de financement permettant d'étaler le paiement de votre
-              voyage. Votre demande est étudiée personnellement par Monsieur Santhe. L'acceptation n'est
-              pas automatique et dépend de votre profil. Une réponse vous sera communiquée sous 48 à 72 heures.
-            </p>
 
             <div className="grid gap-6 md:grid-cols-3 lg:grid-cols-5">
-              {advantages.map((adv, idx) => (
+              {[
+                { icon: CreditCard, title: t("credit.advantagePayment"), description: t("credit.advantagePaymentDesc") },
+                { icon: Users, title: t("credit.advantageSupport"), description: t("credit.advantageSupportDesc") },
+                { icon: Globe, title: t("credit.advantageAccess"), description: t("credit.advantageAccessDesc") },
+                { icon: Shield, title: t("credit.advantageConfidential"), description: t("credit.advantageConfidentialDesc") },
+                { icon: Clock, title: t("credit.advantageFlexibility"), description: t("credit.advantageFlexibilityDesc") },
+              ].map((adv, idx) => (
                 <Card key={idx} className="text-center">
                   <CardContent className="pt-6">
                     <adv.icon className="w-10 h-10 mx-auto mb-4 text-primary" />
@@ -899,18 +892,14 @@ export function VoyageCreditPage() {
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-2xl font-heading font-bold mb-6">
-              Prêt à concrétiser votre projet ?
+              {t("credit.howTitle")}
             </h2>
-            <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-              Remplissez le formulaire de demande ci-dessous. Notre équipe étudiera votre dossier
-              avec attention et vous contactera dans les plus brefs délais.
-            </p>
             <Button
               size="lg"
               data-testid="button-start-request"
               onClick={handleStartRequest}
             >
-              Faire une demande
+              {t("credit.startRequest")}
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
           </div>
@@ -941,7 +930,7 @@ export function VoyageCreditPage() {
               data-testid="button-back"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Retour
+              {t("common.back")}
             </Button>
           </div>
 
@@ -957,9 +946,9 @@ export function VoyageCreditPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
-              <span>Demande de voyage à crédit</span>
+              <span>{t("credit.formTitle")}</span>
               <span className="text-sm font-normal text-muted-foreground">
-                Étape {step + 1} / 6
+                {step + 1} / 6
               </span>
             </CardTitle>
             <div className="w-full bg-muted rounded-full h-2 mt-4">
@@ -982,7 +971,7 @@ export function VoyageCreditPage() {
                     data-testid="button-prev-step"
                   >
                     <ArrowLeft className="w-4 h-4 mr-2" />
-                    Précédent
+                    {t("credit.prev")}
                   </Button>
                 )}
                 {step < 5 ? (
@@ -992,7 +981,7 @@ export function VoyageCreditPage() {
                     className="ml-auto"
                     data-testid="button-next-step"
                   >
-                    Suivant
+                    {t("credit.next")}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 ) : (
@@ -1005,11 +994,11 @@ export function VoyageCreditPage() {
                     {submitMutation.isPending ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Envoi en cours...
+                        {t("credit.submitting")}
                       </>
                     ) : (
                       <>
-                        Soumettre ma demande
+                        {t("credit.submit")}
                         <CheckCircle className="w-4 h-4 ml-2" />
                       </>
                     )}

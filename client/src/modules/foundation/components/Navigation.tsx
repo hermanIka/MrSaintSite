@@ -2,12 +2,15 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
+import { LanguageToggle } from "./LanguageToggle";
 import { Menu, X, Plane } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [location] = useLocation();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,13 +26,13 @@ export function Navigation() {
   }, [location]);
 
   const navLinks = [
-    { href: "/", label: "Accueil" },
-    { href: "/a-propos", label: "À propos" },
-    { href: "/services", label: "Services" },
-    { href: "/go-plus", label: "GO+" },
-    { href: "/portfolio", label: "Portfolio" },
-    { href: "/voyages", label: "Nos Voyages" },
-    { href: "/contact", label: "Contact" },
+    { href: "/", label: t("nav.home") },
+    { href: "/a-propos", label: t("nav.about") },
+    { href: "/services", label: t("nav.services") },
+    { href: "/go-plus", label: t("nav.goplus") },
+    { href: "/portfolio", label: t("nav.portfolio") },
+    { href: "/voyages", label: t("nav.trips") },
+    { href: "/contact", label: t("nav.contact") },
   ];
 
   return (
@@ -54,7 +57,7 @@ export function Navigation() {
               {navLinks.map((link) => (
                 <Link key={link.href} href={link.href}>
                   <span
-                    data-testid={`link-${link.label.toLowerCase()}`}
+                    data-testid={`link-nav-${link.href}`}
                     className={`px-4 py-2 rounded-md text-sm font-medium transition-colors hover-elevate active-elevate-2 cursor-pointer ${
                       location === link.href
                         ? "text-primary"
@@ -65,27 +68,31 @@ export function Navigation() {
                   </span>
                 </Link>
               ))}
+              <LanguageToggle />
               <ThemeToggle />
               <Link href="/reservation">
                 <Button
                   data-testid="button-reserve-service"
-                  className="ml-4"
+                  className="ml-2"
                   size="default"
-                >Consultation</Button>
+                >{t("nav.consultation")}</Button>
               </Link>
             </div>
 
-            <button
-              data-testid="button-mobile-menu"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 text-white hover-elevate active-elevate-2 rounded-md"
-            >
-              {isMobileMenuOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
-            </button>
+            <div className="md:hidden flex items-center gap-2">
+              <LanguageToggle />
+              <button
+                data-testid="button-mobile-menu"
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 text-white hover-elevate active-elevate-2 rounded-md"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </nav>
@@ -95,7 +102,7 @@ export function Navigation() {
             {navLinks.map((link) => (
               <Link key={link.href} href={link.href}>
                 <span
-                  data-testid={`link-mobile-${link.label.toLowerCase()}`}
+                  data-testid={`link-mobile-${link.href}`}
                   className={`block px-6 py-4 rounded-lg text-lg font-medium transition-colors hover-elevate active-elevate-2 cursor-pointer ${
                     location === link.href
                       ? "text-primary bg-primary/10"
@@ -112,7 +119,7 @@ export function Navigation() {
                 className="w-full mt-4"
                 size="lg"
               >
-                Réserver
+                {t("nav.reserve")}
               </Button>
             </Link>
           </div>

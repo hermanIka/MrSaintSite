@@ -26,6 +26,7 @@ import {
   Star,
 } from "lucide-react";
 import type { Trip } from "@shared/schema";
+import { useTranslation } from "react-i18next";
 
 interface TripReservationModalProps {
   trip: Trip;
@@ -56,6 +57,7 @@ export function TripReservationModal({
   pendingProvider,
 }: TripReservationModalProps) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState<"maishapay" | "pawapay">("maishapay");
   const [selectedCountry, setSelectedCountry] = useState<PawaPayCountry | null>(null);
@@ -233,9 +235,9 @@ export function TripReservationModal({
   }
 
   const steps = [
-    { label: "Informations", icon: User },
-    { label: "Paiement", icon: CreditCard },
-    { label: "Confirmation", icon: Star },
+    { label: t("tripModal.step1"), icon: User },
+    { label: t("tripModal.step2"), icon: CreditCard },
+    { label: t("tripModal.step3"), icon: Star },
   ];
 
   function handleClose() {
@@ -252,7 +254,7 @@ export function TripReservationModal({
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-heading">
-            {succeeded ? "Réservation confirmée" : "Réserver ce voyage"}
+            {succeeded ? t("tripModal.confirmedTitle") : t("tripModal.title")}
           </DialogTitle>
         </DialogHeader>
 
@@ -291,22 +293,22 @@ export function TripReservationModal({
           {step === 0 && (
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="fullName">Nom complet <span className="text-red-500">*</span></Label>
+                <Label htmlFor="fullName">{t("tripModal.fullName")} <span className="text-red-500">*</span></Label>
                 <Input id="fullName" data-testid="input-trip-fullName" placeholder="Jean Dupont" {...register("fullName")} />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="email">{t("tripModal.email")} <span className="text-red-500">*</span></Label>
                   <Input id="email" data-testid="input-trip-email" type="email" placeholder="jean@exemple.com" {...register("email")} />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="phone">Téléphone <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="phone">{t("tripModal.phone")} <span className="text-red-500">*</span></Label>
                   <Input id="phone" data-testid="input-trip-phone" placeholder="+33 6 00 00 00 00" {...register("phone")} />
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label htmlFor="numberOfPeople">Nombre de personnes <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="numberOfPeople">{t("tripModal.people")} <span className="text-red-500">*</span></Label>
                   <Input
                     id="numberOfPeople"
                     data-testid="input-trip-numberOfPeople"
@@ -317,21 +319,21 @@ export function TripReservationModal({
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="travelDate">Date souhaitée</Label>
+                  <Label htmlFor="travelDate">{t("tripModal.travelDate")}</Label>
                   <Input id="travelDate" data-testid="input-trip-travelDate" type="date" {...register("travelDate")} />
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="notes">Message (optionnel)</Label>
+                <Label htmlFor="notes">{t("tripModal.notes")}</Label>
                 <Textarea id="notes" data-testid="input-trip-notes" placeholder="Questions, préférences particulières..." rows={3} {...register("notes")} />
               </div>
               <div className="bg-muted/40 rounded-lg p-3 border border-border text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Prix unitaire</span>
-                  <span>{trip.price}€ / personne</span>
+                  <span className="text-muted-foreground">{t("tripModal.unitPrice")}</span>
+                  <span>{trip.price}€ {t("tripModal.perPerson")}</span>
                 </div>
                 <div className="flex justify-between font-semibold mt-1">
-                  <span>Total ({numberOfPeople} pers.)</span>
+                  <span>{t("tripModal.total")} ({numberOfPeople} {t("tripModal.persons")})</span>
                   <span className="text-primary">{totalPrice}€</span>
                 </div>
               </div>
@@ -342,21 +344,21 @@ export function TripReservationModal({
           {step === 1 && (
             <div className="space-y-6">
               <div className="bg-muted/40 rounded-lg p-4 border border-border">
-                <h4 className="text-sm font-semibold text-foreground mb-3">Récapitulatif</h4>
+                <h4 className="text-sm font-semibold text-foreground mb-3">{t("tripModal.recap")}</h4>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                  <span className="text-muted-foreground">Nom :</span>
+                  <span className="text-muted-foreground">{t("tripModal.name")}</span>
                   <span className="font-medium">{formValues.fullName}</span>
-                  <span className="text-muted-foreground">Email :</span>
+                  <span className="text-muted-foreground">{t("tripModal.emailColon")}</span>
                   <span className="font-medium">{formValues.email}</span>
-                  <span className="text-muted-foreground">Personnes :</span>
+                  <span className="text-muted-foreground">{t("tripModal.personsColon")}</span>
                   <span className="font-medium">{numberOfPeople}</span>
-                  <span className="text-muted-foreground">Total à payer :</span>
+                  <span className="text-muted-foreground">{t("tripModal.totalToPay")}</span>
                   <span className="font-bold text-primary text-base">{totalPrice}€</span>
                 </div>
               </div>
 
               <div className="space-y-3">
-                <h3 className="text-base font-heading font-semibold text-foreground">Mode de paiement</h3>
+                <h3 className="text-base font-heading font-semibold text-foreground">{t("tripModal.paymentMode")}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <button
                     type="button"
@@ -366,7 +368,7 @@ export function TripReservationModal({
                   >
                     <CreditCard className="w-5 h-5 text-primary flex-shrink-0" />
                     <div>
-                      <p className="font-medium text-sm text-foreground">Carte bancaire</p>
+                      <p className="font-medium text-sm text-foreground">{t("tripModal.payCard")}</p>
                       <p className="text-xs text-muted-foreground">Visa, Mastercard, UnionPay</p>
                     </div>
                   </button>
@@ -378,7 +380,7 @@ export function TripReservationModal({
                   >
                     <Smartphone className="w-5 h-5 text-primary flex-shrink-0" />
                     <div>
-                      <p className="font-medium text-sm text-foreground">Mobile Money</p>
+                      <p className="font-medium text-sm text-foreground">{t("tripModal.payMobile")}</p>
                       <p className="text-xs text-muted-foreground">MTN, Orange, M-Pesa...</p>
                     </div>
                   </button>
@@ -388,7 +390,7 @@ export function TripReservationModal({
               {paymentMethod === "pawapay" && (
                 <div className="space-y-4 p-4 rounded-lg bg-muted/30 border border-border">
                   <div className="space-y-1.5">
-                    <Label>Pays</Label>
+                    <Label>{t("tripModal.selectCountry")}</Label>
                     <Select
                       value={selectedCountry?.code || ""}
                       onValueChange={(code) => {
@@ -399,7 +401,7 @@ export function TripReservationModal({
                       }}
                     >
                       <SelectTrigger data-testid="select-trip-pawapay-country">
-                        <SelectValue placeholder="Sélectionner votre pays" />
+                        <SelectValue placeholder={t("tripModal.selectCountry")} />
                       </SelectTrigger>
                       <SelectContent>
                         {PAWAPAY_COUNTRIES.map((c) => (
@@ -412,10 +414,10 @@ export function TripReservationModal({
                   </div>
                   {selectedCountry && selectedCountry.operators.length > 1 && (
                     <div className="space-y-1.5">
-                      <Label>Opérateur</Label>
+                      <Label>{t("tripModal.selectOperator")}</Label>
                       <Select value={selectedCorrespondent} onValueChange={setSelectedCorrespondent}>
                         <SelectTrigger data-testid="select-trip-pawapay-operator">
-                          <SelectValue placeholder="Choisir l'opérateur" />
+                          <SelectValue placeholder={t("tripModal.selectOperator")} />
                         </SelectTrigger>
                         <SelectContent>
                           {selectedCountry.operators.map((op) => (
@@ -427,7 +429,7 @@ export function TripReservationModal({
                   )}
                   {selectedCountry && (
                     <div className="space-y-1.5">
-                      <Label>Numéro Mobile Money</Label>
+                      <Label>{t("tripModal.mobileNumber")}</Label>
                       <div className="flex gap-2">
                         <div className="flex items-center px-3 bg-muted rounded-md border border-input text-sm text-muted-foreground whitespace-nowrap">
                           {selectedCountry.flag} {selectedCountry.phonePrefix}
@@ -448,7 +450,7 @@ export function TripReservationModal({
               {isPolling && (
                 <div className="flex items-center justify-center gap-2 p-4 rounded-lg bg-primary/5 border border-primary/20">
                   <Loader2 className="w-5 h-5 text-primary animate-spin" />
-                  <p className="text-sm text-muted-foreground">En attente de confirmation sur votre téléphone...</p>
+                  <p className="text-sm text-muted-foreground">{t("tripModal.waitingPhone")}</p>
                 </div>
               )}
             </div>
@@ -461,15 +463,14 @@ export function TripReservationModal({
                 <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
               </div>
               <h3 data-testid="text-trip-reservation-success" className="text-xl font-heading font-bold text-foreground">
-                Réservation confirmée !
+                {t("tripModal.successTitle")}
               </h3>
               <p className="text-muted-foreground text-sm">
-                Votre réservation pour <strong>{trip.title}</strong> a été confirmée avec succès.
-                Un email de confirmation et votre facture vous ont été envoyés à <strong>{formValues.email}</strong>.
+                {t("tripModal.successBody", { trip: trip.title, email: formValues.email })}
               </p>
-              <p className="text-sm text-muted-foreground">Notre équipe vous contactera dans les 24h pour finaliser les détails.</p>
+              <p className="text-sm text-muted-foreground">{t("tripModal.successFollow")}</p>
               <Button data-testid="button-trip-reservation-close" onClick={handleClose} className="mt-2">
-                Fermer
+                {t("tripModal.close")}
               </Button>
             </div>
           )}
@@ -485,7 +486,7 @@ export function TripReservationModal({
                   onClick={() => setStep((s) => s - 1)}
                   disabled={isSubmitting || isPolling}
                 >
-                  <ChevronLeft className="w-4 h-4 mr-1" /> Précédent
+                  <ChevronLeft className="w-4 h-4 mr-1" /> {t("tripModal.prev")}
                 </Button>
               ) : (
                 <div />
@@ -496,7 +497,7 @@ export function TripReservationModal({
                   data-testid="button-trip-next"
                   onClick={() => { if (validateStep0()) setStep(1); }}
                 >
-                  Suivant <ChevronRight className="w-4 h-4 ml-1" />
+                  {t("tripModal.next")} <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
               ) : step === 1 ? (
                 <Button
@@ -507,9 +508,9 @@ export function TripReservationModal({
                   className="gap-2"
                 >
                   {isSubmitting ? (
-                    <><Loader2 className="w-4 h-4 animate-spin" /> Traitement...</>
+                    <><Loader2 className="w-4 h-4 animate-spin" /> {t("tripModal.processing")}</>
                   ) : (
-                    <><Lock className="w-4 h-4" /> Payer {totalPrice}€</>
+                    <><Lock className="w-4 h-4" /> {t("tripModal.pay")} {totalPrice}€</>
                   )}
                 </Button>
               ) : null}

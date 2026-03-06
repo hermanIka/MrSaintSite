@@ -1,9 +1,11 @@
 import { Link } from "wouter";
 import { Plane, Facebook, Instagram, Linkedin, Mail, Phone } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
+import { useTranslation } from "react-i18next";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
+  const { t } = useTranslation();
 
   return (
     <footer className="bg-black text-white pt-20 pb-8">
@@ -15,9 +17,7 @@ export function Footer() {
               <span className="text-2xl font-heading font-bold">Mr Saint</span>
             </div>
             <p className="text-muted-foreground mb-6 leading-relaxed">
-              Expert voyagiste avec 7 ans d'expérience. Votre partenaire de
-              confiance pour tous vos projets de voyage et de création
-              d'agence.
+              {t("footer.tagline")}
             </p>
             <div className="flex gap-3">
               <a
@@ -61,7 +61,7 @@ export function Footer() {
 
           <div>
             <h3 className="text-lg font-heading font-semibold mb-6 text-primary">
-              Liens rapides
+              {t("footer.quickLinks")}
             </h3>
             <ul className="space-y-3">
               <li>
@@ -70,7 +70,7 @@ export function Footer() {
                     data-testid="link-footer-home"
                     className="text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                   >
-                    Accueil
+                    {t("footer.home")}
                   </span>
                 </Link>
               </li>
@@ -80,7 +80,7 @@ export function Footer() {
                     data-testid="link-footer-visa"
                     className="text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                   >
-                    Facilitation Visa
+                    {t("footer.visaFacilitation")}
                   </span>
                 </Link>
               </li>
@@ -90,7 +90,7 @@ export function Footer() {
                     data-testid="link-footer-agency"
                     className="text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                   >
-                    Création d'agence
+                    {t("footer.agencyCreation")}
                   </span>
                 </Link>
               </li>
@@ -100,7 +100,7 @@ export function Footer() {
                     data-testid="link-footer-trips"
                     className="text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                   >
-                    Voyages organisés
+                    {t("footer.organizedTrips")}
                   </span>
                 </Link>
               </li>
@@ -110,7 +110,7 @@ export function Footer() {
                     data-testid="link-footer-faq"
                     className="text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                   >
-                    FAQ
+                    {t("footer.faq")}
                   </span>
                 </Link>
               </li>
@@ -119,20 +119,20 @@ export function Footer() {
 
           <div>
             <h3 className="text-lg font-heading font-semibold mb-6 text-primary">
-              Services
+              {t("footer.services")}
             </h3>
             <ul className="space-y-3">
-              <li className="text-muted-foreground">Visa Tourisme</li>
-              <li className="text-muted-foreground">Visa Business</li>
-              <li className="text-muted-foreground">Visa Études</li>
-              <li className="text-muted-foreground">Formation agence</li>
-              <li className="text-muted-foreground">Voyages business</li>
+              <li className="text-muted-foreground">{t("footer.tourismVisa")}</li>
+              <li className="text-muted-foreground">{t("footer.businessVisa")}</li>
+              <li className="text-muted-foreground">{t("footer.studyVisa")}</li>
+              <li className="text-muted-foreground">{t("footer.agencyTraining")}</li>
+              <li className="text-muted-foreground">{t("footer.businessTrips")}</li>
             </ul>
           </div>
 
           <div>
             <h3 className="text-lg font-heading font-semibold mb-6 text-primary">
-              Contact
+              {t("footer.contactTitle")}
             </h3>
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
@@ -142,7 +142,7 @@ export function Footer() {
                     data-testid="link-phone-footer"
                     className="text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                   >
-                    Réserver un appel
+                    {t("footer.bookCall")}
                   </span>
                 </Link>
               </li>
@@ -156,7 +156,7 @@ export function Footer() {
                   matandusaint@gmail.com
                 </a>
               </li>
-              <li className="text-muted-foreground">France</li>
+              <li className="text-muted-foreground">{t("footer.location")}</li>
             </ul>
           </div>
         </div>
@@ -164,7 +164,7 @@ export function Footer() {
         <div className="pt-8 border-t border-white/10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-muted-foreground">
-              © {currentYear} Mr Saint. Tous droits réservés.
+              © {currentYear} Mr Saint. {t("footer.rights")}
             </p>
             <div className="flex gap-6">
               <a
@@ -172,14 +172,14 @@ export function Footer() {
                 data-testid="link-privacy"
                 className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
-                Politique de confidentialité
+                {t("footer.privacy")}
               </a>
               <a
                 href="#"
                 data-testid="link-terms"
                 className="text-sm text-muted-foreground hover:text-primary transition-colors"
               >
-                Conditions d'utilisation
+                {t("footer.terms")}
               </a>
             </div>
           </div>

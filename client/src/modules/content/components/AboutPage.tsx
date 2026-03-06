@@ -6,43 +6,30 @@ import { Link } from "wouter";
 import { Award, Globe, Users, Target, CheckCircle, Plane } from "lucide-react";
 import mrSaintPhoto from "@assets/Mr_saint_photo_profil_1769639553577.jfif";
 import aboutHeroBanner from "@/assets/images/about-hero-banner.png";
+import { useTranslation } from "react-i18next";
 
 export default function AboutPage() {
+  const { t } = useTranslation();
+
   const milestones = [
-    { year: "2018", title: "Création de Mr Saint", description: "Lancement de l'agence avec une vision premium" },
-    { year: "2020", title: "Expansion internationale", description: "Ouverture de partenariats à Dubaï et Istanbul" },
-    { year: "2022", title: "Programme de formation", description: "Lancement du coaching pour créateurs d'agences" },
-    { year: "2024", title: "500+ clients satisfaits", description: "Une communauté grandissante de voyageurs" },
+    { year: t("about.milestone0Year"), title: t("about.milestone0Title"), description: t("about.milestone0Desc") },
+    { year: t("about.milestone1Year"), title: t("about.milestone1Title"), description: t("about.milestone1Desc") },
+    { year: t("about.milestone2Year"), title: t("about.milestone2Title"), description: t("about.milestone2Desc") },
+    { year: t("about.milestone3Year"), title: t("about.milestone3Title"), description: t("about.milestone3Desc") },
   ];
 
   const values = [
-    {
-      icon: Award,
-      title: "Excellence",
-      description: "Nous visons la perfection dans chaque service que nous offrons à nos clients.",
-    },
-    {
-      icon: Users,
-      title: "Accompagnement",
-      description: "Un suivi personnalisé du début à la fin de votre projet.",
-    },
-    {
-      icon: Globe,
-      title: "Accessibilité",
-      description: "Rendre le voyage et l'entrepreneuriat accessibles à tous.",
-    },
-    {
-      icon: Target,
-      title: "Résultats",
-      description: "Des solutions concrètes qui transforment vos rêves en réalité.",
-    },
+    { icon: Award, title: t("about.value0Title"), description: t("about.value0Desc") },
+    { icon: Users, title: t("about.value1Title"), description: t("about.value1Desc") },
+    { icon: Globe, title: t("about.value2Title"), description: t("about.value2Desc") },
+    { icon: Target, title: t("about.value3Title"), description: t("about.value3Desc") },
   ];
 
   const stats = [
-    { value: "7+", label: "Années d'expérience" },
-    { value: "500+", label: "Clients accompagnés" },
-    { value: "15+", label: "Agences créées" },
-    { value: "98%", label: "Taux de satisfaction" },
+    { value: "7+", label: t("about.stat0Label") },
+    { value: "500+", label: t("about.stat1Label") },
+    { value: "15+", label: t("about.stat2Label") },
+    { value: "98%", label: t("about.stat3Label") },
   ];
 
   return (
@@ -64,19 +51,19 @@ export default function AboutPage() {
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div data-testid="badge-since-2018" className="inline-flex items-center gap-2 bg-primary/20 text-primary px-4 py-2 rounded-full mb-6">
             <Plane className="w-4 h-4" />
-            <span className="text-sm font-medium">Depuis 2018</span>
+            <span className="text-sm font-medium">{t("about.since")}</span>
           </div>
           <h1
             data-testid="text-about-title"
             className="text-4xl sm:text-5xl lg:text-6xl font-heading font-bold mb-6"
           >
-            À propos de Mr Saint
+            {t("about.title")}
           </h1>
           <p
             data-testid="text-about-subtitle"
             className="text-xl text-white/80 max-w-2xl mx-auto"
           >
-            Une passion pour le voyage transformée en expertise au service de vos ambitions.
+            {t("about.subtitle")}
           </p>
         </div>
       </section>
@@ -99,43 +86,31 @@ export default function AboutPage() {
                     data-testid="text-story-title"
                     className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-2"
                   >
-                    Notre Histoire
+                    {t("about.storyTitle")}
                   </h2>
-                  <p data-testid="text-founder-name" className="text-primary font-medium">Mr Saint, Fondateur</p>
+                  <p data-testid="text-founder-name" className="text-primary font-medium">{t("about.founderLabel")}</p>
                 </div>
               </div>
               <div className="space-y-4 text-muted-foreground leading-relaxed">
-                <p>
-                  Mr Saint est né d'une passion profonde pour le voyage et d'une volonté 
-                  d'aider les autres à réaliser leurs rêves. Après des années d'expérience 
-                  dans le secteur du tourisme, j'ai décidé de créer une agence différente.
-                </p>
-                <p>
-                  Notre mission est simple : rendre le voyage accessible, éliminer les 
-                  obstacles administratifs, et accompagner ceux qui souhaitent créer leur 
-                  propre entreprise dans ce domaine passionnant.
-                </p>
-                <p>
-                  Aujourd'hui, Mr Saint c'est plus de 500 clients satisfaits, des dizaines d'agences créées grâce à notre programme de formation, et une réputation d'excellence dans la facilitation visa.
-                </p>
-                <p>
-                  Je suis également le fondateur de plusieurs plateformes et entreprises innovantes :
-                </p>
+                <p>{t("about.story1")}</p>
+                <p>{t("about.story2")}</p>
+                <p>{t("about.story3")}</p>
+                <p>{t("about.story4")}</p>
                 <ul className="space-y-2">
-                  <li><strong className="text-foreground">Go Fly</strong> : la première OTA offrant aux agences de voyage et aux agents indépendants du monde entier la possibilité de créer, gérer et vendre leurs propres forfaits touristiques, connectant ainsi des milliers de voyageurs.</li>
-                  <li><strong className="text-foreground">Go Send</strong> : une application mobile qui facilite la livraison et l'expédition de colis à travers le monde.</li>
-                  <li><strong className="text-foreground">Go House</strong> : un marketplace immobilier.</li>
+                  <li><strong className="text-foreground">Go Fly</strong> : {t("about.goFlyDesc")}</li>
+                  <li><strong className="text-foreground">Go Send</strong> : {t("about.goSendDesc")}</li>
+                  <li><strong className="text-foreground">Go House</strong> : {t("about.goHouseDesc")}</li>
                 </ul>
               </div>
               <div className="flex flex-wrap gap-4 mt-8">
                 <Link href="/services">
                   <Button data-testid="button-discover-services" size="lg">
-                    Découvrir nos services
+                    {t("about.discoverServices")}
                   </Button>
                 </Link>
                 <Link href="/contact">
                   <Button data-testid="button-contact-us" variant="outline" size="lg">
-                    Nous contacter
+                    {t("about.contactUs")}
                   </Button>
                 </Link>
               </div>
@@ -163,10 +138,10 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 data-testid="text-values-title" className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-4">
-              Nos Valeurs
+              {t("about.valuesTitle")}
             </h2>
             <p data-testid="text-values-subtitle" className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Les principes qui guident chacune de nos actions
+              {t("about.valuesSubtitle")}
             </p>
           </div>
 
@@ -198,10 +173,10 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 data-testid="text-journey-title" className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-4">
-              Notre Parcours
+              {t("about.journeyTitle")}
             </h2>
             <p data-testid="text-journey-subtitle" className="text-lg text-muted-foreground">
-              Les étapes clés de notre développement
+              {t("about.journeySubtitle")}
             </p>
           </div>
 
@@ -230,17 +205,17 @@ export default function AboutPage() {
       <section className="py-24 bg-primary text-primary-foreground">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-6">
-            Prêt à nous rejoindre ?
+            {t("about.ctaTitle")}
           </h2>
           <p className="text-lg mb-10 opacity-90">
-            Que vous souhaitiez voyager ou créer votre agence, nous sommes là pour vous accompagner.
+            {t("about.ctaSubtitle")}
           </p>
           <Link href="/reservation">
             <Button
               data-testid="button-cta-contact"
               size="lg"
               variant="secondary"
-            >Consultez Maintenant</Button>
+            >{t("about.ctaBtn")}</Button>
           </Link>
         </div>
       </section>

@@ -11,6 +11,7 @@ import { PaymentMethodSelector } from "./PaymentMethodSelector";
 import { useToast } from "@/hooks/use-toast";
 import { usePrices } from "@/hooks/usePrices";
 import reservationHero from "@/assets/images/reservation-hero.png";
+import { useTranslation } from "react-i18next";
 
 type ServiceType = "visa" | "agence" | "credit" | null;
 type Step = "select" | "calendar" | "payment" | "verifying" | "success";
@@ -25,6 +26,7 @@ interface SelectedSlotInfo {
 export default function ReservationPage() {
   const [, setLocation] = useLocation();
   const { prices } = usePrices();
+  const { t } = useTranslation();
   const [selectedService, setSelectedService] = useState<ServiceType>(null);
   const [currentStep, setCurrentStep] = useState<Step>("select");
   const [paymentMode, setPaymentMode] = useState<PaymentMode>("direct");
@@ -88,7 +90,7 @@ export default function ReservationPage() {
     {
       id: "visa" as const,
       icon: FileText,
-      title: "Facilitation Visa",
+      title: t("reservation.visaService"),
       description: "Demande de visa pour votre destination",
       price: prices.visa,
       priceLabel: `${prices.visa}€`,
@@ -98,7 +100,7 @@ export default function ReservationPage() {
     {
       id: "agence" as const,
       icon: Briefcase,
-      title: "Création d'Agence",
+      title: t("reservation.agencyService"),
       description: "Formation et accompagnement complet",
       price: prices.agence_classique,
       priceLabel: `À partir de ${prices.agence_classique}€`,
@@ -108,7 +110,7 @@ export default function ReservationPage() {
     {
       id: "credit" as const,
       icon: Banknote,
-      title: "Voyage à Crédit",
+      title: t("reservation.creditService"),
       description: "Financement de voyage sur mesure",
       price: 0,
       priceLabel: "Sur demande",
@@ -120,22 +122,22 @@ export default function ReservationPage() {
   const steps = [
     {
       number: 1,
-      title: "Choisir un service",
-      description: "Sélectionnez le service qui correspond à vos besoins",
+      title: t("reservation.step1Title"),
+      description: t("reservation.step1Desc"),
       icon: CheckCircle,
       active: currentStep === "select",
     },
     {
       number: 2,
-      title: "Paiement sécurisé",
-      description: "Carte bancaire, PayPal ou Mobile Money",
+      title: t("reservation.step2Title"),
+      description: t("reservation.step2Desc"),
       icon: CreditCard,
       active: currentStep === "payment",
     },
     {
       number: 3,
-      title: "Réservation confirmée",
-      description: "Choisissez votre créneau et recevez votre confirmation",
+      title: t("reservation.step3Title"),
+      description: t("reservation.step3Desc"),
       icon: CalendarIcon,
       active: currentStep === "calendar" || currentStep === "verifying" || currentStep === "success",
     },
@@ -260,18 +262,16 @@ export default function ReservationPage() {
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div data-testid="badge-secure-payment" className="inline-flex items-center gap-2 bg-white/10 text-white/80 px-4 py-2 rounded-full mb-6">
             <Lock className="w-4 h-4" />
-            <span className="text-sm font-medium">Paiement 100% sécurisé</span>
+            <span className="text-sm font-medium">{t("reservation.heroSecure")}</span>
           </div>
           <h1
             data-testid="text-reservation-title"
             className="text-4xl sm:text-5xl lg:text-6xl font-heading font-bold mb-6"
-          >Réservez votre consultation</h1>
+          >{t("reservation.heroTitle")}</h1>
           <p
             data-testid="text-reservation-subtitle"
             className="text-xl text-white/80 max-w-2xl mx-auto"
-          >Un expert voyagiste je t'aide de débloquer ton voyage , ton visa... et si tu souhaites lancer ton agence de voyage rentable je t'aide à le réaliser 
-
-          Prends rendez-vous et on démarre</p>
+          >{t("reservation.heroSubtitle")}</p>
         </div>
       </section>
       <section className="py-16 bg-background border-b">
@@ -310,12 +310,12 @@ export default function ReservationPage() {
             <>
               <div className="text-center mb-12">
                 <h2 data-testid="text-choose-service-title" className="text-3xl font-heading font-bold text-foreground mb-4">
-                  {currentStep === "select" ? "Choisissez votre service" : "Finalisez votre paiement"}
+                  {currentStep === "select" ? t("reservation.chooseService") : t("reservation.finalizePayment")}
                 </h2>
                 <p data-testid="text-choose-service-subtitle" className="text-muted-foreground">
                   {currentStep === "select" 
-                    ? "Sélectionnez le service pour lequel vous souhaitez effectuer une réservation"
-                    : `Service sélectionné : ${selectedServiceData?.title}`
+                    ? t("reservation.step1Desc")
+                    : `${t("reservation.selectedService")} : ${selectedServiceData?.title}`
                   }
                 </p>
               </div>
@@ -370,7 +370,7 @@ export default function ReservationPage() {
                   <CardContent className="p-8">
                     <div className="text-center mb-8">
                       <p className="text-muted-foreground">
-                        Vous avez sélectionné :{" "}
+                        {t("reservation.youSelected")}{" "}
                         <span data-testid="text-selected-service" className="font-medium text-primary">
                           {selectedServiceData?.title}
                         </span>
@@ -385,7 +385,7 @@ export default function ReservationPage() {
                           onClick={handleContactFirst}
                         >
                           <CalendarIcon className="w-5 h-5 mr-2" />
-                          Consultez Maintenant ({prices.consultation}€)
+                          {t("reservation.consultNow")} ({prices.consultation}€)
                         </Button>
                     </div>
                   </CardContent>
@@ -401,13 +401,13 @@ export default function ReservationPage() {
                     data-testid="button-back-to-calendar"
                   >
                     <ArrowLeft className="w-4 h-4" />
-                    {paymentMode === "consultation" ? "Retour au calendrier" : "Retour aux services"}
+                    {paymentMode === "consultation" ? t("reservation.backToCalendar") : t("reservation.backToServices")}
                   </Button>
                   
                   {selectedSlot && paymentMode === "consultation" && (
                     <Card className="border-primary/20 bg-card mb-6">
                       <CardContent className="p-4">
-                        <h3 className="font-heading font-semibold mb-3">Créneau sélectionné</h3>
+                        <h3 className="font-heading font-semibold mb-3">{t("reservation.selectedSlotTitle")}</h3>
                         <div className="flex flex-wrap gap-4 text-sm">
                           <div className="flex items-center gap-2">
                             <CalendarIcon className="w-4 h-4 text-primary" />
@@ -426,13 +426,13 @@ export default function ReservationPage() {
                     <CardHeader>
                       <CardTitle className="text-xl font-heading">
                         {paymentMode === "consultation" 
-                          ? `Consultation pour : ${selectedServiceData?.title} (${prices.consultation}€)`
-                          : `Paiement pour : ${selectedServiceData?.title}`
+                          ? `${t("reservation.consultationFor")} : ${selectedServiceData?.title} (${prices.consultation}€)`
+                          : `${t("reservation.paymentFor")} : ${selectedServiceData?.title}`
                         }
                       </CardTitle>
                       {paymentMode === "consultation" && (
                         <p className="text-sm text-muted-foreground mt-1">
-                          Le prix de la consultation est de {prices.consultation}€, quel que soit le service choisi.
+                          {t("reservation.consultationPriceNote")} {prices.consultation}€.
                         </p>
                       )}
                     </CardHeader>
@@ -462,15 +462,15 @@ export default function ReservationPage() {
                 data-testid="button-back-to-services"
               >
                 <ArrowLeft className="w-4 h-4" />
-                Retour aux services
+                {t("reservation.backToServices")}
               </Button>
               
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-heading font-bold text-foreground mb-2">
-                  Réserver selon votre créneau
+                  {t("reservation.chooseSlot")}
                 </h2>
                 <p className="text-muted-foreground">
-                  Sélectionnez une date et un créneau disponible pour {selectedServiceData?.title}
+                  {t("reservation.chooseSlotDesc")} {selectedServiceData?.title}
                 </p>
               </div>
 
@@ -492,14 +492,14 @@ export default function ReservationPage() {
                         <Smartphone className="w-8 h-8 text-primary animate-pulse" />
                       </div>
                       <h2 data-testid="text-verifying-title" className="text-2xl font-heading font-bold text-foreground mb-4">
-                        En attente de confirmation
+                        {t("reservation.waitingTitle")}
                       </h2>
                       <p className="text-muted-foreground mb-6">
-                        Veuillez confirmer le paiement sur votre téléphone en entrant votre code PIN Mobile Money.
+                        {t("reservation.waitingDesc")}
                       </p>
                       <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>Vérification du paiement en cours...</span>
+                        <span>{t("reservation.verifying")}</span>
                       </div>
                     </>
                   )}
@@ -510,10 +510,10 @@ export default function ReservationPage() {
                         <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
                       </div>
                       <h2 data-testid="text-verified-title" className="text-2xl font-heading font-bold text-foreground mb-4">
-                        Paiement confirmé !
+                        {t("reservation.paymentConfirmedTitle")}
                       </h2>
                       <p className="text-muted-foreground mb-6">
-                        Votre paiement a bien été reçu. Redirection en cours...
+                        {t("reservation.paymentConfirmedDesc")}
                       </p>
                     </>
                   )}
@@ -524,16 +524,16 @@ export default function ReservationPage() {
                         <XCircle className="w-8 h-8 text-destructive" />
                       </div>
                       <h2 data-testid="text-payment-failed-title" className="text-2xl font-heading font-bold text-foreground mb-4">
-                        Paiement échoué
+                        {t("reservation.paymentFailedTitle")}
                       </h2>
                       <p className="text-muted-foreground mb-6">
-                        Le paiement n'a pas pu être confirmé. Veuillez réessayer.
+                        {t("reservation.paymentFailedDesc")}
                       </p>
                       <Button
                         data-testid="button-retry-payment"
                         onClick={() => setCurrentStep("payment")}
                       >
-                        Réessayer le paiement
+                        {t("reservation.retryPayment")}
                       </Button>
                     </>
                   )}
@@ -544,24 +544,24 @@ export default function ReservationPage() {
                         <Clock className="w-8 h-8 text-yellow-600 dark:text-yellow-400" />
                       </div>
                       <h2 data-testid="text-payment-timeout-title" className="text-2xl font-heading font-bold text-foreground mb-4">
-                        Délai d'attente dépassé
+                        {t("reservation.paymentTimeoutTitle")}
                       </h2>
                       <p className="text-muted-foreground mb-6">
-                        Nous n'avons pas reçu la confirmation de votre paiement. Si vous avez validé sur votre téléphone, veuillez patienter ou contactez-nous.
+                        {t("reservation.paymentTimeoutDesc")}
                       </p>
                       <div className="flex flex-col sm:flex-row gap-4 justify-center flex-wrap">
                         <Button
                           data-testid="button-retry-payment-timeout"
                           onClick={() => setCurrentStep("payment")}
                         >
-                          Réessayer le paiement
+                          {t("reservation.retryPayment")}
                         </Button>
                         <Button
                           data-testid="button-contact-support"
                           variant="outline"
                           asChild
                         >
-                          <a href="/contact">Contacter le support</a>
+                          <a href="/contact">{t("reservation.contactSupport")}</a>
                         </Button>
                       </div>
                     </>
@@ -579,10 +579,10 @@ export default function ReservationPage() {
                     <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
                   </div>
                   <h2 data-testid="text-final-success-title" className="text-2xl font-heading font-bold text-foreground mb-4">
-                    Paiement confirmé !
+                    {t("reservation.successTitle")}
                   </h2>
                   <p className="text-muted-foreground mb-6">
-                    Votre paiement a été effectué avec succès. Finalisez votre réservation en remplissant le formulaire ci-dessous.
+                    {t("reservation.successDesc")}
                   </p>
                   {selectedSlot && (
                     <div className="bg-muted/50 rounded-lg p-4 mb-4 inline-block text-left">
@@ -622,7 +622,7 @@ export default function ReservationPage() {
                   }}
                   data-testid="button-new-reservation"
                 >
-                  Nouvelle réservation
+                  {t("reservation.newReservation")}
                 </Button>
               </div>
             </div>
@@ -637,10 +637,10 @@ export default function ReservationPage() {
                 <Lock className="w-6 h-6 text-primary" />
               </div>
               <h3 data-testid="text-feature-secure-title" className="font-heading font-semibold text-foreground mb-2">
-                Paiement sécurisé
+                {t("reservation.featureSecureTitle")}
               </h3>
               <p data-testid="text-feature-secure-desc" className="text-sm text-muted-foreground">
-                Carte bancaire, PayPal ou Mobile Money
+                {t("reservation.featureSecureDesc")}
               </p>
             </div>
             <div data-testid="feature-confirmation">
@@ -648,10 +648,10 @@ export default function ReservationPage() {
                 <CalendarIcon className="w-6 h-6 text-primary" />
               </div>
               <h3 data-testid="text-feature-confirm-title" className="font-heading font-semibold text-foreground mb-2">
-                Confirmation immédiate
+                {t("reservation.featureConfirmTitle")}
               </h3>
               <p data-testid="text-feature-confirm-desc" className="text-sm text-muted-foreground">
-                Recevez votre confirmation par email
+                {t("reservation.featureConfirmDesc")}
               </p>
             </div>
             <div data-testid="feature-satisfaction">
@@ -659,10 +659,10 @@ export default function ReservationPage() {
                 <CheckCircle className="w-6 h-6 text-primary" />
               </div>
               <h3 data-testid="text-feature-satisfaction-title" className="font-heading font-semibold text-foreground mb-2">
-                Satisfaction garantie
+                {t("reservation.featureSatisfactionTitle")}
               </h3>
               <p data-testid="text-feature-satisfaction-desc" className="text-sm text-muted-foreground">
-                Service client disponible 7j/7
+                {t("reservation.featureSatisfactionDesc")}
               </p>
             </div>
           </div>

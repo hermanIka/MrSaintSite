@@ -10,6 +10,7 @@ import type { Trip, TripGalleryPhoto } from "@shared/schema";
 import { useRoute, Link, useSearch } from "wouter";
 import { Calendar, MapPin, CheckCircle2, XCircle, Images } from "lucide-react";
 import { TripReservationModal } from "@/modules/transaction/components/TripReservationModal";
+import { useTranslation } from "react-i18next";
 
 export default function TripDetailPage() {
   const [, params] = useRoute("/voyages/:id");
@@ -18,6 +19,7 @@ export default function TripDetailPage() {
   const searchParams = new URLSearchParams(searchString);
   const pendingPaymentId = searchParams.get("payment") === "success" ? (searchParams.get("id") || undefined) : undefined;
   const pendingProvider = searchParams.get("provider") || undefined;
+  const { t } = useTranslation();
 
   const [modalOpen, setModalOpen] = useState(!!pendingPaymentId);
 
@@ -51,10 +53,10 @@ export default function TripDetailPage() {
       <Layout>
         <div className="pt-32 pb-20 text-center">
           <h1 className="text-3xl font-heading font-bold text-foreground mb-4">
-            Voyage non trouvé
+            {t("tripDetail.notFound")}
           </h1>
           <Link href="/voyages">
-            <Button>Retour aux voyages</Button>
+            <Button>{t("tripDetail.backToTrips")}</Button>
           </Link>
         </div>
       </Layout>
@@ -99,7 +101,7 @@ export default function TripDetailPage() {
             <div className="lg:col-span-2">
               <section className="mb-12">
                 <h2 className="text-2xl font-heading font-bold text-foreground mb-6">
-                  Description
+                  {t("tripDetail.description")}
                 </h2>
                 <p
                   data-testid="text-trip-description"
@@ -109,12 +111,11 @@ export default function TripDetailPage() {
                 </p>
               </section>
 
-              {/* Galerie photos mosaïque */}
               {galleryPhotos.length > 0 && (
                 <section className="mb-12">
                   <h2 className="text-2xl font-heading font-bold text-foreground mb-6 flex items-center gap-2">
                     <Images className="w-6 h-6 text-primary" />
-                    Découvrez la destination
+                    {t("tripDetail.gallery")}
                   </h2>
                   <div
                     data-testid="gallery-mosaic"
@@ -152,7 +153,7 @@ export default function TripDetailPage() {
                       <div className="flex items-center gap-2 mb-4">
                         <CheckCircle2 className="w-6 h-6 text-primary" />
                         <h3 className="text-lg font-heading font-semibold">
-                          Inclus
+                          {t("tripDetail.included")}
                         </h3>
                       </div>
                       <ul className="space-y-2">
@@ -175,7 +176,7 @@ export default function TripDetailPage() {
                       <div className="flex items-center gap-2 mb-4">
                         <XCircle className="w-6 h-6 text-destructive" />
                         <h3 className="text-lg font-heading font-semibold">
-                          Non inclus
+                          {t("tripDetail.notIncluded")}
                         </h3>
                       </div>
                       <ul className="space-y-2">
@@ -201,7 +202,7 @@ export default function TripDetailPage() {
                 <CardContent className="p-8">
                   <div className="mb-6">
                     <div className="text-sm text-muted-foreground mb-2">
-                      À partir de
+                      {t("tripDetail.from")}
                     </div>
                     <div
                       data-testid="text-trip-price"
@@ -210,7 +211,7 @@ export default function TripDetailPage() {
                       {trip.price}€
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      par personne
+                      {t("tripDetail.perPerson")}
                     </div>
                   </div>
 
@@ -233,11 +234,11 @@ export default function TripDetailPage() {
                     className="w-full rounded-full text-lg py-6 mb-4"
                     onClick={() => setModalOpen(true)}
                   >
-                    Réserver ma place
+                    {t("tripDetail.reserveBtn")}
                   </Button>
 
                   <p className="text-xs text-center text-muted-foreground">
-                    Paiement sécurisé · Confirmation par email
+                    {t("tripDetail.securePayment")}
                   </p>
                 </CardContent>
               </Card>

@@ -3,11 +3,13 @@ import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { XCircle, RefreshCw, Home } from "lucide-react";
 import { Link, useSearch } from "wouter";
+import { useTranslation } from "react-i18next";
 
 export default function GoPlusFailedPage() {
   const search = useSearch();
   const params = new URLSearchParams(search);
   const reason = params.get("reason") || "";
+  const { t } = useTranslation();
 
   return (
     <Layout>
@@ -19,7 +21,7 @@ export default function GoPlusFailedPage() {
             <XCircle className="w-10 h-10 text-red-500" />
           </div>
 
-          <h1 className="text-3xl font-heading font-bold">Paiement non abouti</h1>
+          <h1 className="text-3xl font-heading font-bold">{t("goplus.failedTitle")}</h1>
           <p className="text-muted-foreground">
             {reason === "transaction_not_found"
               ? "La transaction n'a pas été trouvée. Contacte-nous si tu as été débité."

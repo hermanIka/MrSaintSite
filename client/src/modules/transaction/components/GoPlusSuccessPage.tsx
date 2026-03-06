@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Star, Home, Loader2, Clock, AlertCircle } from "lucide-react";
 import { Link, useSearch, useLocation } from "wouter";
+import { useTranslation } from "react-i18next";
 
 type PollStatus = "pending" | "paid" | "failed" | "timeout";
 
 export default function GoPlusSuccessPage() {
   const search = useSearch();
   const [, setLocation] = useLocation();
+  const { t } = useTranslation();
   const params = new URLSearchParams(search);
   const initialCardNumber = params.get("cardNumber") || "";
   const isPending = params.get("pending") === "1";
@@ -119,7 +121,7 @@ export default function GoPlusSuccessPage() {
               <div className="w-20 h-20 rounded-full bg-green-500/15 flex items-center justify-center mx-auto">
                 <CheckCircle className="w-10 h-10 text-green-500" />
               </div>
-              <h1 className="text-3xl font-heading font-bold">Carte GO+ activée !</h1>
+              <h1 className="text-3xl font-heading font-bold">{t("goplus.successTitle")}</h1>
               <p className="text-muted-foreground">
                 Bravo ! Ta carte GO+ est maintenant active. Tu bénéficies de réductions sur tous les services Mr Saint. Un email de confirmation t'a été envoyé.
               </p>

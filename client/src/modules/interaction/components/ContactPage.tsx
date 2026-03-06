@@ -15,6 +15,7 @@ import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import contactHeroBanner from "@/assets/images/contact-hero-banner.png";
+import { useTranslation } from "react-i18next";
 
 const contactFormSchema = z.object({
   name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
@@ -29,6 +30,7 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
   
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
@@ -46,14 +48,14 @@ export default function ContactPage() {
       await apiRequest("POST", "/api/contact", data);
       setIsSuccess(true);
       toast({
-        title: "Message envoyé !",
-        description: "Nous vous répondrons dans les plus brefs délais.",
+        title: t("contact.successTitle"),
+        description: t("contact.successDesc"),
       });
       form.reset();
     } catch (error) {
       toast({
-        title: "Erreur",
-        description: "Une erreur est survenue. Veuillez réessayer.",
+        title: t("contact.errorTitle"),
+        description: t("contact.errorDesc"),
         variant: "destructive",
       });
     } finally {
@@ -83,12 +85,10 @@ export default function ContactPage() {
               data-testid="text-page-title"
               className="text-4xl sm:text-5xl font-heading font-bold mb-6"
             >
-              Contactez-moi
+              {t("contact.pageTitle")}
             </h1>
             <p className="text-lg sm:text-xl text-white/80 leading-relaxed">
-              Une question sur nos services ? Un projet à discuter ? Je suis à
-              votre écoute pour vous accompagner dans vos projets de voyage et
-              d'entrepreneuriat.
+              {t("contact.pageSubtitle")}
             </p>
           </div>
         </div>
@@ -101,7 +101,7 @@ export default function ContactPage() {
               <Card className="border-primary/20">
                 <CardContent className="p-8">
                   <h2 className="text-2xl font-heading font-bold mb-6">
-                    Envoyez-moi un message
+                    {t("contact.formTitle")}
                   </h2>
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -111,11 +111,11 @@ export default function ContactPage() {
                           name="name"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Nom complet</FormLabel>
+                              <FormLabel>{t("contact.labelName")}</FormLabel>
                               <FormControl>
                                 <Input
                                   data-testid="input-name"
-                                  placeholder="Votre nom"
+                                  placeholder={t("contact.placeholderName")}
                                   {...field}
                                 />
                               </FormControl>
@@ -128,12 +128,12 @@ export default function ContactPage() {
                           name="email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Email</FormLabel>
+                              <FormLabel>{t("contact.labelEmail")}</FormLabel>
                               <FormControl>
                                 <Input
                                   data-testid="input-email"
                                   type="email"
-                                  placeholder="votre@email.com"
+                                  placeholder={t("contact.placeholderEmail")}
                                   {...field}
                                 />
                               </FormControl>
@@ -148,11 +148,11 @@ export default function ContactPage() {
                         name="subject"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Sujet</FormLabel>
+                            <FormLabel>{t("contact.labelSubject")}</FormLabel>
                             <FormControl>
                               <Input
                                 data-testid="input-subject"
-                                placeholder="Objet de votre message"
+                                placeholder={t("contact.placeholderSubject")}
                                 {...field}
                               />
                             </FormControl>
@@ -166,11 +166,11 @@ export default function ContactPage() {
                         name="message"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Message</FormLabel>
+                            <FormLabel>{t("contact.labelMessage")}</FormLabel>
                             <FormControl>
                               <Textarea
                                 data-testid="input-message"
-                                placeholder="Décrivez votre projet ou votre demande..."
+                                placeholder={t("contact.placeholderMessage")}
                                 rows={6}
                                 className="resize-none"
                                 {...field}
@@ -191,15 +191,15 @@ export default function ContactPage() {
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Envoi en cours...
+                            {t("contact.sending")}
                           </>
                         ) : isSuccess ? (
                           <>
                             <CheckCircle className="w-4 h-4 mr-2" />
-                            Message envoyé !
+                            {t("contact.sent")}
                           </>
                         ) : (
-                          "Envoyer le message"
+                          t("contact.sendBtn")
                         )}
                       </Button>
                     </form>
@@ -212,7 +212,7 @@ export default function ContactPage() {
               <Card className="border-primary/20">
                 <CardContent className="p-6">
                   <h3 className="text-lg font-heading font-semibold mb-6">
-                    Contact direct
+                    {t("contact.directContact")}
                   </h3>
                   <div className="space-y-6">
                     <a
@@ -246,10 +246,10 @@ export default function ContactPage() {
                         </div>
                         <div>
                           <div className="font-medium text-foreground">
-                            Téléphone
+                            {t("contact.availability")}
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            Réserver d'abord
+                            {t("contact.bookFirst")}
                           </div>
                         </div>
                         <Calendar className="w-5 h-5 text-primary ml-auto" />
@@ -278,17 +278,17 @@ export default function ContactPage() {
               <Card className="border-primary/20">
                 <CardContent className="p-6">
                   <h3 className="text-lg font-heading font-semibold mb-6">
-                    Informations
+                    {t("contact.infoTitle")}
                   </h3>
                   <div className="space-y-4">
                     <div className="flex items-start gap-3">
                       <MapPin className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                       <div>
                         <div className="font-medium text-foreground mb-1">
-                          Localisation
+                          {t("contact.location")}
                         </div>
                         <div className="text-sm text-muted-foreground">
-                          France
+                          {t("contact.locationValue")}
                         </div>
                       </div>
                     </div>
@@ -296,12 +296,10 @@ export default function ContactPage() {
                       <Clock className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                       <div>
                         <div className="font-medium text-foreground mb-1">
-                          Disponibilité
+                          {t("contact.availability")}
                         </div>
-                        <div className="text-sm text-muted-foreground">
-                          Lundi - Samedi
-                          <br />
-                          9h00 - 19h00
+                        <div className="text-sm text-muted-foreground whitespace-pre-line">
+                          {t("contact.availabilityValue")}
                         </div>
                       </div>
                     </div>

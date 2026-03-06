@@ -10,12 +10,14 @@ import { MapPin, Crown } from "lucide-react";
 import { Link } from "wouter";
 import tripsHeroBanner from "@/assets/images/trips-hero-banner.png";
 import { useGoPlusCard } from "@/hooks/useGoPlusCard";
+import { useTranslation } from "react-i18next";
 
 export default function TripsPage() {
   const { data: trips = [], isLoading } = useQuery<Trip[]>({
     queryKey: ["/api/trips"],
   });
   const { isGold } = useGoPlusCard();
+  const { t } = useTranslation();
 
   return (
     <Layout>
@@ -42,12 +44,10 @@ export default function TripsPage() {
               data-testid="text-page-title"
               className="text-4xl sm:text-5xl font-heading font-bold mb-6"
             >
-              Voyages Organisés Premium
+              {t("trips.pageTitle")}
             </h1>
             <p className="text-lg sm:text-xl text-white/80 leading-relaxed">
-              Découvrez nos voyages business exclusifs. Destinations
-              prestigieuses, expériences uniques et accompagnement sur mesure
-              pour développer votre réseau international.
+              {t("trips.pageSubtitle")}
             </p>
           </div>
         </div>
@@ -70,10 +70,10 @@ export default function TripsPage() {
           ) : trips.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-lg text-muted-foreground mb-4">
-                Aucun voyage disponible pour le moment
+                {t("trips.noTrips")}
               </p>
               <p className="text-sm text-muted-foreground">
-                Revenez bientôt pour découvrir nos prochaines destinations
+                {t("trips.noTripsSub")}
               </p>
             </div>
           ) : (
@@ -97,7 +97,7 @@ export default function TripsPage() {
                       </Badge>
                       {isGold && trip.isFeatured && (
                         <Badge data-testid={`badge-gold-priority-${trip.id}`} className="bg-amber-600 text-white gap-1">
-                          <Crown className="w-3 h-3" /> Prioritaire Gold
+                          <Crown className="w-3 h-3" /> {t("trips.goldPriority")}
                         </Badge>
                       )}
                     </div>
@@ -116,7 +116,7 @@ export default function TripsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="text-sm text-muted-foreground mb-1">
-                          À partir de
+                          {t("trips.from")}
                         </div>
                         <div className="text-2xl font-heading font-bold text-primary">
                           {trip.price}€
@@ -127,7 +127,7 @@ export default function TripsPage() {
                           data-testid={`button-view-program-${trip.id}`}
                           variant="outline"
                         >
-                          Voyager Maintenant
+                          {t("trips.viewTrip")}
                         </Button>
                       </Link>
                     </div>
@@ -141,11 +141,10 @@ export default function TripsPage() {
       <section className="py-24 bg-primary text-primary-foreground">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-6">
-            Voyage sur mesure ?
+            {t("trips.ctaTitle")}
           </h2>
           <p className="text-lg mb-10 opacity-90">
-            Vous avez un projet de voyage spécifique ? Contactez-moi pour créer
-            ensemble le voyage qui correspond parfaitement à vos attentes.
+            {t("trips.ctaSubtitle")}
           </p>
           <Link href="/reservation">
             <Button
@@ -153,7 +152,7 @@ export default function TripsPage() {
               size="lg"
               variant="outline"
               className="text-lg px-8 py-6 rounded-full bg-white text-primary border-white hover:bg-white/90"
-            >Consultez Maintenant</Button>
+            >{t("trips.ctaBtn")}</Button>
           </Link>
         </div>
       </section>

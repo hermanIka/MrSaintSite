@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -54,6 +55,7 @@ export function AgencyApplicationForm({
   pendingProvider,
 }: AgencyApplicationFormProps) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState<"maishapay" | "pawapay">("maishapay");
   const [selectedCountry, setSelectedCountry] = useState<PawaPayCountry | null>(null);
@@ -268,17 +270,15 @@ export function AgencyApplicationForm({
         <div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-6">
           <CheckCircle className="w-10 h-10 text-green-600" />
         </div>
-        <h3 className="text-2xl font-heading font-bold text-foreground mb-3">Demande soumise avec succès !</h3>
-        <p className="text-muted-foreground mb-4 max-w-md mx-auto">
-          Votre demande pour le pack <strong>{packLabel}</strong> a été reçue. Notre équipe vous contactera dans les 24 à 48 heures pour démarrer votre accompagnement.
-        </p>
+        <h3 className="text-2xl font-heading font-bold text-foreground mb-3">{t("agency.successTitle")}</h3>
+        <p className="text-muted-foreground mb-4 max-w-md mx-auto">{t("agency.successDesc")}</p>
         {requestId && (
           <div className="inline-block px-4 py-2 bg-primary/10 rounded-lg border border-primary/20 mb-6">
-            <p className="text-xs text-muted-foreground mb-1">Numéro de référence</p>
+            <p className="text-xs text-muted-foreground mb-1">{t("agency.refNumber")}</p>
             <p className="text-sm font-mono font-semibold text-primary">{requestId}</p>
           </div>
         )}
-        <p className="text-sm text-muted-foreground">Conservez ce numéro pour le suivi de votre dossier.</p>
+        <p className="text-sm text-muted-foreground">{t("agency.refNote")}</p>
       </div>
     );
   }
@@ -287,9 +287,9 @@ export function AgencyApplicationForm({
     return (
       <div className="text-center py-12 px-4">
         <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-6" />
-        <h3 className="text-xl font-heading font-semibold text-foreground mb-3">En attente de confirmation</h3>
+        <h3 className="text-xl font-heading font-semibold text-foreground mb-3">{t("agency.waitingPayment")}</h3>
         <p className="text-muted-foreground max-w-sm mx-auto">
-          Vérifiez votre téléphone et confirmez le paiement Mobile Money de <strong>{packPrice}€</strong>.
+          {t("agency.waitingPaymentDesc")} <strong>{packPrice}€</strong>.
         </p>
       </div>
     );
@@ -299,14 +299,14 @@ export function AgencyApplicationForm({
     return (
       <div className="text-center py-12 px-4">
         <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-6" />
-        <p className="text-muted-foreground">Traitement de votre demande...</p>
+        <p className="text-muted-foreground">{t("agency.processingRequest")}</p>
       </div>
     );
   }
 
   const steps = [
-    { label: "Informations", icon: User },
-    { label: "Paiement", icon: Lock },
+    { label: t("agency.formStepInfo"), icon: User },
+    { label: t("agency.formStepPayment"), icon: Lock },
   ];
 
   return (
@@ -349,39 +349,39 @@ export function AgencyApplicationForm({
       {/* Step 0 — Informations personnelles */}
       {step === 0 && (
         <div className="space-y-4">
-          <h3 className="text-lg font-heading font-semibold text-foreground">Vos informations</h3>
+          <h3 className="text-lg font-heading font-semibold text-foreground">{t("agency.yourInfo")}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="firstName">Prénom <span className="text-red-500">*</span></Label>
+              <Label htmlFor="firstName">{t("agency.firstName")} <span className="text-red-500">*</span></Label>
               <Input id="firstName" data-testid="input-agency-firstName" placeholder="Jean" {...register("firstName")} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="lastName">Nom <span className="text-red-500">*</span></Label>
+              <Label htmlFor="lastName">{t("agency.lastName")} <span className="text-red-500">*</span></Label>
               <Input id="lastName" data-testid="input-agency-lastName" placeholder="Dupont" {...register("lastName")} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
+              <Label htmlFor="email">{t("agency.email")} <span className="text-red-500">*</span></Label>
               <Input id="email" data-testid="input-agency-email" type="email" placeholder="jean@exemple.com" {...register("email")} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="phone">Téléphone <span className="text-red-500">*</span></Label>
+              <Label htmlFor="phone">{t("agency.phone")} <span className="text-red-500">*</span></Label>
               <Input id="phone" data-testid="input-agency-phone" placeholder="+33 6 00 00 00 00" {...register("phone")} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="nationality">Nationalité <span className="text-red-500">*</span></Label>
+              <Label htmlFor="nationality">{t("agency.nationality")} <span className="text-red-500">*</span></Label>
               <Input id="nationality" data-testid="input-agency-nationality" placeholder="Française" {...register("nationality")} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="birthDate">Date de naissance <span className="text-red-500">*</span></Label>
+              <Label htmlFor="birthDate">{t("agency.birthDate")} <span className="text-red-500">*</span></Label>
               <Input id="birthDate" data-testid="input-agency-birthDate" type="date" {...register("birthDate")} />
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="message">Votre motivation (optionnel)</Label>
+            <Label htmlFor="message">{t("agency.motivation")}</Label>
             <Textarea
               id="message"
               data-testid="input-agency-message"
-              placeholder="Décrivez votre projet, votre expérience, vos objectifs..."
+              placeholder={t("agency.motivationPlaceholder")}
               rows={3}
               {...register("message")}
             />
@@ -393,22 +393,22 @@ export function AgencyApplicationForm({
       {step === 1 && (
         <div className="space-y-6">
           <div className="bg-muted/40 rounded-lg p-4 border border-border">
-            <h4 className="text-sm font-semibold text-foreground mb-3">Récapitulatif</h4>
+            <h4 className="text-sm font-semibold text-foreground mb-3">{t("agency.summaryTitle")}</h4>
             <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-              <span className="text-muted-foreground">Nom :</span>
+              <span className="text-muted-foreground">{t("agency.summaryName")}</span>
               <span className="font-medium">{formValues.firstName} {formValues.lastName}</span>
-              <span className="text-muted-foreground">Pack :</span>
+              <span className="text-muted-foreground">{t("agency.summaryPack")}</span>
               <span className="font-medium">{packLabel}</span>
-              <span className="text-muted-foreground">CA estimé :</span>
+              <span className="text-muted-foreground">{t("agency.summaryRevenue")}</span>
               <span className="font-medium text-green-600 dark:text-green-400">{packRevenue}</span>
-              <span className="text-muted-foreground">Accompagnement :</span>
+              <span className="text-muted-foreground">{t("agency.summarySupport")}</span>
               <span className="font-bold text-primary text-base">{packPrice}€</span>
               <span className="text-muted-foreground col-span-2 text-xs mt-1 italic">{packDescription}</span>
             </div>
           </div>
 
           <div className="space-y-3">
-            <h3 className="text-lg font-heading font-semibold text-foreground">Mode de paiement</h3>
+            <h3 className="text-lg font-heading font-semibold text-foreground">{t("agency.paymentMethod")}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 type="button"
@@ -420,8 +420,8 @@ export function AgencyApplicationForm({
               >
                 <CreditCard className="w-5 h-5 text-primary flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-sm text-foreground">Carte bancaire</p>
-                  <p className="text-xs text-muted-foreground">Visa, Mastercard, UnionPay</p>
+                  <p className="font-medium text-sm text-foreground">{t("agency.cardPayment")}</p>
+                  <p className="text-xs text-muted-foreground">{t("agency.cardPaymentDesc")}</p>
                 </div>
               </button>
               <button
@@ -434,8 +434,8 @@ export function AgencyApplicationForm({
               >
                 <Smartphone className="w-5 h-5 text-primary flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-sm text-foreground">Mobile Money</p>
-                  <p className="text-xs text-muted-foreground">MTN, Orange, M-Pesa...</p>
+                  <p className="font-medium text-sm text-foreground">{t("agency.mobileMoneyPayment")}</p>
+                  <p className="text-xs text-muted-foreground">{t("agency.mobileMoneyDesc")}</p>
                 </div>
               </button>
             </div>
@@ -444,7 +444,7 @@ export function AgencyApplicationForm({
           {paymentMethod === "pawapay" && (
             <div className="space-y-4 p-4 rounded-lg bg-muted/30 border border-border">
               <div className="space-y-1.5">
-                <Label>Pays</Label>
+                <Label>{t("agency.country")}</Label>
                 <Select
                   value={selectedCountry?.code || ""}
                   onValueChange={code => {
@@ -455,7 +455,7 @@ export function AgencyApplicationForm({
                   }}
                 >
                   <SelectTrigger data-testid="select-pawapay-country">
-                    <SelectValue placeholder="Sélectionner votre pays" />
+                    <SelectValue placeholder={t("agency.selectCountry")} />
                   </SelectTrigger>
                   <SelectContent>
                     {PAWAPAY_COUNTRIES.map(c => (
@@ -469,10 +469,10 @@ export function AgencyApplicationForm({
 
               {selectedCountry && selectedCountry.operators.length > 1 && (
                 <div className="space-y-1.5">
-                  <Label>Opérateur</Label>
+                  <Label>{t("agency.operator")}</Label>
                   <Select value={selectedCorrespondent} onValueChange={setSelectedCorrespondent}>
                     <SelectTrigger data-testid="select-pawapay-operator">
-                      <SelectValue placeholder="Choisir l'opérateur" />
+                      <SelectValue placeholder={t("agency.selectOperator")} />
                     </SelectTrigger>
                     <SelectContent>
                       {selectedCountry.operators.map(op => (
@@ -485,7 +485,7 @@ export function AgencyApplicationForm({
 
               {selectedCountry && (
                 <div className="space-y-1.5">
-                  <Label>Numéro Mobile Money</Label>
+                  <Label>{t("agency.mobileNumber")}</Label>
                   <div className="flex gap-2">
                     <div className="flex items-center px-3 bg-muted rounded-md border border-input text-sm text-muted-foreground whitespace-nowrap">
                       {selectedCountry.flag} {selectedCountry.phonePrefix}
@@ -515,7 +515,7 @@ export function AgencyApplicationForm({
             onClick={() => setStep(s => s - 1)}
             disabled={isSubmitting || isPolling}
           >
-            <ChevronLeft className="w-4 h-4 mr-1" /> Précédent
+            <ChevronLeft className="w-4 h-4 mr-1" /> {t("agency.prev")}
           </Button>
         ) : (
           <div />
@@ -527,7 +527,7 @@ export function AgencyApplicationForm({
             data-testid="button-agency-next"
             onClick={() => { if (validateStep(step)) setStep(s => s + 1); }}
           >
-            Suivant <ChevronRight className="w-4 h-4 ml-1" />
+            {t("agency.next")} <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
         ) : (
           <Button
@@ -538,9 +538,9 @@ export function AgencyApplicationForm({
             className="gap-2"
           >
             {isSubmitting ? (
-              <><Loader2 className="w-4 h-4 animate-spin" /> Traitement...</>
+              <><Loader2 className="w-4 h-4 animate-spin" /> {t("agency.processing")}</>
             ) : (
-              <><Lock className="w-4 h-4" /> Confirmer et Payer {packPrice}€</>
+              <><Lock className="w-4 h-4" /> {t("agency.confirmAndPay")} {packPrice}€</>
             )}
           </Button>
         )}

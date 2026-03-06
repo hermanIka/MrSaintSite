@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -53,6 +54,7 @@ const POLLING_TIMEOUT = 10 * 60 * 1000;
 
 export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaApplicationFormProps) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const { card, isGold } = useGoPlusCard();
   const { prices } = usePrices();
   const [step, setStep] = useState(0);
@@ -302,39 +304,33 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
           <div className="w-20 h-20 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-5">
             <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
           </div>
-          <h3 className="text-2xl font-heading font-bold text-foreground mb-3">Demande reçue avec succès !</h3>
-          <p className="text-muted-foreground leading-relaxed">
-            Votre dossier a été transmis à notre équipe et est en cours de traitement.
-          </p>
+          <h3 className="text-2xl font-heading font-bold text-foreground mb-3">{t("visa.successTitle")}</h3>
+          <p className="text-muted-foreground leading-relaxed">{t("visa.successDesc")}</p>
         </div>
 
         <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 flex gap-3 items-start">
           <Phone className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-semibold text-foreground mb-1">Un agent vous contactera très prochainement</p>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Un agent voyagiste de notre équipe entrera en contact avec vous par <strong className="text-foreground">appel téléphonique ou vidéoconférence</strong> afin d'entamer la procédure ensemble et vous guider pas à pas.
-            </p>
+            <p className="text-sm font-semibold text-foreground mb-1">{t("visa.successAgentTitle")}</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">{t("visa.successAgentDesc")}</p>
           </div>
         </div>
 
         <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-4 flex gap-3 items-start">
           <Mail className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm font-semibold text-foreground mb-1">Vérifiez votre boîte mail</p>
-            <p className="text-sm text-muted-foreground">
-              Un email de confirmation vous a été envoyé avec le récapitulatif de votre demande. Pensez à vérifier vos spams si vous ne le recevez pas dans les prochaines minutes.
-            </p>
+            <p className="text-sm font-semibold text-foreground mb-1">{t("visa.successEmailTitle")}</p>
+            <p className="text-sm text-muted-foreground">{t("visa.successEmailDesc")}</p>
           </div>
         </div>
 
         {requestId && (
           <div className="text-center">
             <div className="inline-block px-4 py-2 bg-primary/10 rounded-lg border border-primary/20">
-              <p className="text-xs text-muted-foreground mb-1">Numéro de référence dossier</p>
+              <p className="text-xs text-muted-foreground mb-1">{t("visa.refNumber")}</p>
               <p className="text-sm font-mono font-semibold text-primary">{requestId}</p>
             </div>
-            <p className="text-xs text-muted-foreground mt-2">Conservez ce numéro pour tout suivi de votre dossier.</p>
+            <p className="text-xs text-muted-foreground mt-2">{t("visa.refNote")}</p>
           </div>
         )}
       </div>
@@ -345,9 +341,9 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
     return (
       <div className="text-center py-12 px-4">
         <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-6" />
-        <h3 className="text-xl font-heading font-semibold text-foreground mb-3">En attente de confirmation</h3>
+        <h3 className="text-xl font-heading font-semibold text-foreground mb-3">{t("visa.waitingPayment")}</h3>
         <p className="text-muted-foreground max-w-sm mx-auto">
-          Vérifiez votre téléphone et confirmez le paiement Mobile Money de <strong>{prices.visa}€</strong>.
+          {t("visa.waitingPaymentDesc")} <strong>{prices.visa}€</strong>.
         </p>
         <p className="text-xs text-muted-foreground mt-4">ID : {pollingTransactionId}</p>
       </div>
@@ -358,15 +354,15 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
     return (
       <div className="text-center py-12 px-4">
         <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-6" />
-        <p className="text-muted-foreground">Traitement en cours...</p>
+        <p className="text-muted-foreground">{t("visa.processing")}</p>
       </div>
     );
   }
 
   const steps = [
-    { label: "Informations", icon: User },
-    { label: "Documents", icon: FileText },
-    { label: "Paiement", icon: Lock },
+    { label: t("visa.formStepInfo"), icon: User },
+    { label: t("visa.formStepDocs"), icon: FileText },
+    { label: t("visa.formStepPayment"), icon: Lock },
   ];
 
   return (
@@ -411,51 +407,51 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
       {/* Step 0 — Informations personnelles */}
       {step === 0 && (
         <div className="space-y-4">
-          <h3 className="text-lg font-heading font-semibold text-foreground">Informations personnelles</h3>
+          <h3 className="text-lg font-heading font-semibold text-foreground">{t("visa.personalInfo")}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="firstName">Prénom <span className="text-red-500">*</span></Label>
+              <Label htmlFor="firstName">{t("visa.firstName")} <span className="text-red-500">*</span></Label>
               <Input id="firstName" data-testid="input-visa-firstName" placeholder="Jean" {...register("firstName")} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="lastName">Nom <span className="text-red-500">*</span></Label>
+              <Label htmlFor="lastName">{t("visa.lastName")} <span className="text-red-500">*</span></Label>
               <Input id="lastName" data-testid="input-visa-lastName" placeholder="Dupont" {...register("lastName")} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email <span className="text-red-500">*</span></Label>
+              <Label htmlFor="email">{t("visa.email")} <span className="text-red-500">*</span></Label>
               <Input id="email" data-testid="input-visa-email" type="email" placeholder="jean@exemple.com" {...register("email")} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="phone">Téléphone <span className="text-red-500">*</span></Label>
+              <Label htmlFor="phone">{t("visa.phone")} <span className="text-red-500">*</span></Label>
               <Input id="phone" data-testid="input-visa-phone" placeholder="+33 6 00 00 00 00" {...register("phone")} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="nationality">Nationalité <span className="text-red-500">*</span></Label>
+              <Label htmlFor="nationality">{t("visa.nationality")} <span className="text-red-500">*</span></Label>
               <Input id="nationality" data-testid="input-visa-nationality" placeholder="Française" {...register("nationality")} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="birthDate">Date de naissance <span className="text-red-500">*</span></Label>
+              <Label htmlFor="birthDate">{t("visa.birthDate")} <span className="text-red-500">*</span></Label>
               <Input id="birthDate" data-testid="input-visa-birthDate" type="date" {...register("birthDate")} />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label>Type de visa <span className="text-red-500">*</span></Label>
+              <Label>{t("visa.visaType")} <span className="text-red-500">*</span></Label>
               <Select value={formValues.visaType} onValueChange={v => setValue("visaType", v)}>
                 <SelectTrigger data-testid="select-visa-type">
-                  <SelectValue placeholder="Sélectionner un type" />
+                  <SelectValue placeholder={t("visa.selectVisaType")} />
                 </SelectTrigger>
                 <SelectContent>
-                  {VISA_TYPES.map(t => (
-                    <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                  {VISA_TYPES.map(vt => (
+                    <SelectItem key={vt.value} value={vt.value}>{vt.label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="destination">Destination <span className="text-red-500">*</span></Label>
-              <Input id="destination" data-testid="input-visa-destination" placeholder="Dubaï, Canada, États-Unis..." {...register("destination")} />
+              <Label htmlFor="destination">{t("visa.destination")} <span className="text-red-500">*</span></Label>
+              <Input id="destination" data-testid="input-visa-destination" placeholder={t("visa.destinationPlaceholder")} {...register("destination")} />
             </div>
           </div>
         </div>
@@ -464,12 +460,12 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
       {/* Step 1 — Documents */}
       {step === 1 && (
         <div className="space-y-6">
-          <h3 className="text-lg font-heading font-semibold text-foreground">Documents requis</h3>
-          <p className="text-sm text-muted-foreground">Formats acceptés : PDF, JPG, PNG (max 10 Mo par fichier)</p>
+          <h3 className="text-lg font-heading font-semibold text-foreground">{t("visa.docsRequired")}</h3>
+          <p className="text-sm text-muted-foreground">{t("visa.docsFormats")}</p>
 
           {[
-            { field: "passportUrl" as const, label: "Copie du passeport", required: true, hint: "Pages d'identité + tampons récents" },
-            { field: "photoUrl" as const, label: "Photo d'identité récente", required: true, hint: "Fond blanc, moins de 6 mois" },
+            { field: "passportUrl" as const, label: t("visa.docPassport"), required: true, hint: t("visa.docPassportHint") },
+            { field: "photoUrl" as const, label: t("visa.docPhoto"), required: true, hint: t("visa.docPhotoHint") },
           ].map(({ field, label, required, hint }) => (
             <div key={field} className="space-y-2">
               <Label>
@@ -493,10 +489,10 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
                     <Upload className="w-4 h-4" />
                   )}
                   {uploadingField === field
-                    ? "Envoi en cours..."
+                    ? t("visa.uploading")
                     : formValues[field]
-                    ? uploadedFiles[field] || "Fichier téléchargé"
-                    : "Choisir un fichier"}
+                    ? uploadedFiles[field] || t("visa.uploaded")
+                    : t("visa.chooseFile")}
                 </label>
                 <input
                   id={`upload-${field}`}
@@ -517,19 +513,19 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
       {step === 2 && (
         <div className="space-y-6">
           <div className="bg-muted/40 rounded-lg p-4 border border-border">
-            <h4 className="text-sm font-semibold text-foreground mb-2">Récapitulatif de la demande</h4>
+            <h4 className="text-sm font-semibold text-foreground mb-2">{t("visa.summaryTitle")}</h4>
             <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-              <span className="text-muted-foreground">Nom :</span>
+              <span className="text-muted-foreground">{t("visa.summaryName")}</span>
               <span className="font-medium">{formValues.firstName} {formValues.lastName}</span>
-              <span className="text-muted-foreground">Type de visa :</span>
-              <span className="font-medium">{VISA_TYPES.find(t => t.value === formValues.visaType)?.label || formValues.visaType}</span>
-              <span className="text-muted-foreground">Destination :</span>
+              <span className="text-muted-foreground">{t("visa.summaryVisaType")}</span>
+              <span className="font-medium">{VISA_TYPES.find(vt => vt.value === formValues.visaType)?.label || formValues.visaType}</span>
+              <span className="text-muted-foreground">{t("visa.summaryDestination")}</span>
               <span className="font-medium">{formValues.destination}</span>
-              <span className="text-muted-foreground">Montant :</span>
+              <span className="text-muted-foreground">{t("visa.summaryAmount")}</span>
               {goldEmailMatch ? (
                 <span className="font-bold text-base flex items-center gap-2">
                   <span className="line-through text-muted-foreground">{prices.visa}€</span>
-                  <span className="text-green-600 dark:text-green-400">GRATUIT</span>
+                  <span className="text-green-600 dark:text-green-400">{t("visa.free")}</span>
                   <Crown className="w-4 h-4 text-primary" />
                 </span>
               ) : (
@@ -548,7 +544,7 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
             </div>
           ) : (
             <div className="space-y-3">
-              <h3 className="text-lg font-heading font-semibold text-foreground">Mode de paiement</h3>
+              <h3 className="text-lg font-heading font-semibold text-foreground">{t("visa.paymentMethod")}</h3>
               {isGold && (
                 <p className="text-xs text-amber-600 dark:text-amber-400">
                   Entrez l'email associé à votre carte GO+ Gold à l'étape 1 pour activer la gratuité.
@@ -567,8 +563,8 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
                 >
                   <CreditCard className="w-5 h-5 text-primary flex-shrink-0" />
                   <div>
-                    <p className="font-medium text-sm text-foreground">Carte bancaire</p>
-                    <p className="text-xs text-muted-foreground">Visa, Mastercard, UnionPay</p>
+                    <p className="font-medium text-sm text-foreground">{t("visa.cardPayment")}</p>
+                    <p className="text-xs text-muted-foreground">{t("visa.cardPaymentDesc")}</p>
                   </div>
                 </button>
                 <button
@@ -583,8 +579,8 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
                 >
                   <Smartphone className="w-5 h-5 text-primary flex-shrink-0" />
                   <div>
-                    <p className="font-medium text-sm text-foreground">Mobile Money</p>
-                    <p className="text-xs text-muted-foreground">MTN, Orange, M-Pesa...</p>
+                    <p className="font-medium text-sm text-foreground">{t("visa.mobileMoneyPayment")}</p>
+                    <p className="text-xs text-muted-foreground">{t("visa.mobileMoneyDesc")}</p>
                   </div>
                 </button>
               </div>
@@ -594,7 +590,7 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
           {paymentMethod === "pawapay" && !goldEmailMatch && (
             <div className="space-y-4 p-4 rounded-lg bg-muted/30 border border-border">
               <div className="space-y-1.5">
-                <Label>Pays</Label>
+                <Label>{t("visa.country")}</Label>
                 <Select
                   value={selectedCountry?.code || ""}
                   onValueChange={code => {
@@ -605,7 +601,7 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
                   }}
                 >
                   <SelectTrigger data-testid="select-pawapay-country">
-                    <SelectValue placeholder="Sélectionner votre pays" />
+                    <SelectValue placeholder={t("visa.selectCountry")} />
                   </SelectTrigger>
                   <SelectContent>
                     {PAWAPAY_COUNTRIES.map(c => (
@@ -619,10 +615,10 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
 
               {selectedCountry && selectedCountry.operators.length > 1 && (
                 <div className="space-y-1.5">
-                  <Label>Opérateur</Label>
+                  <Label>{t("visa.operator")}</Label>
                   <Select value={selectedCorrespondent} onValueChange={setSelectedCorrespondent}>
                     <SelectTrigger data-testid="select-pawapay-operator">
-                      <SelectValue placeholder="Choisir l'opérateur" />
+                      <SelectValue placeholder={t("visa.selectOperator")} />
                     </SelectTrigger>
                     <SelectContent>
                       {selectedCountry.operators.map(op => (
@@ -635,7 +631,7 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
 
               {selectedCountry && (
                 <div className="space-y-1.5">
-                  <Label>Numéro Mobile Money</Label>
+                  <Label>{t("visa.mobileNumber")}</Label>
                   <div className="flex gap-2">
                     <div className="flex items-center px-3 bg-muted rounded-md border border-input text-sm text-muted-foreground whitespace-nowrap">
                       {selectedCountry.flag} {selectedCountry.phonePrefix}
@@ -665,7 +661,7 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
             onClick={() => setStep(s => s - 1)}
             disabled={isSubmitting || isPolling}
           >
-            <ChevronLeft className="w-4 h-4 mr-1" /> Précédent
+            <ChevronLeft className="w-4 h-4 mr-1" /> {t("visa.prev")}
           </Button>
         ) : (
           <div />
@@ -679,7 +675,7 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
               if (validateStep(step)) setStep(s => s + 1);
             }}
           >
-            Suivant <ChevronRight className="w-4 h-4 ml-1" />
+            {t("visa.next")} <ChevronRight className="w-4 h-4 ml-1" />
           </Button>
         ) : goldEmailMatch ? (
           <Button
@@ -690,9 +686,9 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
             className="gap-2"
           >
             {isSubmitting ? (
-              <><Loader2 className="w-4 h-4 animate-spin" /> Traitement...</>
+              <><Loader2 className="w-4 h-4 animate-spin" /> {t("visa.processing")}</>
             ) : (
-              <><Crown className="w-4 h-4" /> Soumettre gratuitement (GO+ Gold)</>
+              <><Crown className="w-4 h-4" /> {t("visa.submitFreeGold")}</>
             )}
           </Button>
         ) : (
@@ -704,9 +700,9 @@ export function VisaApplicationForm({ pendingPaymentId, pendingProvider }: VisaA
             className="gap-2"
           >
             {isSubmitting ? (
-              <><Loader2 className="w-4 h-4 animate-spin" /> Traitement...</>
+              <><Loader2 className="w-4 h-4 animate-spin" /> {t("visa.processing")}</>
             ) : (
-              <><Lock className="w-4 h-4" /> Confirmer et Payer {prices.visa}€</>
+              <><Lock className="w-4 h-4" /> {t("visa.confirmAndPay")} {prices.visa}€</>
             )}
           </Button>
         )}

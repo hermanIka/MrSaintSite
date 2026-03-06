@@ -3,10 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  Clock, 
+import {
+  ChevronLeft,
+  ChevronRight,
+  Clock,
   Calendar as CalendarIcon,
   CheckCircle,
   Globe,
@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useTranslation } from "react-i18next";
 
 interface TimeSlot {
   time: string;
@@ -71,11 +72,12 @@ function getShortTimezone(tz: string): string {
   }
 }
 
-export default function CalendarBooking({ 
-  serviceType, 
+export default function CalendarBooking({
+  serviceType,
   serviceName,
-  onSlotSelected 
+  onSlotSelected
 }: CalendarBookingProps) {
+  const { t } = useTranslation();
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
@@ -378,7 +380,7 @@ export default function CalendarBooking({
               onValueChange={handleEventTypeChange}
             >
               <SelectTrigger data-testid="select-event-type">
-                <SelectValue placeholder="Choisir un type de rendez-vous" />
+                <SelectValue placeholder={t("calendar.selectEventType")} />
               </SelectTrigger>
               <SelectContent>
                 {eventTypes.map((et) => (
@@ -476,9 +478,9 @@ export default function CalendarBooking({
         <Card data-testid="card-time-slots">
           <CardHeader className="pb-2">
             <CardTitle className="text-lg font-heading">
-              {selectedDate 
+              {selectedDate
                 ? `Créneaux du ${formatSelectedDate()}`
-                : "Sélectionnez une date"
+                : t("calendar.selectDate")
               }
             </CardTitle>
           </CardHeader>
@@ -513,8 +515,8 @@ export default function CalendarBooking({
                             <p><span className="text-muted-foreground">Durée:</span> {eventType?.duration || 30} minutes</p>
                           </div>
                         </div>
-                        <Button 
-                          className="w-full gap-2" 
+                        <Button
+                          className="w-full gap-2"
                           size="lg"
                           onClick={handleConfirmBooking}
                           data-testid="button-confirm-booking"
@@ -522,12 +524,12 @@ export default function CalendarBooking({
                           {onSlotSelected ? (
                             <>
                               <CreditCard className="w-4 h-4" />
-                              Valider et passer au paiement
+                              {t("reservation.payNow")}
                             </>
                           ) : (
                             <>
                               <CalendarIcon className="w-4 h-4" />
-                              Confirmer et réserver
+                              {t("calendar.bookBtn")}
                             </>
                           )}
                         </Button>
@@ -537,15 +539,15 @@ export default function CalendarBooking({
                 ) : (
                   <div className="h-48 flex flex-col items-center justify-center text-center text-muted-foreground">
                     <Clock className="w-12 h-12 mb-3 opacity-50" />
-                    <p>Aucun créneau disponible pour cette date</p>
-                    <p className="text-sm mt-2">Essayez une autre date</p>
+                    <p>{t("calendar.noSlots")}</p>
+                    <p className="text-sm mt-2">{t("calendar.noSlotsDesc")}</p>
                   </div>
                 )}
               </>
             ) : (
               <div className="h-48 flex flex-col items-center justify-center text-center text-muted-foreground">
                 <CalendarIcon className="w-12 h-12 mb-3 opacity-50" />
-                <p>Veuillez d'abord sélectionner une date dans le calendrier</p>
+                <p>{t("calendar.selectDate")}</p>
               </div>
             )}
           </CardContent>

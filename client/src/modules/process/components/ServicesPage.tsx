@@ -16,6 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Service } from "@shared/schema";
 import servicesHeroBanner from "@/assets/images/services-hero-banner.png";
+import { useTranslation } from "react-i18next";
 
 const iconMap: Record<string, LucideIcon> = {
   FileText,
@@ -50,6 +51,7 @@ export default function ServicesPage() {
   const { data: services, isLoading, isError } = useQuery<Service[]>({
     queryKey: ["/api/services"],
   });
+  const { t } = useTranslation();
 
   return (
     <Layout>
@@ -72,13 +74,13 @@ export default function ServicesPage() {
             data-testid="text-services-title"
             className="text-4xl sm:text-5xl lg:text-6xl font-heading font-bold mb-6"
           >
-            Nos Services
+            {t("services.pageTitle")}
           </h1>
           <p
             data-testid="text-services-subtitle"
             className="text-xl text-white/80 max-w-2xl mx-auto"
           >
-            Des solutions complètes pour tous vos projets de voyage et d'entrepreneuriat
+            {t("services.pageSubtitle")}
           </p>
         </div>
       </section>
@@ -92,7 +94,7 @@ export default function ServicesPage() {
               </>
             ) : isError ? (
               <div className="w-full text-center py-12 text-muted-foreground">
-                Une erreur est survenue lors du chargement des services. Veuillez réessayer.
+                {t("services.errorLoading")}
               </div>
             ) : services && services.length > 0 ? (
               services.filter(s => s.slug !== "voyage" && s.slug !== "consultation").map((service) => {
@@ -139,7 +141,7 @@ export default function ServicesPage() {
               })
             ) : (
               <div className="w-full text-center py-12 text-muted-foreground">
-                Aucun service disponible pour le moment.
+                {t("services.noServices")}
               </div>
             )}
           </div>
@@ -148,11 +150,10 @@ export default function ServicesPage() {
       <section className="py-24 bg-primary text-primary-foreground">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-heading font-bold mb-6">
-            Besoin d'un service personnalisé ?
+            {t("services.ctaTitle")}
           </h2>
           <p className="text-lg mb-10 opacity-90">
-            Contactez-nous pour discuter de vos besoins spécifiques. 
-            Nous créons des solutions sur mesure pour chaque client.
+            {t("services.ctaSubtitle")}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center flex-wrap">
             <Link href="/reservation">
@@ -160,7 +161,7 @@ export default function ServicesPage() {
                 data-testid="button-reserve-now"
                 size="lg"
                 variant="secondary"
-              >Consultez maintenant</Button>
+              >{t("services.ctaBtn")}</Button>
             </Link>
           </div>
         </div>
