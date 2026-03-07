@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
+import { useTranslation } from "react-i18next";
 import type { Trip } from "@shared/schema";
 import { MapPin, Calendar, ArrowRight, Clock } from "lucide-react";
+import { formatTripDates } from "@/lib/tripUtils";
 
 const MAX_FEATURED_TRIPS = 4;
 
-function TripCard({ trip, index }: { trip: Trip; index: number }) {
+function TripCard({ trip, index, lang }: { trip: Trip; index: number; lang: string }) {
   return (
     <Link href={`/voyages/${trip.id}`}>
       <div
@@ -38,7 +40,7 @@ function TripCard({ trip, index }: { trip: Trip; index: number }) {
           <div className="absolute top-3 left-3">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-sm text-white text-xs font-medium border border-white/10">
               <Clock className="w-3 h-3" />
-              {trip.duration || "7 jours"}
+              {(trip as any).duration || "7 jours"}
             </span>
           </div>
 
@@ -66,7 +68,7 @@ function TripCard({ trip, index }: { trip: Trip; index: number }) {
 
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
             <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
-            <span>{trip.date}</span>
+            <span>{formatTripDates(trip.startDate, trip.endDate, lang)}</span>
           </div>
 
           <p className="text-sm text-muted-foreground line-clamp-2 mb-4 leading-relaxed">
@@ -86,6 +88,7 @@ function TripCard({ trip, index }: { trip: Trip; index: number }) {
 }
 
 export function FeaturedTripsCarousel() {
+  const { i18n } = useTranslation();
   const { data: allFeaturedTrips = [], isLoading } = useQuery<Trip[]>({
     queryKey: ["/api/trips/featured"],
   });
@@ -153,7 +156,7 @@ export function FeaturedTripsCarousel() {
           style={{ width: `${duplicatedTrips.length * cardWidth}px` }}
         >
           {duplicatedTrips.map((trip, index) => (
-            <TripCard key={`${trip.id}-${index}`} trip={trip} index={index} />
+            <TripCard key={`${trip.id}-${index}`} trip={trip} index={index} lang={i18n.language} />
           ))}
         </div>
 

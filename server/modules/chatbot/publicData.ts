@@ -74,7 +74,8 @@ export async function getPublicDataForChatbot(): Promise<PublicData> {
     db.select({
       title: trips.title,
       destination: trips.destination,
-      date: trips.date,
+      startDate: trips.startDate,
+      endDate: trips.endDate,
       price: trips.price,
       description: trips.description,
       included: trips.included,
@@ -137,7 +138,7 @@ export function formatPublicDataForPrompt(data: PublicData): string {
   for (const trip of data.trips) {
     context += `### ${trip.title}\n`;
     context += `Destination: ${trip.destination}\n`;
-    context += `Date: ${trip.date}\n`;
+    context += `Dates: ${trip.startDate} → ${trip.endDate}\n`;
     context += `Prix: ${trip.price}€\n`;
     context += `Description: ${trip.description}\n`;
     context += `Inclus: ${trip.included.join(', ')}\n\n`;

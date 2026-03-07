@@ -24,7 +24,8 @@ import { useToast } from "@/hooks/use-toast";
 interface TripFormData {
   title: string;
   destination: string;
-  date: string;
+  startDate: string;
+  endDate: string;
   price: number;
   description: string;
   imageUrl: string;
@@ -37,7 +38,8 @@ interface TripFormData {
 const emptyFormData: TripFormData = {
   title: "",
   destination: "",
-  date: "",
+  startDate: "",
+  endDate: "",
   price: 0,
   description: "",
   imageUrl: "",
@@ -225,7 +227,8 @@ export function AdminTripsPage() {
     setFormData({
       title: trip.title,
       destination: trip.destination,
-      date: trip.date,
+      startDate: trip.startDate,
+      endDate: trip.endDate,
       price: trip.price,
       description: trip.description,
       imageUrl: trip.imageUrl,
@@ -371,13 +374,17 @@ export function AdminTripsPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="date">Date</Label>
-                    <Input id="date" value={formData.date} onChange={(e) => setFormData((p) => ({ ...p, date: e.target.value }))} placeholder="15-25 Mars 2025" required data-testid="input-trip-date" />
+                    <Label htmlFor="startDate">Date de début</Label>
+                    <Input id="startDate" type="date" value={formData.startDate} onChange={(e) => setFormData((p) => ({ ...p, startDate: e.target.value }))} required data-testid="input-trip-start-date" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="price">Prix (€)</Label>
-                    <Input id="price" type="number" value={formData.price} onChange={(e) => setFormData((p) => ({ ...p, price: Number(e.target.value) }))} required data-testid="input-trip-price" />
+                    <Label htmlFor="endDate">Date de fin</Label>
+                    <Input id="endDate" type="date" value={formData.endDate} onChange={(e) => setFormData((p) => ({ ...p, endDate: e.target.value }))} required data-testid="input-trip-end-date" />
                   </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="price">Prix (€)</Label>
+                  <Input id="price" type="number" value={formData.price} onChange={(e) => setFormData((p) => ({ ...p, price: Number(e.target.value) }))} required data-testid="input-trip-price" />
                 </div>
 
                 <div className="space-y-2">
@@ -608,7 +615,7 @@ export function AdminTripsPage() {
                         </Badge>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground">{trip.destination} • {trip.date}</p>
+                    <p className="text-sm text-muted-foreground">{trip.destination} • {trip.startDate} → {trip.endDate}</p>
                     <p className="text-primary font-bold">{trip.price}€</p>
                   </div>
                   <div className="flex items-center gap-4">

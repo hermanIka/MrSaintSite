@@ -11,13 +11,14 @@ import { Link } from "wouter";
 import tripsHeroBanner from "@/assets/images/trips-hero-banner.png";
 import { useGoPlusCard } from "@/hooks/useGoPlusCard";
 import { useTranslation } from "react-i18next";
+import { formatTripDates } from "@/lib/tripUtils";
 
 export default function TripsPage() {
   const { data: trips = [], isLoading } = useQuery<Trip[]>({
     queryKey: ["/api/trips"],
   });
   const { isGold } = useGoPlusCard();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   return (
     <Layout>
@@ -93,7 +94,7 @@ export default function TripsPage() {
                     />
                     <div className="absolute top-4 right-4 flex flex-col gap-2 items-end">
                       <Badge className="bg-primary text-primary-foreground">
-                        {trip.date}
+                        {formatTripDates(trip.startDate, trip.endDate, i18n.language)}
                       </Badge>
                       {isGold && trip.isFeatured && (
                         <Badge data-testid={`badge-gold-priority-${trip.id}`} className="bg-amber-600 text-white gap-1">

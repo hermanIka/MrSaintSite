@@ -11,6 +11,7 @@ import { useRoute, Link, useSearch } from "wouter";
 import { Calendar, MapPin, CheckCircle2, XCircle, Images } from "lucide-react";
 import { TripReservationModal } from "@/modules/transaction/components/TripReservationModal";
 import { useTranslation } from "react-i18next";
+import { formatTripDates } from "@/lib/tripUtils";
 
 export default function TripDetailPage() {
   const [, params] = useRoute("/voyages/:id");
@@ -19,7 +20,7 @@ export default function TripDetailPage() {
   const searchParams = new URLSearchParams(searchString);
   const pendingPaymentId = searchParams.get("payment") === "success" ? (searchParams.get("id") || undefined) : undefined;
   const pendingProvider = searchParams.get("provider") || undefined;
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const [modalOpen, setModalOpen] = useState(!!pendingPaymentId);
 
@@ -80,7 +81,7 @@ export default function TripDetailPage() {
           <div className="absolute bottom-8 left-0 right-0">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <Badge className="bg-primary text-primary-foreground mb-4">
-                {trip.date}
+                {formatTripDates(trip.startDate, trip.endDate, i18n.language)}
               </Badge>
               <h1
                 data-testid="text-trip-title"
@@ -218,7 +219,7 @@ export default function TripDetailPage() {
                   <div className="space-y-3 mb-8">
                     <div className="flex items-center gap-3 text-sm">
                       <Calendar className="w-5 h-5 text-primary" />
-                      <span className="text-muted-foreground">{trip.date}</span>
+                      <span className="text-muted-foreground">{formatTripDates(trip.startDate, trip.endDate, i18n.language)}</span>
                     </div>
                     <div className="flex items-center gap-3 text-sm">
                       <MapPin className="w-5 h-5 text-primary" />

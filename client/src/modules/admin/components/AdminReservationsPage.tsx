@@ -254,7 +254,7 @@ export function AdminReservationsPage() {
                   <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Voyage</p>
                   <p className="font-medium text-foreground">{selected.trip?.title || "—"}</p>
                   <p className="text-muted-foreground">{selected.trip?.destination}</p>
-                  <p className="text-muted-foreground">{selected.trip?.date}</p>
+                  <p className="text-muted-foreground">{selected.trip?.startDate && selected.trip?.endDate ? `${selected.trip.startDate} → ${selected.trip.endDate}` : selected.trip?.startDate || "—"}</p>
                 </div>
               </div>
 

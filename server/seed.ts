@@ -44,7 +44,8 @@ async function seed() {
     {
       title: "Business Chine - Mars 2025",
       destination: "Shanghai & Beijing",
-      date: "15-25 Mars 2025",
+      startDate: "2025-03-15",
+      endDate: "2025-03-25",
       price: 2800,
       description:
         "Voyage business exclusif en Chine. Découvrez les opportunités d'import-export, visitez les plus grands marchés et développez votre réseau avec des entrepreneurs chinois. Programme intensif de 10 jours avec interprète professionnel.",
@@ -80,7 +81,8 @@ async function seed() {
     {
       title: "Dubaï Business Retreat",
       destination: "Dubaï, UAE",
-      date: "10-17 Avril 2025",
+      startDate: "2025-04-10",
+      endDate: "2025-04-17",
       price: 3200,
       description:
         "Séjour business premium à Dubaï. Explorez le hub entrepreneurial du Moyen-Orient, participez à des conférences exclusives, rencontrez des investisseurs et découvrez les opportunités d'affaires dans l'une des villes les plus dynamiques du monde.",
@@ -114,7 +116,8 @@ async function seed() {
     {
       title: "Istanbul Import Trip",
       destination: "Istanbul, Turquie",
-      date: "5-12 Mai 2025",
+      startDate: "2025-05-05",
+      endDate: "2025-05-12",
       price: 1900,
       description:
         "Voyage d'affaires à Istanbul pour découvrir les opportunités d'import textile, maroquinerie et décoration. Visitez les plus grands grossistes, négociez directement avec les fabricants et repartez avec vos premiers contrats.",

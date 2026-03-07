@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import type { Trip } from "@shared/schema";
 import { useTranslation } from "react-i18next";
+import { formatTripDates } from "@/lib/tripUtils";
 
 interface TripReservationModalProps {
   trip: Trip;
@@ -57,7 +58,7 @@ export function TripReservationModal({
   pendingProvider,
 }: TripReservationModalProps) {
   const { toast } = useToast();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [step, setStep] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState<"maishapay" | "pawapay">("maishapay");
   const [selectedCountry, setSelectedCountry] = useState<PawaPayCountry | null>(null);
@@ -264,7 +265,7 @@ export function TripReservationModal({
             <Star className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-foreground">{trip.title}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">{trip.destination} · {trip.date}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{trip.destination} · {formatTripDates(trip.startDate, trip.endDate, i18n.language)}</p>
             </div>
             <span className="text-lg font-bold text-primary flex-shrink-0">{trip.price}€<span className="text-xs font-normal text-muted-foreground">/pers.</span></span>
           </div>
