@@ -99,8 +99,8 @@ export default function AboutPage() {
                 <ul className="space-y-2">
                   <li><strong className="text-foreground">Go Fly</strong> : {t("about.goFlyDesc")}</li>
                   <li><strong className="text-foreground">Go Send</strong> : {t("about.goSendDesc")}</li>
-                  <li><strong className="text-foreground">Go House</strong> : {t("about.goHouseDesc")}</li>
                 </ul>
+                <p>{t("about.goGroupDesc")}</p>
               </div>
               <div className="flex flex-wrap gap-4 mt-8">
                 <Link href="/services">
