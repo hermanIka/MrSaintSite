@@ -273,7 +273,7 @@ const fr = {
     pay: "Payer",
     totalTrip: "Total voyage",
     depositDueNow: "Acompte dû maintenant",
-    remainingBalance: "Solde restant après démarches",
+    remainingBalance: "Solde restant après procédure",
   },
   chat: {
     title: "Assistant Mr Saint",
