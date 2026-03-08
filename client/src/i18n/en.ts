@@ -273,7 +273,7 @@ const en = {
     pay: "Pay",
     totalTrip: "Trip total",
     depositDueNow: "Deposit due now",
-    remainingBalance: "Remaining balance after trip",
+    remainingBalance: "Remaining balance after process",
   },
   chat: {
     title: "Mr Saint Assistant",
