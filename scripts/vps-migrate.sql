@@ -63,7 +63,35 @@ BEGIN
   END IF;
 END $$;
 
--- 4. Vérification finale
-SELECT id, title, start_date, end_date FROM trips LIMIT 10;
+-- 4. Ajouter has_deposit si absent
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'trips' AND column_name = 'has_deposit'
+  ) THEN
+    ALTER TABLE trips ADD COLUMN has_deposit BOOLEAN NOT NULL DEFAULT false;
+    RAISE NOTICE 'Colonne has_deposit ajoutée.';
+  ELSE
+    RAISE NOTICE 'Colonne has_deposit déjà présente — ignorée.';
+  END IF;
+END $$;
+
+-- 5. Ajouter deposit_amount si absent
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'trips' AND column_name = 'deposit_amount'
+  ) THEN
+    ALTER TABLE trips ADD COLUMN deposit_amount INTEGER NOT NULL DEFAULT 0;
+    RAISE NOTICE 'Colonne deposit_amount ajoutée.';
+  ELSE
+    RAISE NOTICE 'Colonne deposit_amount déjà présente — ignorée.';
+  END IF;
+END $$;
+
+-- 6. Vérification finale
+SELECT id, title, start_date, end_date, has_deposit, deposit_amount FROM trips LIMIT 10;
 
 COMMIT;

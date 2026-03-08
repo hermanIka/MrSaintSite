@@ -45,13 +45,16 @@ export function registerReservationRoutes(app: Express): void {
       }
 
       const totalPrice = trip.price * numberOfPeople;
+      const paymentAmount = (trip.hasDeposit && trip.depositAmount > 0)
+        ? trip.depositAmount * numberOfPeople
+        : totalPrice;
       const client = await findOrCreateClient(email, fullName, phone);
       const reservationId = await createReservation({ clientId: client.id, tripId, numberOfPeople, totalPrice, travelDate, notes });
 
       const appUrl = process.env.APP_URL || "http://localhost:5000";
       const paymentResult = await paymentService.initPayment({
         provider,
-        amount: totalPrice,
+        amount: paymentAmount,
         currency: "EUR",
         serviceId: `trip_${tripId}`,
         serviceName: `Voyage — ${trip.title}`,
@@ -83,7 +86,7 @@ export function registerReservationRoutes(app: Express): void {
         redirectUrl: paymentResult.redirectUrl,
         checkoutUrl: paymentResult.checkoutUrl,
         externalId: paymentResult.externalId,
-        amount: totalPrice,
+        amount: paymentAmount,
       });
     } catch (err) {
       console.error("[Reservation] Error:", err);

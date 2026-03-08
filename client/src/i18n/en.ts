@@ -133,6 +133,8 @@ const en = {
     noTrips: "No trips available at the moment",
     noTripsSub: "Come back soon to discover our upcoming destinations",
     goldPriority: "Gold Priority",
+    depositRequired: "Deposit required",
+    depositFrom: "Deposit: {{amount}}€/pers.",
     ctaTitle: "Custom trip?",
     ctaSubtitle: "Have a specific travel project? Contact me to create together the trip that perfectly matches your expectations.",
     ctaBtn: "Consult Now",
@@ -269,6 +271,9 @@ const en = {
     mobileNumber: "Mobile Money number",
     processing: "Processing...",
     pay: "Pay",
+    totalTrip: "Trip total",
+    depositDueNow: "Deposit due now",
+    remainingBalance: "Remaining balance after trip",
   },
   chat: {
     title: "Mr Saint Assistant",

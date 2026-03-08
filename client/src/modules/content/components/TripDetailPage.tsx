@@ -214,6 +214,16 @@ export default function TripDetailPage() {
                     <div className="text-sm text-muted-foreground">
                       {t("tripDetail.perPerson")}
                     </div>
+                    {trip.hasDeposit && trip.depositAmount > 0 && (
+                      <div className="mt-3 p-2.5 rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                        <p className="text-xs font-semibold text-amber-700 dark:text-amber-400">
+                          {t("trips.depositRequired")}
+                        </p>
+                        <p className="text-xs text-amber-600 dark:text-amber-500 mt-0.5">
+                          {t("trips.depositFrom", { amount: trip.depositAmount })}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-3 mb-8">

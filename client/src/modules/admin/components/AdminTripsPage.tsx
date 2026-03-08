@@ -33,6 +33,8 @@ interface TripFormData {
   included: string[];
   notIncluded: string[];
   isFeatured: boolean;
+  hasDeposit: boolean;
+  depositAmount: number;
 }
 
 const emptyFormData: TripFormData = {
@@ -47,6 +49,8 @@ const emptyFormData: TripFormData = {
   included: [""],
   notIncluded: [""],
   isFeatured: false,
+  hasDeposit: false,
+  depositAmount: 0,
 };
 
 export function AdminTripsPage() {
@@ -236,6 +240,8 @@ export function AdminTripsPage() {
       included: trip.included.length > 0 ? trip.included : [""],
       notIncluded: trip.notIncluded.length > 0 ? trip.notIncluded : [""],
       isFeatured: trip.isFeatured,
+      hasDeposit: trip.hasDeposit,
+      depositAmount: trip.depositAmount,
     });
     setImagePreview(trip.imageUrl);
     setIsDialogOpen(true);
@@ -385,6 +391,37 @@ export function AdminTripsPage() {
                 <div className="space-y-2">
                   <Label htmlFor="price">Prix (€)</Label>
                   <Input id="price" type="number" value={formData.price} onChange={(e) => setFormData((p) => ({ ...p, price: Number(e.target.value) }))} required data-testid="input-trip-price" />
+                </div>
+
+                <div className="space-y-3 p-3 rounded-lg border border-border bg-muted/30">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label htmlFor="hasDeposit" className="font-medium">Acompte requis</Label>
+                      <p className="text-xs text-muted-foreground mt-0.5">Le client paie un acompte à la réservation, solde à régler ultérieurement</p>
+                    </div>
+                    <Switch
+                      id="hasDeposit"
+                      data-testid="switch-trip-has-deposit"
+                      checked={formData.hasDeposit}
+                      onCheckedChange={(checked) => setFormData((p) => ({ ...p, hasDeposit: checked, depositAmount: checked ? p.depositAmount : 0 }))}
+                    />
+                  </div>
+                  {formData.hasDeposit && (
+                    <div className="space-y-2">
+                      <Label htmlFor="depositAmount">Montant de l'acompte par personne (€)</Label>
+                      <Input
+                        id="depositAmount"
+                        type="number"
+                        min={1}
+                        max={formData.price}
+                        value={formData.depositAmount}
+                        onChange={(e) => setFormData((p) => ({ ...p, depositAmount: Number(e.target.value) }))}
+                        required={formData.hasDeposit}
+                        data-testid="input-trip-deposit-amount"
+                        placeholder="ex: 500"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">

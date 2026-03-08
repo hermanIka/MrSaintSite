@@ -17,6 +17,8 @@ export const trips = pgTable("trips", {
   included: text("included").array().notNull(),
   notIncluded: text("not_included").array().notNull(),
   isFeatured: boolean("is_featured").notNull().default(false),
+  hasDeposit: boolean("has_deposit").notNull().default(false),
+  depositAmount: integer("deposit_amount").notNull().default(0),
 });
 
 export const insertTripSchema = createInsertSchema(trips).omit({

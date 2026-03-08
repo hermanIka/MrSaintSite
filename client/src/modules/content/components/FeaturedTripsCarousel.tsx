@@ -44,10 +44,15 @@ function TripCard({ trip, index, lang }: { trip: Trip; index: number; lang: stri
             </span>
           </div>
 
-          <div className="absolute top-3 right-3">
+          <div className="absolute top-3 right-3 flex flex-col items-end gap-1">
             <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary text-black text-xs font-bold shadow-lg">
               {trip.price.toLocaleString()} €
             </span>
+            {trip.hasDeposit && trip.depositAmount > 0 && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-amber-500 text-white text-xs font-medium shadow">
+                Acompte {trip.depositAmount}€
+              </span>
+            )}
           </div>
 
           <div className="absolute bottom-0 left-0 right-0 p-4">

@@ -133,6 +133,8 @@ const fr = {
     noTrips: "Aucun voyage disponible pour le moment",
     noTripsSub: "Revenez bientôt pour découvrir nos prochaines destinations",
     goldPriority: "Prioritaire Gold",
+    depositRequired: "Acompte requis",
+    depositFrom: "Acompte : {{amount}}€/pers.",
     ctaTitle: "Voyage sur mesure ?",
     ctaSubtitle: "Vous avez un projet de voyage spécifique ? Contactez-moi pour créer ensemble le voyage qui correspond parfaitement à vos attentes.",
     ctaBtn: "Consultez Maintenant",
@@ -269,6 +271,9 @@ const fr = {
     mobileNumber: "Numéro Mobile Money",
     processing: "Traitement...",
     pay: "Payer",
+    totalTrip: "Total voyage",
+    depositDueNow: "Acompte dû maintenant",
+    remainingBalance: "Solde restant après voyage",
   },
   chat: {
     title: "Assistant Mr Saint",

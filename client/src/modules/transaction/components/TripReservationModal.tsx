@@ -85,6 +85,8 @@ export function TripReservationModal({
   const formValues = watch();
   const numberOfPeople = Number(formValues.numberOfPeople) || 1;
   const totalPrice = trip.price * numberOfPeople;
+  const depositTotal = trip.hasDeposit && trip.depositAmount > 0 ? trip.depositAmount * numberOfPeople : 0;
+  const paymentAmount = depositTotal > 0 ? depositTotal : totalPrice;
 
   useEffect(() => {
     if (pendingPaymentId && pendingProvider === "maishapay" && open) {
@@ -328,15 +330,34 @@ export function TripReservationModal({
                 <Label htmlFor="notes">{t("tripModal.notes")}</Label>
                 <Textarea id="notes" data-testid="input-trip-notes" placeholder="Questions, préférences particulières..." rows={3} {...register("notes")} />
               </div>
-              <div className="bg-muted/40 rounded-lg p-3 border border-border text-sm">
+              <div className="bg-muted/40 rounded-lg p-3 border border-border text-sm space-y-1">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">{t("tripModal.unitPrice")}</span>
                   <span>{trip.price}€ {t("tripModal.perPerson")}</span>
                 </div>
-                <div className="flex justify-between font-semibold mt-1">
-                  <span>{t("tripModal.total")} ({numberOfPeople} {t("tripModal.persons")})</span>
-                  <span className="text-primary">{totalPrice}€</span>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">{t("tripModal.total")} ({numberOfPeople} {t("tripModal.persons")})</span>
+                  <span>{totalPrice}€</span>
                 </div>
+                {depositTotal > 0 && (
+                  <>
+                    <div className="border-t border-border pt-1 mt-1" />
+                    <div className="flex justify-between font-semibold">
+                      <span className="text-amber-600 dark:text-amber-400">{t("tripModal.depositDueNow")}</span>
+                      <span className="text-amber-600 dark:text-amber-400">{depositTotal}€</span>
+                    </div>
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>{t("tripModal.remainingBalance")}</span>
+                      <span>{totalPrice - depositTotal}€</span>
+                    </div>
+                  </>
+                )}
+                {depositTotal === 0 && (
+                  <div className="flex justify-between font-semibold border-t border-border pt-1">
+                    <span>{t("tripModal.totalToPay")}</span>
+                    <span className="text-primary">{totalPrice}€</span>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -353,8 +374,8 @@ export function TripReservationModal({
                   <span className="font-medium">{formValues.email}</span>
                   <span className="text-muted-foreground">{t("tripModal.personsColon")}</span>
                   <span className="font-medium">{numberOfPeople}</span>
-                  <span className="text-muted-foreground">{t("tripModal.totalToPay")}</span>
-                  <span className="font-bold text-primary text-base">{totalPrice}€</span>
+                  <span className="text-muted-foreground">{depositTotal > 0 ? t("tripModal.depositDueNow") : t("tripModal.totalToPay")}</span>
+                  <span className="font-bold text-primary text-base">{paymentAmount}€</span>
                 </div>
               </div>
 
@@ -511,7 +532,7 @@ export function TripReservationModal({
                   {isSubmitting ? (
                     <><Loader2 className="w-4 h-4 animate-spin" /> {t("tripModal.processing")}</>
                   ) : (
-                    <><Lock className="w-4 h-4" /> {t("tripModal.pay")} {totalPrice}€</>
+                    <><Lock className="w-4 h-4" /> {t("tripModal.pay")} {paymentAmount}€</>
                   )}
                 </Button>
               ) : null}

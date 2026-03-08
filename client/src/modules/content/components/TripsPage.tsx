@@ -122,6 +122,11 @@ export default function TripsPage() {
                         <div className="text-2xl font-heading font-bold text-primary">
                           {trip.price}€
                         </div>
+                        {trip.hasDeposit && trip.depositAmount > 0 && (
+                          <div className="text-xs text-amber-600 dark:text-amber-400 font-medium mt-1">
+                            {t("trips.depositFrom", { amount: trip.depositAmount })}
+                          </div>
+                        )}
                       </div>
                       <Link href={`/voyages/${trip.id}`}>
                         <Button
