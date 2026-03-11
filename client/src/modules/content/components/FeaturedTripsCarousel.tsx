@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { useTranslation } from "react-i18next";
 import type { Trip } from "@shared/schema";
 import { MapPin, Calendar, ArrowRight, Clock } from "lucide-react";
-import { formatTripDates } from "@/lib/tripUtils";
+import { formatTripDates, calculateTripDuration } from "@/lib/tripUtils";
 
 const MAX_FEATURED_TRIPS = 4;
 
@@ -37,12 +37,14 @@ function TripCard({ trip, index, lang }: { trip: Trip; index: number; lang: stri
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent" />
 
-          <div className="absolute top-3 left-3">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-sm text-white text-xs font-medium border border-white/10">
-              <Clock className="w-3 h-3" />
-              {(trip as any).duration || "7 jours"}
-            </span>
-          </div>
+          {calculateTripDuration(trip.startDate, trip.endDate, lang) && (
+            <div className="absolute top-3 left-3">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-sm text-white text-xs font-medium border border-white/10">
+                <Clock className="w-3 h-3" />
+                {calculateTripDuration(trip.startDate, trip.endDate, lang)}
+              </span>
+            </div>
+          )}
 
           <div className="absolute top-3 right-3 flex flex-col items-end gap-1">
             <span className="inline-flex items-center px-3 py-1 rounded-full bg-primary text-black text-xs font-bold shadow-lg">
