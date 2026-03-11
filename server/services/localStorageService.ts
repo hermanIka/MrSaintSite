@@ -92,8 +92,9 @@ export class LocalStorageService {
     const ext = this.getExtension(name, contentType);
     const filename = `${randomUUID()}${ext}`;
     const objectPath = `/uploads/${filename}`;
-    const appUrl = process.env.APP_URL || "http://localhost:5000";
-    const uploadURL = `${appUrl}/api/upload/direct/${filename}`;
+    // Return a relative path so the browser resolves it against the current origin
+    // This avoids issues with localhost URLs in hosted/proxied environments
+    const uploadURL = `/api/upload/direct/${filename}`;
     return { uploadURL, objectPath };
   }
 

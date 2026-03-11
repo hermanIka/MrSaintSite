@@ -5,7 +5,7 @@
  * Chaque module gère ses propres routes dans server/modules/<module>/routes.ts
  */
 
-import type { Express, Request, Response } from "express";
+import express, { type Express, type Request, type Response } from "express";
 import { createServer, type Server } from "http";
 import { registerContentRoutes } from "./modules/content";
 import { registerTransactionRoutes } from "./modules/transaction";
@@ -28,22 +28,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Direct upload endpoint (used by localStorageService signed upload URLs)
-  app.put("/api/upload/direct/:filename", (req: Request, res: Response) => {
+  // express.raw() middleware bypasses the global express.json() parser so the binary body is preserved
+  app.put("/api/upload/direct/:filename", express.raw({ type: "*/*", limit: "20mb" }), (req: Request, res: Response) => {
     const filename = req.params.filename;
     if (!filename || filename.includes("..")) {
       return res.status(400).json({ error: "Nom de fichier invalide" });
     }
     const filePath = path.join(uploadsDir, filename);
-    const chunks: Buffer[] = [];
-    req.on("data", (chunk: Buffer) => chunks.push(chunk));
-    req.on("end", () => {
-      fs.writeFileSync(filePath, Buffer.concat(chunks));
+    try {
+      const buffer: Buffer = Buffer.isBuffer(req.body) ? req.body : Buffer.from(req.body || "");
+      fs.writeFileSync(filePath, buffer);
       res.status(200).json({ success: true });
-    });
-    req.on("error", (err) => {
-      console.error("[Upload] Stream error:", err);
+    } catch (err) {
+      console.error("[Upload] Write error:", err);
       res.status(500).json({ error: "Erreur lors de l'upload" });
-    });
+    }
   });
 
   // Enregistrement des routes par module
