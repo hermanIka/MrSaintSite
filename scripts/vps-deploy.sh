@@ -2,14 +2,15 @@
 # =============================================================================
 # Script de déploiement VPS — Mr Saint (https://mrsaint.fr)
 # VPS Hostinger KVM 2 | IP: 187.77.173.51
+# Répertoire : /var/www/mr-saint | PM2 app : mr-saint
 # Usage : bash scripts/vps-deploy.sh
 # =============================================================================
 
 set -e  # Arrêter immédiatement en cas d'erreur
 
 # --- Configuration ---
-APP_DIR="/var/www/mrsaint"          # Répertoire du projet sur le VPS (adapter si besoin)
-PM2_APP_NAME="mrsaint"             # Nom de l'app dans PM2
+APP_DIR="/var/www/mr-saint"
+PM2_APP_NAME="mr-saint"
 DATABASE_URL="postgresql://mrsaint_user:matandu2026@localhost:5432/mrsaint"
 GITHUB_BRANCH="main"
 
@@ -19,52 +20,84 @@ echo "======================================================"
 
 # --- 1. Récupérer les dernières modifications depuis GitHub ---
 echo ""
-echo "[1/7] Récupération du code depuis GitHub..."
+echo "[1/8] Récupération du code depuis GitHub..."
 git pull origin "$GITHUB_BRANCH"
 echo "      OK — Code mis à jour."
 
-# --- 2. Installer les dépendances (y compris devDependencies pour le build) ---
+# --- 2. Installer les dépendances ---
 echo ""
-echo "[2/7] Installation des dépendances npm..."
+echo "[2/8] Installation des dépendances npm..."
 npm install
 echo "      OK — Dépendances installées."
 
-# --- 3. Fix vite.config.ts : supprimer les plugins Replit-only pour le build ---
-#         Ces plugins ne fonctionnent que dans l'environnement Replit.
+# --- 3. Créer le dossier uploads/ si absent (persistance des fichiers) ---
 echo ""
-echo "[3/7] Adaptation de vite.config.ts pour la production..."
+echo "[3/8] Vérification du dossier uploads/..."
+mkdir -p "$APP_DIR/uploads"
+echo "      OK — Dossier uploads/ prêt."
+
+# --- 4. Patch vite.config.ts pour le build production ---
+#   Les plugins @replit/* ne fonctionnent que dans l'environnement Replit.
+#   On écrit un vite.config.ts temporaire sans ces plugins, puis on restaure.
+echo ""
+echo "[4/8] Adaptation de vite.config.ts pour la production..."
 cp vite.config.ts vite.config.ts.bak
 
-# Supprimer le bloc conditionnel Replit (plugins cartographer et devBanner)
-sed -i '/process\.env\.REPL_ID/,/\])/d' vite.config.ts
+cat > vite.config.ts << 'VITE_EOF'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
 
-# Supprimer aussi runtimeErrorOverlay (plugin Replit)
-sed -i '/runtimeErrorOverlay/d' vite.config.ts
-sed -i '/@replit\/vite-plugin-runtime-error-modal/d' vite.config.ts
+export default defineConfig({
+  plugins: [
+    react(),
+  ],
+  resolve: {
+    alias: {
+      "@": path.resolve(import.meta.dirname, "client", "src"),
+      "@shared": path.resolve(import.meta.dirname, "shared"),
+      "@assets": path.resolve(import.meta.dirname, "attached_assets"),
+    },
+  },
+  root: path.resolve(import.meta.dirname, "client"),
+  build: {
+    outDir: path.resolve(import.meta.dirname, "dist/public"),
+    emptyOutDir: true,
+  },
+  server: {
+    fs: {
+      strict: true,
+      deny: ["**/.*"],
+    },
+  },
+});
+VITE_EOF
 
 echo "      OK — vite.config.ts adapté."
 
-# --- 4. Build de production ---
+# --- 5. Build de production ---
 echo ""
-echo "[4/7] Build de production (frontend + backend)..."
+echo "[5/8] Build de production (frontend + backend)..."
 npm run build
 echo "      OK — Build terminé."
 
-# --- 5. Restaurer vite.config.ts original ---
+# --- 6. Restaurer vite.config.ts original ---
 echo ""
-echo "[5/7] Restauration de vite.config.ts..."
+echo "[6/8] Restauration de vite.config.ts..."
 mv vite.config.ts.bak vite.config.ts
 echo "      OK — vite.config.ts restauré."
 
-# --- 6. Migration de la base de données ---
+# --- 7. Migration de la base de données (idempotente) ---
+#   Ce script ajoute les colonnes manquantes sans jamais supprimer de données.
+#   Peut être exécuté plusieurs fois sans risque.
 echo ""
-echo "[6/7] Migration de la base de données..."
+echo "[7/8] Migration de la base de données..."
 psql "$DATABASE_URL" -f scripts/vps-migrate.sql
 echo "      OK — Migration terminée."
 
-# --- 7. Redémarrage de l'application via PM2 ---
+# --- 8. Redémarrage de l'application via PM2 ---
 echo ""
-echo "[7/7] Redémarrage de l'application (PM2)..."
+echo "[8/8] Redémarrage de l'application (PM2)..."
 pm2 reload "$PM2_APP_NAME" --update-env || pm2 restart "$PM2_APP_NAME" --update-env
 echo "      OK — Application redémarrée."
 
